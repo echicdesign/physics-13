@@ -1,0 +1,2616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mech Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Trocchi&display=swap">
+<style>
+  :root{
+    --bg:#F5F7F8; --surface:#FFFFFF; --surface-2:#EDF1F2;
+    --ink:#1B2730; --ink-muted:#5B6870; --border:#D6DEE1;
+    --accent:#0E6E6B; --on-accent:#F6FBFA;
+    --input-line:#B6C1C5; --focus-ring: rgba(14,110,107,0.25);
+    --bad:#B3432E; --good:#1E7A46;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#10171B; --surface:#17222A; --surface-2:#1E2B31;
+      --ink:#E7EEF0; --ink-muted:#9FB0B6; --border:#2B3C43;
+      --accent:#4FD1C0; --on-accent:#082220;
+      --input-line:#3A4B52; --focus-ring: rgba(79,209,192,0.28);
+      --bad:#E5806A; --good:#5FCB8C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10171B; --surface:#17222A; --surface-2:#1E2B31;
+    --ink:#E7EEF0; --ink-muted:#9FB0B6; --border:#2B3C43;
+    --accent:#4FD1C0; --on-accent:#082220;
+    --input-line:#3A4B52; --focus-ring: rgba(79,209,192,0.28);
+    --bad:#E5806A; --good:#5FCB8C;
+  }
+  *{ box-sizing:border-box; }
+  body{ background:var(--bg); color:var(--ink); font-family:'Public Sans', -apple-system, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums; }
+  .wrap{ max-width:900px; margin:0 auto; padding:20px 22px 60px; }
+  h1{ font-family:'Fraunces', Georgia, serif; font-weight:700; font-size:clamp(1.4rem,2.6vw,1.9rem); line-height:1.2; margin:0; display:inline; text-wrap:balance; }
+  .eyebrow-inline{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--ink-muted); }
+  .title-row{ margin-bottom:12px; display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; }
+  .nav-link{ margin-left:auto; text-decoration:none; align-self:center; }
+  a.ghost-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem;
+    color:var(--ink-muted); background:var(--surface); border:1px solid var(--border);
+    border-radius:7px; padding:7px 12px; cursor:pointer; display:inline-block;
+  }
+  a.ghost-btn:hover{ color:var(--ink); border-color:var(--input-line); }
+  a.ghost-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .topic-select{
+    font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem;
+    padding:8px 34px 8px 14px; border-radius:9px; border:1.5px solid var(--border);
+    background:var(--surface) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%235B6870"><path d="M5.5 7.5l4.5 5 4.5-5z"/></svg>') no-repeat right 10px center;
+    background-size:16px; color:var(--ink); cursor:pointer; appearance:none; -webkit-appearance:none;
+    max-width:100%; margin-bottom:12px;
+  }
+  .topic-select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .topic-panel[hidden]{ display:none; }
+  .memorise-card{ background:var(--surface); border:1.5px solid var(--bad); border-radius:14px; padding:20px 24px; margin-bottom:14px; }
+  .memorise-card h3{ font-family:'Fraunces', serif; margin:0 0 6px; font-size:1.15rem; }
+  .memorise-formula{ font-family:'Trocchi', serif; font-size:1.3rem; font-weight:600; color:var(--accent); margin:8px 0; }
+  .memorise-note{ color:var(--ink-muted); font-size:0.92rem; line-height:1.5; margin:0; }
+
+  .toprow{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:14px; }
+  .badge{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:5px 12px; color:var(--ink-muted); }
+  .mode-toggle{ display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+  .mode-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.75rem; padding:6px 13px; background:var(--surface); color:var(--ink-muted); border:none; cursor:pointer; }
+  .mode-btn.active{ background:var(--accent); color:var(--on-accent); }
+  .mode-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  button.ghost-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--ink-muted); background:var(--surface); border:1px solid var(--border); border-radius:7px; padding:7px 12px; cursor:pointer; }
+  button.ghost-btn:hover{ color:var(--ink); border-color:var(--input-line); }
+  button.ghost-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  button.danger-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:var(--bad); background:var(--surface); border:1px solid var(--bad); border-radius:7px; padding:7px 12px; cursor:pointer; }
+  button.danger-btn:hover{ background:var(--bad); color:#fff; }
+  button.danger-btn:focus-visible{ outline:2px solid var(--bad); outline-offset:2px; }
+
+  .picture-box{ margin:0 0 20px; padding:16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; }
+  .picture-box[hidden]{ display:none; }
+  .picture-box svg, .picture-box img{ max-width:100%; height:auto; display:block; margin:0 auto; }
+  .picture-box .picture-empty{ color:var(--ink-muted); font-style:italic; font-size:0.9rem; margin:0; text-align:center; padding:20px 0; }
+
+  .story-box{ margin:0 0 20px; padding:22px 26px; background:var(--surface); border:1px solid var(--border); border-radius:12px; }
+  .story-box[hidden]{ display:none; }
+  .story-box .story-title{ font-family:'Fraunces', serif; font-weight:700; font-size:1.15rem; margin:0 0 12px; text-wrap:balance; }
+  .story-box .story-text{ font-family:'Fraunces', serif; font-size:1.02rem; line-height:1.7; color:var(--ink); margin:0 0 12px; }
+  .story-box .story-text:last-child{ margin-bottom:0; }
+
+  .layout{ display:grid; grid-template-columns:1fr; gap:18px; }
+  .stage{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; }
+  .stage canvas{ width:100%; height:140px; display:block; }
+  .stage-note{ font-size:0.82rem; color:var(--ink-muted); margin:8px 0 0; text-align:center; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:14px; }
+  .qcard{ background:var(--surface); border:1.5px solid var(--qcolor, var(--border)); border-radius:12px; padding:14px 16px; position:relative; }
+  .qcard.is-unlocked{ background:var(--qcolor); }
+  .qcard .tag{ position:absolute; top:10px; right:10px; font-family:'IBM Plex Mono', monospace; font-size:0.65rem; font-weight:700; letter-spacing:0.05em; padding:2px 8px; border-radius:999px; background:var(--surface-2); color:var(--ink-muted); }
+  .qcard .tag.unlocked{ background:rgba(255,255,255,0.25); color:#fff; }
+  .qcard-title{ font-family:'IBM Plex Mono', monospace; font-size:0.95rem; font-weight:700; margin:0 0 8px; color:var(--ink); }
+  .qcard.is-unlocked .qcard-title{ color:#fff; }
+  .clue{ font-size:0.88rem; line-height:1.5; margin:0 0 12px; min-height:2.6em; }
+  .qcard.is-unlocked .clue{ color:rgba(255,255,255,0.92); }
+  .quiz-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
+  .quiz-row label{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-muted); }
+  .qcard.is-unlocked .quiz-row label{ color:rgba(255,255,255,0.75); }
+  .quiz-row input, .quiz-row select{ font-family:'Trocchi', serif; font-size:0.92rem; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:10px 12px; }
+  .quiz-row input:focus, .quiz-row select:focus{ outline:none; border-color:var(--qcolor, var(--accent)); box-shadow:0 0 0 3px var(--focus-ring); }
+  .quiz-row input.ok, .quiz-row select.ok{ border-color:var(--good); }
+  .quiz-row input.bad, .quiz-row select.bad{ border-color:var(--bad); }
+  .greek-wrap{ position:relative; display:inline-block; margin-top:8px; }
+  .greek-trigger{ font-family:'Public Sans', sans-serif; font-size:0.78rem; font-style:italic; background:none; border:none; border-bottom:1px dotted var(--ink-muted); padding:2px 0; cursor:pointer; color:var(--ink-muted); }
+  .qcard.is-unlocked .greek-trigger{ color:rgba(255,255,255,0.75); }
+  .greek-trigger:hover{ color:var(--qcolor); border-bottom-color:var(--qcolor); }
+  .greek-popup{ position:absolute; top:100%; left:0; margin-top:6px; z-index:20; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px; display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; box-shadow:0 10px 28px rgba(0,0,0,0.25); min-width:230px; }
+  .greek-popup[hidden]{ display:none; }
+  .greek-opt{ display:flex; flex-direction:column; align-items:center; gap:2px; font-family:'IBM Plex Mono', monospace; font-size:1.15rem; color:var(--ink); background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:8px 4px; cursor:pointer; }
+  .greek-opt span{ font-family:'Public Sans', sans-serif; font-size:0.62rem; color:var(--ink-muted); font-style:italic; }
+  .greek-opt:hover{ border-color:var(--qcolor); }
+  .quiz-actions{ display:flex; align-items:center; gap:10px; margin-top:2px; flex-wrap:wrap; }
+  .check-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; font-weight:600; color:var(--on-accent); background:var(--qcolor, var(--accent)); border:none; border-radius:7px; padding:7px 14px; cursor:pointer; }
+  .qcard.is-unlocked .check-btn{ background:rgba(255,255,255,0.3); }
+  .feedback{ font-size:0.78rem; color:var(--ink-muted); }
+  .qcard.is-unlocked .feedback{ color:rgba(255,255,255,0.85); }
+  .unlocked-panel[hidden]{ display:none; }
+  .live-row{ display:flex; align-items:baseline; gap:8px; margin-bottom:6px; }
+  .derived-value{ font-family:'Trocchi', serif; font-size:1.3rem; font-weight:700; color:#fff; }
+  .qnote{ font-size:0.8rem; color:rgba(255,255,255,0.82); font-style:italic; margin:4px 0 0; }
+  .qslider{ width:100%; margin:6px 0; accent-color:#fff; }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-box{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:30px 32px; max-width:420px; text-align:center; box-shadow:0 16px 50px rgba(0,0,0,0.3); animation: celebrate-pop 0.55s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes celebrate-pop{ 0%{ transform:scale(0.3) rotate(-20deg); opacity:0; } 60%{ transform:scale(1.08) rotate(8deg); opacity:1; } 80%{ transform:scale(0.96) rotate(-3deg); } 100%{ transform:scale(1) rotate(0deg); } }
+  .modal-eyebrow{ font-family:'IBM Plex Mono', monospace; font-size:0.85rem; color:var(--ink-muted); margin:0 0 6px; }
+  .modal-title{ font-family:'Fraunces', serif; font-weight:700; font-size:1.4rem; margin:0 0 12px; }
+  .modal-summary{ color:var(--ink-muted); line-height:1.55; margin:0 0 22px; }
+  .next-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.9rem; font-weight:600; color:var(--on-accent); background:var(--accent); border:none; border-radius:9px; padding:11px 26px; cursor:pointer; }
+  .next-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .modal-box{ animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-row">
+    <h1>Mech Lab</h1><span class="eyebrow-inline">AS91524 &middot; Mechanical Systems &middot; identify a quantity to unlock it</span>
+    <a class="ghost-btn nav-link" href="../">&#127968; All tools</a>
+  </div>
+
+  <div class="toprow">
+    <button class="ghost-btn danger-btn" id="newStudentBtn" type="button">New student &mdash; clear everything</button>
+  </div>
+
+  <select id="topicSelect" class="topic-select">
+    <option value="linear">Linear Mechanics</option>
+    <option value="circular">Circular Motion</option>
+    <option value="angular">Angular Mechanics</option>
+    <option value="shm">SHM</option>
+    <option value="memorise">Memorise (not on formula sheet)</option>
+  </select>
+
+  <section class="topic-panel" data-topic="linear">
+    <div class="toprow">
+      <span class="badge" id="progressBadge-lin"><b>0</b> / 12 done</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer, one field still given free. Expert: type everything, nothing given.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="playBtn-lin" type="button">Pause</button>
+      <button class="ghost-btn" id="resetBtn-lin" type="button">Next set</button>
+      <button class="ghost-btn show-pic-btn" type="button">Show picture</button>
+      <button class="ghost-btn show-story-btn" type="button">Show story</button>
+    </div>
+
+    <div class="picture-box" hidden>
+      <p class="picture-empty">No diagram uploaded yet for Linear Mechanics.</p>
+    </div>
+
+    <div class="story-box" hidden>
+      <h3 class="story-title">The Ledger of Balance and the Twinbell Toll</h3>
+      <p class="story-text">In the Counting House of Fulcrum Keep, two iron weights sit on a long balance-beam. The heavier weight, <strong>Anchor's Burden</strong> <em>(m1)</em>, rests at one marked position &mdash; its <strong>Anchor's Post</strong> <em>(x1)</em> &mdash; while the lighter weight, <strong>Second Burden</strong> <em>(m2)</em>, rests at its own marked spot, the <strong>Second Post</strong> <em>(x2)</em>.</p>
+      <p class="story-text">Somewhere between the two, weighted toward whichever burden is heavier, sits the beam's true balance point &mdash; the <strong>Fulcrum's Heart</strong> <em>(xCOM)</em>. Move Anchor's Burden further from Second Burden's post, or make it heavier still, and the Fulcrum's Heart creeps toward it.</p>
+      <p class="story-text">Beyond the ledger hall, two carts race toward the same crossing. Each rolls in at its own <strong>Approach Speed</strong> <em>(u1, u2)</em> &mdash; how fast Anchor's cart and Second's cart are moving before they meet. When they collide and lock together, both carts lurch onward as one at a single shared <strong>Afterspeed</strong> <em>(v)</em> &mdash; slower than either approached alone, since the heavier cart drags the lighter one down to its pace, and the lighter one drags the heavier one up.</p>
+      <p class="story-text">Whatever a single cart carries while rolling &mdash; its mass moving at its speed &mdash; is its <strong>Rolling Weight</strong> <em>(p)</em>. A sudden shove from Fulcrum Keep's ram changes a cart's Rolling Weight by some amount &mdash; the <strong>Toll Shift</strong> <em>(&Delta;p)</em> &mdash; delivered over some <strong>Toll's Ring</strong> <em>(&Delta;t)</em>, the time the ram is actually in contact. The harder the ram pushes &mdash; the <strong>Ram's Push</strong> <em>(F)</em> &mdash; the bigger the Toll Shift for the same Toll's Ring; the longer the Toll's Ring, the gentler the same Ram's Push can be for the same Toll Shift.</p>
+    </div>
+
+    <div class="layout">
+      <div class="stage">
+        <canvas id="waveCanvas-lin" role="img" aria-label="Two masses on a beam with the centre of mass marked between them"></canvas>
+      </div>
+      <div class="grid" id="cardsGrid-lin"></div>
+    </div>
+  </section>
+
+  <section class="topic-panel" data-topic="circular" hidden>
+    <div class="toprow">
+      <span class="badge" id="progressBadge-cir"><b>0</b> / 7 done</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer, one field still given free. Expert: type everything, nothing given.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="playBtn-cir" type="button">Pause</button>
+      <button class="ghost-btn" id="resetBtn-cir" type="button">Next set</button>
+      <button class="ghost-btn show-pic-btn" type="button">Show picture</button>
+      <button class="ghost-btn show-story-btn" type="button">Show story</button>
+    </div>
+
+    <div class="picture-box" hidden>
+      <p class="picture-empty">No diagram uploaded yet for Circular Motion.</p>
+    </div>
+
+    <div class="story-box" hidden>
+      <h3 class="story-title">The Ring-Bound Sentinel and the Twin Worlds</h3>
+      <p class="story-text">In the Ringworks of Wandering Hold, a sentinel golem of fixed weight — the <strong>Bound Mass</strong> <em>(m)</em> — circles endlessly around the Hold's central spire, never straying inward or outward, held forever on its path.</p>
+      <p class="story-text">The golem sweeps around its circle at a steady pace — the <strong>Circling Speed</strong> <em>(v)</em> — never slowing, never rushing, forever tracing the same loop.</p>
+      <p class="story-text">From the spire's heart to the golem's own path lies a fixed distance — the <strong>Tether's Reach</strong> <em>(r)</em> — the radius of its endless circuit.</p>
+      <p class="story-text">Binding the golem inward, stopping it flying off into the wild beyond, is an unseen pull toward the spire — the <strong>Sentinel's Chain</strong> <em>(Fc)</em> — invisible, but strong enough to hold a circling weight on its course.</p>
+      <p class="story-text">The spire itself has its own vast bulk — the <strong>Spire's Weight</strong> <em>(M)</em> — far greater than the golem's own, its gravity alone enough to command an orbit.</p>
+      <p class="story-text">Every gravity-binding in the Hold, from the smallest pebble to the mightiest spire, obeys the same fixed universal number woven into the world's making — the <strong>Warden's Constant</strong> <em>(G)</em> — unchanging, whatever the scale.</p>
+      <p class="story-text">And the true pull holding golem to spire, reckoned from the Warden's Constant, the Spire's Weight, the Bound Mass and the Tether's Reach, is the <strong>Spire's Grasp</strong> <em>(Fg)</em> — the very same gravity that binds a falling apple, just far, far stronger here.</p>
+    </div>
+
+    <div class="layout">
+      <div class="stage">
+        <canvas id="waveCanvas-cir" role="img" aria-label="A mass orbiting a central point, held in by a centripetal force"></canvas>
+      </div>
+      <div class="grid" id="cardsGrid-cir"></div>
+    </div>
+  </section>
+
+  <section class="topic-panel" data-topic="angular" hidden>
+    <div class="toprow">
+      <span class="badge" id="progressBadge-ang"><b>0</b> / 7 done</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer, one field still given free. Expert: type everything, nothing given.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="playBtn-ang" type="button">Pause</button>
+      <button class="ghost-btn" id="resetBtn-ang" type="button">Next set</button>
+      <button class="ghost-btn show-pic-btn" type="button">Show picture</button>
+      <button class="ghost-btn show-story-btn" type="button">Show story</button>
+    </div>
+
+    <div class="picture-box" hidden>
+      <p class="picture-empty">No diagram uploaded yet for Angular Mechanics.</p>
+    </div>
+
+    <div class="story-box" hidden>
+      <h3 class="story-title">The Great Millwheel of Cogturn Hollow</h3>
+      <p class="story-text">Deep in Cogturn Hollow turns a vast stone millwheel. As it spins, it sweeps through an angle — the <strong>Swept Angle</strong> <em>(&Delta;&theta;)</em> — over some stretch of time, the <strong>Turning Span</strong> <em>(&Delta;t)</em>, giving the wheel its steady spinning pace, the <strong>Turning Rate</strong> <em>(&omega;)</em>.</p>
+      <p class="story-text">The millwheel doesn't always spin at the same rate — sometimes the miller lets it speed up or slow down, a change measured by the <strong>Turning Surge</strong> <em>(&alpha;)</em>.</p>
+      <p class="story-text">How stubbornly the wheel resists any change to its spin — heavier at the rim, harder to speed up or slow — is its <strong>Turning Stubbornness</strong> <em>(I)</em>. A wheel built with its mass spread wide at the rim resists far more than one built light and close to the axle.</p>
+      <p class="story-text">To overcome that stubbornness and actually change the wheel's spin, the miller must apply a twist at the axle — the <strong>Miller's Twist</strong> <em>(&tau;)</em> — greater than the wheel's own resistance, or nothing changes at all.</p>
+      <p class="story-text">And once spinning, the wheel carries a certain rotational momentum of its own — the <strong>Millwheel's Whirl</strong> <em>(L)</em> — built from how stubborn it is to change and how fast it's already turning. Stop the miller's twist entirely, and the Millwheel's Whirl carries the wheel on turning, undiminished, forever.</p>
+    </div>
+
+    <div class="layout">
+      <div class="stage">
+        <canvas id="waveCanvas-ang" role="img" aria-label="A wheel spinning around a central axle"></canvas>
+      </div>
+      <div class="grid" id="cardsGrid-ang"></div>
+    </div>
+  </section>
+
+  <section class="topic-panel" data-topic="shm" hidden>
+    <div class="toprow">
+      <span class="badge" id="progressBadge-shm"><b>0</b> / 6 done</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer, one field still given free. Expert: type everything, nothing given.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="playBtn-shm" type="button">Pause</button>
+      <button class="ghost-btn" id="resetBtn-shm" type="button">Next set</button>
+      <button class="ghost-btn show-pic-btn" type="button">Show picture</button>
+      <button class="ghost-btn show-story-btn" type="button">Show story</button>
+    </div>
+
+    <div class="picture-box" hidden>
+      <p class="picture-empty">No diagram uploaded yet for SHM.</p>
+    </div>
+
+    <div class="story-box" hidden>
+      <h3 class="story-title">The Coilwrought Bellows of Tidewell Vault</h3>
+      <p class="story-text">In Tidewell Vault hangs a great iron bellows from a coiled spring. How the bellows bounces depends on two things: its own heft, the <strong>Bellows' Burden</strong> <em>(m)</em>, and the coil's own stubborn stiffness, the <strong>Coil's Grip</strong> <em>(k)</em> — a stiffer coil or a lighter bellows means a quicker bounce.</p>
+      <p class="story-text">Each full bounce — out, back, and returning to where it started, moving the same way — takes some measured stretch of time, the <strong>Bellows' Round</strong> <em>(T)</em>.</p>
+      <p class="story-text">At any moment the bellows sits some distance from its resting hang-point, the <strong>Sway</strong> <em>(y)</em> — swinging first one way, then the other, through that resting point and back again.</p>
+      <p class="story-text">The greater the Sway, the harder the coil hauls the bellows back toward its resting point — a pull called the <strong>Coil's Recall</strong> <em>(F)</em> — always aimed back toward rest, never away from it.</p>
+      <p class="story-text">Stretch or compress the coil and it stores away a hidden reserve, ready to be spent — the <strong>Coil's Hoard</strong> <em>(Ep)</em> — greatest when the Sway is greatest, and spent entirely into motion as the bellows swings back through its resting point.</p>
+    </div>
+
+    <div class="layout">
+      <div class="stage">
+        <canvas id="waveCanvas-shm" role="img" aria-label="A mass bouncing up and down on a coiled spring"></canvas>
+      </div>
+      <div class="grid" id="cardsGrid-shm"></div>
+    </div>
+  </section>
+
+  <section class="topic-panel" data-topic="memorise" hidden>
+    <p style="font-size:0.85rem; font-style:italic; color:var(--ink-muted); margin:0 0 16px;">These formulae are NOT printed on the real AS91524 Resource Booklet &mdash; unlike every other formula in this app, you have to know these cold, from memory, on exam day.</p>
+    <div class="memorise-card">
+      <h3>Conservation of momentum</h3>
+      <p class="memorise-formula">m&#8321;u&#8321; + m&#8322;u&#8322; = (m&#8321;+m&#8322;)v</p>
+      <p class="memorise-note">Used for collisions where two objects stick together (perfectly inelastic). Built from p&nbsp;=&nbsp;mv (which IS on the sheet) applied to each object, plus the law that total momentum before a collision equals total momentum after &mdash; that law itself isn't printed anywhere, you're expected to know it.</p>
+    </div>
+  </section>
+</div>
+
+<div class="modal-overlay" id="celebrateModal" hidden>
+  <div class="modal-box" role="status" aria-live="polite">
+    <p class="modal-eyebrow" id="celebrateSymbol"></p>
+    <h2 class="modal-title" id="celebrateTitle">Wahoo &mdash; well done!</h2>
+    <p class="modal-summary" id="celebrateSummary"></p>
+  </div>
+</div>
+
+<div class="modal-overlay" id="allDoneModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="allDoneTitle">
+    <h2 class="modal-title" id="allDoneTitle">You've mastered Linear Mechanics!</h2>
+    <p class="modal-summary" id="allDoneSummary"></p>
+    <button class="next-btn" id="allDoneBtn" type="button"></button>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var topicSelect = document.getElementById('topicSelect');
+  topicSelect.addEventListener('change', function(){
+    var id = topicSelect.value;
+    document.querySelectorAll('.topic-panel').forEach(function(p){
+      p.hidden = (p.getAttribute('data-topic') !== id);
+    });
+  });
+
+  document.querySelectorAll('.show-pic-btn').forEach(function(btn){
+    var box = btn.closest('.toprow').parentElement.querySelector('.picture-box');
+    btn.addEventListener('click', function(){
+      box.hidden = !box.hidden;
+      btn.textContent = box.hidden ? 'Show picture' : 'Hide picture';
+    });
+  });
+
+  document.querySelectorAll('.show-story-btn').forEach(function(btn){
+    var box = btn.closest('.toprow').parentElement.querySelector('.story-box');
+    btn.addEventListener('click', function(){
+      box.hidden = !box.hidden;
+      btn.textContent = box.hidden ? 'Show story' : 'Hide story';
+    });
+  });
+
+  document.getElementById('newStudentBtn').addEventListener('click', function(){
+    (window.mechLabTopics || []).forEach(function(fn){ fn(); });
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var panel = document.querySelector('.topic-panel[data-topic="linear"]');
+
+  function isDarkMode(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  // Greek letters a student will actually meet across NCEA L3 Physics
+  // mechanics topics -- not exhaustive, just the ones actually used here.
+  var GREEK_LETTERS = [
+    { ch:'Δ', name:'delta' },
+    { ch:'θ', name:'theta' },
+    { ch:'ω', name:'omega' },
+    { ch:'α', name:'alpha' },
+    { ch:'τ', name:'tau' }
+  ];
+  var SYMBOL_PRONOUNCE = {};
+  GREEK_LETTERS.forEach(function(g){ SYMBOL_PRONOUNCE[g.ch] = g.name; });
+  function symbolOptionLabel(s){
+    return SYMBOL_PRONOUNCE[s] ? (s + ' (' + SYMBOL_PRONOUNCE[s] + ')') : s;
+  }
+
+  var QUANTITIES = [
+    { key:'m1', order:1, name:'Mass 1', symbol:'m1', unit:'kg',
+      nameAliases:['mass 1','mass one','first mass'], symbolAliases:['m1'], unitAliases:['kg','kilogram','kilograms'],
+      clues:[
+        "The mass of the first object in a two-body system — the one named first in the problem.",
+        "A 1.00×10² kg object collides with a stationary 3.00×10² kg object. Taking the first-named object as object 1, what quantity is 1.00×10² kg?",
+        "Two pool balls, 0.146 kg and 0.165 kg, collide on the table. What quantity is 0.146 kg, for the first ball?",
+        "A dwarven forge-cart, heavy with ore, rolls toward a lighter elven cart. Taking the forge-cart (named first) as object 1, what quantity describes how much it carries?",
+        "For the first object, this quantity never changes during a collision, no matter how the object moves afterward."
+      ],
+      definition:"Mass 1 is the mass of the first object in a two-body system. It is measured in kilograms.",
+      kind:'slider', min:1, max:10, step:0.5, def:3,
+      colorLight:'#2B6CB0', colorDark:'#7FB2E8', fill:'#2B6CB0' },
+    { key:'m2', order:2, name:'Mass 2', symbol:'m2', unit:'kg',
+      nameAliases:['mass 2','mass two','second mass'], symbolAliases:['m2'], unitAliases:['kg','kilogram','kilograms'],
+      clues:[
+        "The mass of the second object in a two-body system.",
+        "A 1.00×10² kg object collides with a stationary 3.00×10² kg object. Taking the second-named object as object 2, what quantity is 3.00×10² kg?",
+        "Two pool balls, 0.146 kg and 0.165 kg, collide on the table. What quantity is 0.165 kg, for the second ball?",
+        "A dwarven forge-cart (object 1) rolls toward and strikes a lighter elven cart. Taking the elven cart as object 2, what quantity describes how much it carries?",
+        "A collision always involves this quantity for the second object, alongside the first object's own mass."
+      ],
+      definition:"Mass 2 is the mass of the second object in a two-body system. It is measured in kilograms.",
+      kind:'slider', min:1, max:10, step:0.5, def:5,
+      colorLight:'#B0562B', colorDark:'#E8A67F', fill:'#B0562B' },
+    { key:'x1', order:3, name:'Position 1', symbol:'x1', unit:'m',
+      nameAliases:['position 1','position one','first position','distance 1'], symbolAliases:['x1'], unitAliases:['m','metre','metres','meter','meters'],
+      clues:[
+        "Where the first object sits, measured from some fixed reference point.",
+        "A 4.0 kg mass sits 2.0 m from a reference wall, on a long balance beam, with a second mass further along. What quantity is 2.0 m, for the first mass?",
+        "To find a system's centre of mass, you first need to know where each object actually sits. What quantity is that, for the first object?",
+        "A first stone gargoyle perches 3.0 m along a castle's ramparts, measured from the gatehouse, with a second gargoyle further along. What quantity is 3.0 m, for the first gargoyle?",
+        "For the first object, this quantity, together with its mass, is one of the two facts you need to locate the centre of mass."
+      ],
+      definition:"Position 1 is where the first object sits, measured from a fixed reference point. It is measured in metres.",
+      kind:'slider', min:0, max:10, step:0.5, def:1,
+      colorLight:'#1B8A6B', colorDark:'#5FD1AC', fill:'#1B8A6B' },
+    { key:'x2', order:4, name:'Position 2', symbol:'x2', unit:'m',
+      nameAliases:['position 2','position two','second position','distance 2'], symbolAliases:['x2'], unitAliases:['m','metre','metres','meter','meters'],
+      clues:[
+        "Where the second object sits, measured from the same fixed reference point as the first.",
+        "A second, lighter mass sits 6.0 m from the same reference wall as the first. What quantity is 6.0 m?",
+        "A second gargoyle perches 9.0 m along the same ramparts, measured from the same gatehouse. What quantity is 9.0 m?",
+        "Increasing this quantity for the second object, while the first stays put, spreads the two masses further apart.",
+        "The second object's position must be measured from the same starting point as the first object's for a centre-of-mass calculation to work."
+      ],
+      definition:"Position 2 is where the second object sits, measured from the same reference point as the first. It is measured in metres.",
+      kind:'slider', min:0, max:10, step:0.5, def:7,
+      colorLight:'#8A5A1B', colorDark:'#D1A05F', fill:'#8A5A1B' },
+    { key:'xCOM', order:5, name:'Centre of mass position', symbol:'xCOM', unit:'m',
+      nameAliases:['centre of mass position','centre of mass','center of mass','com position'], symbolAliases:['xcom','xcm'], unitAliases:['m','metre','metres','meter','meters'],
+      clues:[
+        "The single point where a system's mass balances perfectly — closer to whichever object is heavier.",
+        "Two masses on a seesaw balance exactly when it pivots at one particular point. What quantity is that point?",
+        "A skater's arms and legs all pull toward one point when they curl into a spin. What quantity is that point, for their whole body?",
+        "A dwarven forge-cart and a lighter elven cart are joined by a long pole; the pair balances closer to the dwarven cart's end. What quantity sits closer to the heavier cart?",
+        "This quantity is calculated using xCOM = (m1x1 + m2x2) / (m1 + m2) — it isn't given directly, only worked out from the masses and positions."
+      ],
+      definition:"Centre of mass position is the single balance point of a system's mass. It is measured in metres.",
+      note:"xCOM isn't independent — it's calculated from m1, x1, m2 and x2. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return (state.m1*state.x1 + state.m2*state.x2) / (state.m1 + state.m2); },
+      colorLight:'#6B2BB0', colorDark:'#B27FE8', fill:'#6B2BB0' },
+    { key:'u1', order:6, name:'Velocity 1', symbol:'u1', unit:'m/s',
+      nameAliases:['velocity 1','initial velocity 1','speed 1','first velocity'], symbolAliases:['u1'], unitAliases:['m/s','ms','m per s','metrespersecond','metrepersecond','meterspersecond'],
+      clues:[
+        "How fast the first object is moving, before any collision happens.",
+        "A 1.00×10² kg object moving at 5.00×10² m/s collides with a stationary object. Taking the moving object as object 1, what quantity is 5.00×10² m/s?",
+        "A rollerblader (object 1) moving at a steady pace collides with a friend at a right angle. What quantity describes the rollerblader's speed just before impact?",
+        "A dwarven forge-cart (object 1) rolls toward a lighter elven cart at a steady pace before they meet. What quantity is the forge-cart's pace?",
+        "For the first object, this quantity, together with its mass, tells you how much it is carrying — its momentum — before any collision."
+      ],
+      definition:"Velocity 1 is how fast the first object is moving before a collision. It is measured in metres per second.",
+      kind:'slider', min:-10, max:20, step:1, def:8,
+      colorLight:'#B08A2B', colorDark:'#E8CC7F', fill:'#B08A2B' },
+    { key:'u2', order:7, name:'Velocity 2', symbol:'u2', unit:'m/s',
+      nameAliases:['velocity 2','initial velocity 2','speed 2','second velocity'], symbolAliases:['u2'], unitAliases:['m/s','ms','m per s','metrespersecond','metrepersecond','meterspersecond'],
+      clues:[
+        "How fast the second object is moving, before any collision happens — zero if it starts at rest.",
+        "A moving object collides with a stationary 3.00×10² kg object. Taking the stationary object as object 2, what quantity is 0 m/s?",
+        "A rollerblader (object 1) collides at a right angle with a friend (object 2) who is standing still. What quantity is zero, for the friend?",
+        "A lighter elven cart (object 2) sits motionless before a heavier cart (object 1) rolls into it. What quantity is zero, for the elven cart?",
+        "For the second object, this quantity doesn't have to be zero — both objects could be moving toward or away from each other before they meet."
+      ],
+      definition:"Velocity 2 is how fast the second object is moving before a collision. It is measured in metres per second.",
+      kind:'slider', min:-10, max:20, step:1, def:0,
+      colorLight:'#5A2BB0', colorDark:'#A07FE8', fill:'#5A2BB0' },
+    { key:'v', order:8, name:'Final velocity', symbol:'v', unit:'m/s',
+      nameAliases:['final velocity','common velocity','velocity after collision','combined velocity'], symbolAliases:['v'], unitAliases:['m/s','ms','m per s','metrespersecond','metrepersecond','meterspersecond'],
+      clues:[
+        "The single shared speed both objects move at together, once they collide and stick.",
+        "Two carts lock together on collision and lurch onward as one. What quantity describes their shared speed afterward?",
+        "A rollerblader and her friend tangle together after colliding and slide off as one combined mass. What quantity is their shared speed?",
+        "This quantity is always somewhere between the two objects' original speeds — never faster than the quicker one, never slower than the slower one.",
+        "Momentum conservation (m1u1 + m2u2 = (m1+m2)v) is used to calculate this quantity — it isn't measured directly."
+      ],
+      definition:"Final velocity is the single shared speed of both objects after a perfectly inelastic collision. It is measured in metres per second.",
+      note:"v isn't independent — it's calculated from m1, u1, m2 and u2. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return (state.m1*state.u1 + state.m2*state.u2) / (state.m1 + state.m2); },
+      colorLight:'#B02B6C', colorDark:'#E87FB2', fill:'#B02B6C' },
+    { key:'p', order:9, name:'Momentum', symbol:'p', unit:'kg m/s',
+      nameAliases:['momentum'], symbolAliases:['p'], unitAliases:['kg m/s','kgm/s','kilogram metres per second','kgms-1'],
+      clues:[
+        "How much a single moving object is carrying — its mass multiplied by its velocity.",
+        "A 1.00×10² kg object moving at 5.00×10² m/s carries a certain amount of this quantity before it collides.",
+        "A heavier, faster object carries more of this quantity than a lighter, slower one.",
+        "A dwarven forge-cart rolling at speed, loaded with ore, carries a large amount of this quantity — more than the same cart standing still.",
+        "This quantity is calculated using p = m1 × u1 — it isn't measured directly, only worked out from mass and velocity."
+      ],
+      definition:"Momentum is how much a moving object is carrying — its mass times its velocity. It is measured in kilogram metres per second.",
+      note:"p isn't independent — it's calculated from m1 and u1. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return state.m1 * state.u1; },
+      colorLight:'#2BB05A', colorDark:'#7FE8A6', fill:'#2BB05A' },
+    { key:'dt', order:10, name:'Time interval', symbol:'Δt', unit:'s', symbolIsGreek:true,
+      nameAliases:['time interval','change in time','time taken','duration'], symbolAliases:['δt','deltat','dt'], unitAliases:['s','sec','second','seconds'],
+      clues:[
+        "How long a force is actually in contact with an object — the duration of a push, a kick, or an impact.",
+        "A bat is in contact with a ball for only 0.010 s during a hit. What quantity is 0.010 s?",
+        "A ram at Fulcrum Keep pushes a cart for exactly 0.50 s before letting go. What quantity is 0.50 s?",
+        "Stretching out a collision over a longer version of this quantity — like a padded crumple zone — means less force is needed for the same change in momentum.",
+        "This quantity is always positive, and always appears on the bottom of F = Δp / Δt."
+      ],
+      definition:"Time interval is how long a force is in contact with an object. It is measured in seconds.",
+      kind:'slider', min:0.01, max:2, step:0.01, def:0.2,
+      colorLight:'#2B4FB0', colorDark:'#7FA0E8', fill:'#2B4FB0' },
+    { key:'dp', order:11, name:'Change in momentum', symbol:'Δp', unit:'kg m/s', symbolIsGreek:true,
+      nameAliases:['change in momentum','momentum change','impulse'], symbolAliases:['δp','deltap','dp'], unitAliases:['kg m/s','kgm/s','kilogram metres per second','kgms-1'],
+      clues:[
+        "How much an object's momentum changes because of a force acting on it.",
+        "A tennis ball's momentum changes by 2.4 kg m/s the instant it's struck by a racquet. What quantity is 2.4 kg m/s?",
+        "A cart rolling toward Fulcrum Keep's ram has its momentum shifted by a fixed amount every time the ram pushes. What quantity is that shift?",
+        "This quantity equals the force applied multiplied by how long that force acts for — F × Δt.",
+        "A bigger push, or a longer-lasting push, both increase this quantity for the same object."
+      ],
+      definition:"Change in momentum is how much an object's momentum changes because of a force. It is measured in kilogram metres per second.",
+      kind:'slider', min:-50, max:50, step:1, def:20,
+      colorLight:'#7A6B2B', colorDark:'#C9BF7F', fill:'#7A6B2B' },
+    { key:'F', order:12, name:'Force', symbol:'F', unit:'N',
+      nameAliases:['force'], symbolAliases:['f'], unitAliases:['n','newton','newtons'],
+      clues:[
+        "A push or pull strong enough to change an object's momentum.",
+        "A racquet's strings push a tennis ball hard enough to change its momentum by 2.4 kg m/s in just 0.010 s. What quantity describes that push?",
+        "Fulcrum Keep's ram exerts this quantity on a cart, changing its momentum over the time the ram is in contact.",
+        "This quantity is calculated using F = Δp ÷ Δt — the same change in momentum spread over a shorter time needs a bigger version of this quantity.",
+        "A padded crumple zone reduces this quantity in a crash by stretching out the time the collision takes."
+      ],
+      definition:"Force is a push or pull that changes an object's momentum. It is measured in newtons.",
+      note:"F isn't independent — it's calculated from Δp and Δt. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return state.dp / state.dt; },
+      colorLight:'#B02B2B', colorDark:'#E87F7F', fill:'#B02B2B' }
+  ];
+
+  var FIELD_ORDER = ['name','symbol','unit'];
+  var FIELD_LABELS = { name:'Name', symbol:'Symbol', unit:'Unit of measurement' };
+  var ALL_SYMBOLS = QUANTITIES.map(function(x){ return x.symbol; });
+  var ALL_NAMES = QUANTITIES.map(function(x){ return x.name; });
+  var ALL_UNITS_UNIQUE = (function(){
+    var seen = {}, out = [];
+    QUANTITIES.forEach(function(x){ if(!seen[x.unit]){ seen[x.unit]=true; out.push(x.unit); } });
+    return out;
+  })();
+  var cardGiven = {};
+  var qByKey = {};
+  QUANTITIES.forEach(function(x){ qByKey[x.key] = x; });
+
+  var waveState = { m1:3, m2:5, x1:1, x2:7, u1:8, u2:0, dt:0.2, dp:20 };
+  var unlocked = { m1:false, m2:false, x1:false, x2:false, xCOM:false, u1:false, u2:false, v:false, p:false, dt:false, dp:false, F:false };
+  var FIELD_MODE = 'learner';
+  var playing = true, userPaused = false, autoPaused = false;
+  var seenClues = { learner:{}, confident:{}, expert:{} };
+  var fullyCycled = { learner:{}, confident:{}, expert:{} };
+  var currentClueIndex = {};
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+  function normalize(s){
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δ]/gi,'');
+  }
+
+  function saveKey(){ return 'mechLab_linear_v1'; }
+  function save(){
+    try{
+      localStorage.setItem(saveKey(), JSON.stringify({ unlocked:unlocked, seenClues:seenClues, fullyCycled:fullyCycled, FIELD_MODE:FIELD_MODE, waveState:waveState }));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      var raw = localStorage.getItem(saveKey());
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      if(data.unlocked) unlocked = data.unlocked;
+      if(data.seenClues) seenClues = data.seenClues;
+      if(data.fullyCycled) fullyCycled = data.fullyCycled;
+      if(data.FIELD_MODE) FIELD_MODE = data.FIELD_MODE;
+      if(data.waveState) waveState = data.waveState;
+    }catch(e){}
+  }
+  function ensureClueIndices(){
+    QUANTITIES.forEach(function(q){ if(!(q.key in currentClueIndex)) currentClueIndex[q.key] = 0; });
+  }
+  load();
+  ensureClueIndices();
+
+  var grid = panel.querySelector('.grid');
+
+  function fieldIsDropdown(f){ return FIELD_MODE === 'learner'; }
+  function fieldPool(f){
+    if(f === 'symbol') return ALL_SYMBOLS;
+    if(f === 'name') return ALL_NAMES;
+    return ALL_UNITS_UNIQUE;
+  }
+  function buildFieldHtml(f, q){
+    if(fieldIsDropdown(f)){
+      var opts = shuffle(fieldPool(f));
+      var optHtml = '<option value="">— choose —</option>';
+      opts.forEach(function(s){
+        var label = f === 'symbol' ? symbolOptionLabel(s) : s;
+        optHtml += '<option value="'+s+'">'+label+'</option>';
+      });
+      return '<label>'+FIELD_LABELS[f]+'<select data-field="'+f+'">'+optHtml+'</select></label>';
+    }
+    var helper = '';
+    if(f === 'symbol'){
+      var optsHtml = GREEK_LETTERS.map(function(g){
+        return '<button type="button" class="greek-opt" data-char="'+g.ch+'">'+g.ch+'<span>'+g.name+'</span></button>';
+      }).join('');
+      helper =
+        '<div class="greek-wrap">' +
+          '<button type="button" class="greek-trigger">Greek ▾</button>' +
+          '<div class="greek-popup" hidden>'+optsHtml+'</div>' +
+        '</div>';
+    }
+    return '<label>'+FIELD_LABELS[f]+'<input data-field="'+f+'" autocomplete="off" spellcheck="false">'+helper+'</label>';
+  }
+  function closeAllGreekPopups(){
+    document.querySelectorAll('.greek-popup').forEach(function(p){ p.hidden = true; });
+  }
+  document.addEventListener('click', closeAllGreekPopups);
+
+  function fieldCorrect(q, f, el){
+    var correctVal = f==='name' ? q.name : (f==='symbol' ? q.symbol : q.unit);
+    if(el.tagName === 'SELECT') return el.value === correctVal;
+    var val = normalize(el.value);
+    if(val === '') return false;
+    var aliases = f==='name' ? q.nameAliases : (f==='symbol' ? q.symbolAliases : q.unitAliases);
+    return aliases.map(normalize).indexOf(val) !== -1;
+  }
+
+  function applyQColor(card, q){
+    card.style.setProperty('--qcolor', isDarkMode() ? q.colorDark : q.colorLight);
+    card.style.setProperty('--qfill', q.fill);
+  }
+
+  function pickCluesForMode(q){
+    var mode = FIELD_MODE;
+    if(!seenClues[mode][q.key]) seenClues[mode][q.key] = {};
+    var total = q.clues.length;
+    var seenCount = Object.keys(seenClues[mode][q.key]).length;
+    if(seenCount >= total){
+      seenClues[mode][q.key] = {};
+      fullyCycled[mode][q.key] = true;
+    }
+  }
+
+  function nextClueIndex(q){
+    pickCluesForMode(q);
+    var mode = FIELD_MODE;
+    var total = q.clues.length;
+    var tries = 0;
+    var idx;
+    do{
+      idx = Math.floor(Math.random()*total);
+      tries++;
+    } while(seenClues[mode][q.key][idx] && tries < 20);
+    seenClues[mode][q.key][idx] = true;
+    return idx;
+  }
+
+  function renderCard(q){
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.setAttribute('data-key', q.key);
+    applyQColor(card, q);
+
+    var tagHtml = '<span class="tag" hidden></span>';
+    card.innerHTML =
+      tagHtml +
+      '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
+      '<p class="clue"></p>' +
+      '<div class="quiz"></div>' +
+      '<div class="unlocked-panel" hidden></div>';
+
+    renderQuizState(q, card);
+    return card;
+  }
+
+  function renderQuizState(q, card){
+    if(unlocked[q.key]){
+      unlockCard(q, card, true);
+      return;
+    }
+    currentClueIndex[q.key] = nextClueIndex(q);
+    var clueEl = card.querySelector('.clue');
+    clueEl.textContent = q.clues[currentClueIndex[q.key]];
+
+    var quiz = card.querySelector('.quiz');
+    var rowHtml = '';
+    FIELD_ORDER.forEach(function(f){
+      rowHtml += '<div class="quiz-row">' + buildFieldHtml(f, q) + '</div>';
+    });
+    rowHtml += '<div class="quiz-actions"><button class="check-btn" type="button">Check</button><span class="feedback" aria-live="polite"></span></div>';
+    quiz.innerHTML = rowHtml;
+
+    var btn = quiz.querySelector('.check-btn');
+    var fields = quiz.querySelectorAll('[data-field]');
+    function attempt(){ checkCard(q, card); }
+    btn.addEventListener('click', attempt);
+    fields.forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); attempt(); } });
+      el.addEventListener('focus', function(){ if(playing){ autoPaused = true; setPlaying(false); } });
+      el.addEventListener('blur', function(){ if(autoPaused && !userPaused){ autoPaused = false; setPlaying(true); } });
+    });
+    quiz.querySelectorAll('.greek-wrap').forEach(function(wrap){
+      var trigger = wrap.querySelector('.greek-trigger');
+      var popup = wrap.querySelector('.greek-popup');
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        var wasOpen = !popup.hidden;
+        closeAllGreekPopups();
+        popup.hidden = wasOpen;
+      });
+      popup.querySelectorAll('.greek-opt').forEach(function(opt){
+        opt.addEventListener('click', function(e){
+          e.stopPropagation();
+          var input = wrap.closest('label').querySelector('input');
+          if(input){
+            input.value = opt.getAttribute('data-char');
+            input.classList.remove('ok','bad');
+          }
+          popup.hidden = true;
+          if(input) input.focus();
+        });
+      });
+    });
+
+    if(q.kind === 'slider'){
+      var panelEl = card.querySelector('.unlocked-panel');
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else {
+      var panelEl2 = card.querySelector('.unlocked-panel');
+      panelEl2.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+  }
+
+  function checkCard(q, card){
+    var quiz = card.querySelector('.quiz');
+    var fields = quiz.querySelectorAll('[data-field]');
+    var allOk = true;
+    fields.forEach(function(el){
+      var f = el.getAttribute('data-field');
+      var ok = fieldCorrect(q, f, el);
+      el.classList.remove('ok','bad');
+      el.classList.add(ok ? 'ok' : 'bad');
+      if(!ok) allOk = false;
+    });
+    var feedback = quiz.querySelector('.feedback');
+    if(allOk){
+      feedback.textContent = '';
+      unlockCard(q, card, false);
+    } else {
+      feedback.textContent = 'Not quite — check name, symbol AND unit, then try again.';
+    }
+  }
+
+  function updateLiveValue(q, card){
+    var el = card.querySelector('.derived-value');
+    if(!el) return;
+    var val = q.kind === 'derived' ? q.deriveFn(waveState) : waveState[q.key];
+    el.textContent = (typeof val === 'number' ? val.toFixed(2) : val) + ' ' + q.unit;
+  }
+
+  function unlockCard(q, card, silent){
+    unlocked[q.key] = true;
+    card.classList.add('is-unlocked');
+    var tagEl = card.querySelector('.tag');
+    tagEl.hidden = false;
+    tagEl.className = 'tag unlocked';
+    tagEl.textContent = 'DONE';
+    card.querySelector('.qcard-title').textContent = q.symbol + ' — ' + q.name + ' (' + q.unit + ')';
+    card.querySelector('.quiz').hidden = true;
+    var panelEl = card.querySelector('.unlocked-panel');
+    panelEl.hidden = false;
+    if(q.kind === 'slider' && !panelEl.querySelector('.qslider')){
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else if(q.kind === 'derived' && !panelEl.querySelector('.qnote')){
+      panelEl.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+    updateLiveValue(q, card);
+    if(q.kind === 'slider'){
+      var slider = panelEl.querySelector('.qslider');
+      slider.addEventListener('input', function(){
+        waveState[q.key] = parseFloat(slider.value);
+        updateLiveValue(q, card);
+        renderGrid(true);
+        save();
+      });
+    }
+    if(!silent){
+      save();
+      grid.appendChild(card);
+      showCelebration(q);
+      updateProgress();
+    }
+  }
+
+  function showCelebration(q){
+    var modal = document.getElementById('celebrateModal');
+    var symbolEl = document.getElementById('celebrateSymbol');
+    var titleEl = document.getElementById('celebrateTitle');
+    var summaryEl = document.getElementById('celebrateSummary');
+    symbolEl.textContent = q.symbol + ' — ' + q.name;
+    titleEl.textContent = 'Wahoo — well done!';
+    summaryEl.textContent = q.definition;
+    modal.hidden = false;
+    setTimeout(function(){
+      modal.hidden = true;
+      checkAllDone();
+    }, 1000);
+  }
+
+  function updateProgress(){
+    var done = Object.keys(unlocked).filter(function(k){ return unlocked[k]; }).length;
+    document.getElementById('progressBadge-lin').innerHTML = '<b>'+done+'</b> / '+QUANTITIES.length+' done';
+  }
+
+  function allFullyCycled(){
+    return QUANTITIES.every(function(q){ return fullyCycled[FIELD_MODE][q.key]; });
+  }
+
+  function checkAllDone(){
+    var allUnlocked = QUANTITIES.every(function(q){ return unlocked[q.key]; });
+    if(!allUnlocked) return;
+    var modal = document.getElementById('allDoneModal');
+    var title = document.getElementById('allDoneTitle');
+    var summary = document.getElementById('allDoneSummary');
+    var btn = document.getElementById('allDoneBtn');
+    if(allFullyCycled()){
+      title.textContent = "You've mastered Linear Mechanics!";
+      summary.textContent = "Every quantity, every clue variation, in " + FIELD_MODE + " mode. Time for the next mode, or the next topic.";
+      btn.textContent = 'Keep going';
+    } else {
+      title.textContent = "Amazing progress!";
+      summary.textContent = "All quantities unlocked at least once in " + FIELD_MODE + " mode — next set will cycle through the clues you haven't seen yet.";
+      btn.textContent = 'Next set';
+    }
+    btn.onclick = function(){ modal.hidden = true; fullReset(false); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function renderGrid(preserveScroll){
+    grid.innerHTML = '';
+    var order = QUANTITIES.slice().sort(function(a,b){
+      var au = unlocked[a.key] ? 1 : 0, bu = unlocked[b.key] ? 1 : 0;
+      if(au !== bu) return au - bu;
+      return a.order - b.order;
+    });
+    order.forEach(function(q){ grid.appendChild(renderCard(q)); });
+  }
+
+  function fullReset(clearStorage){
+    unlocked = {};
+    QUANTITIES.forEach(function(q){ unlocked[q.key] = false; });
+    if(clearStorage){
+      seenClues = { learner:{}, confident:{}, expert:{} };
+      fullyCycled = { learner:{}, confident:{}, expert:{} };
+      waveState = { m1:3, m2:5, x1:1, x2:7, u1:8, u2:0, dt:0.2, dp:20 };
+      FIELD_MODE = 'learner';
+      updateModeButtons();
+    }
+    currentClueIndex = {};
+    save();
+    renderGrid();
+    updateProgress();
+  }
+  window.mechLabTopics = window.mechLabTopics || [];
+  window.mechLabTopics.push(function(){ fullReset(true); });
+
+  var playBtn = document.getElementById('playBtn-lin');
+  function setPlaying(p){ playing = p; playBtn.textContent = playing ? 'Pause' : 'Play'; }
+  playBtn.addEventListener('click', function(){ setPlaying(!playing); userPaused = !playing; });
+  document.getElementById('resetBtn-lin').addEventListener('click', function(){ fullReset(false); });
+
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){
+    modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+  }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if(m === FIELD_MODE) return;
+      FIELD_MODE = m;
+      save();
+      updateModeButtons();
+      renderGrid();
+    });
+  });
+  updateModeButtons();
+
+  // ---------- canvas ----------
+  var canvas = document.getElementById('waveCanvas-lin');
+  var cctx = canvas.getContext('2d');
+  var cw = 0, ch = 140;
+  var pal = {};
+  function readPalette(){
+    var cs = getComputedStyle(document.documentElement);
+    pal.ink = cs.getPropertyValue('--ink').trim();
+    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
+    pal.border = cs.getPropertyValue('--border').trim();
+    pal.m1 = isDarkMode() ? qByKey.m1.colorDark : qByKey.m1.colorLight;
+    pal.m2 = isDarkMode() ? qByKey.m2.colorDark : qByKey.m2.colorLight;
+    pal.xCOM = isDarkMode() ? qByKey.xCOM.colorDark : qByKey.xCOM.colorLight;
+  }
+  readPalette();
+  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
+
+  function sizeCanvas(){
+    var rect = canvas.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    cw = rect.width;
+    canvas.width = cw*dpr; canvas.height = ch*dpr;
+    cctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  function render(){
+    cctx.clearRect(0,0,cw,ch);
+    var margin = 40;
+    var span = Math.max(cw - margin*2, 100);
+    var maxPos = 10;
+    var midY = 80;
+
+    cctx.strokeStyle = pal.border;
+    cctx.beginPath(); cctx.moveTo(margin, midY); cctx.lineTo(cw-margin, midY); cctx.stroke();
+
+    var x1px = margin + (waveState.x1/maxPos)*span;
+    var x2px = margin + (waveState.x2/maxPos)*span;
+    var xcom = (waveState.m1*waveState.x1 + waveState.m2*waveState.x2) / (waveState.m1 + waveState.m2);
+    var xcomPx = margin + (xcom/maxPos)*span;
+
+    var r1 = 8 + waveState.m1*2;
+    var r2 = 8 + waveState.m2*2;
+
+    cctx.fillStyle = unlocked.m1 ? pal.m1 : pal.ink;
+    cctx.beginPath(); cctx.arc(x1px, midY, r1, 0, 2*Math.PI); cctx.fill();
+    cctx.font = "11px 'Trocchi', serif"; cctx.textAlign = 'center'; cctx.fillStyle = pal.inkMuted;
+    cctx.fillText('m1', x1px, midY + r1 + 16);
+
+    cctx.fillStyle = unlocked.m2 ? pal.m2 : pal.ink;
+    cctx.beginPath(); cctx.arc(x2px, midY, r2, 0, 2*Math.PI); cctx.fill();
+    cctx.fillStyle = pal.inkMuted;
+    cctx.fillText('m2', x2px, midY + r2 + 16);
+
+    cctx.strokeStyle = unlocked.xCOM ? pal.xCOM : pal.inkMuted;
+    cctx.lineWidth = 2;
+    cctx.beginPath(); cctx.moveTo(xcomPx, midY-30); cctx.lineTo(xcomPx, midY+30); cctx.stroke();
+    cctx.lineWidth = 1;
+    if(unlocked.xCOM){
+      cctx.fillStyle = pal.xCOM;
+      cctx.fillText('xCOM', xcomPx, midY-36);
+    }
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  renderGrid();
+  updateProgress();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var panel = document.querySelector('.topic-panel[data-topic="circular"]');
+
+  function isDarkMode(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  var GREEK_LETTERS = [
+    { ch:'Δ', name:'delta' },
+    { ch:'θ', name:'theta' },
+    { ch:'ω', name:'omega' },
+    { ch:'α', name:'alpha' },
+    { ch:'τ', name:'tau' }
+  ];
+  var SYMBOL_PRONOUNCE = {};
+  GREEK_LETTERS.forEach(function(g){ SYMBOL_PRONOUNCE[g.ch] = g.name; });
+  function symbolOptionLabel(s){
+    return SYMBOL_PRONOUNCE[s] ? (s + ' (' + SYMBOL_PRONOUNCE[s] + ')') : s;
+  }
+
+  // real Fg values are astronomically tiny or huge on toy-scale sliders
+  // (gravity between everyday-sized objects is genuinely negligible) --
+  // this keeps the live readout readable either way.
+  function formatValue(val){
+    if(val === 0) return '0';
+    var abs = Math.abs(val);
+    if(abs < 0.01 || abs >= 100000){ return val.toExponential(2); }
+    return val.toFixed(2);
+  }
+
+  var GRAV_CONST = 6.67e-11;
+
+  var QUANTITIES = [
+    { key:'m', order:1, name:'Mass', symbol:'m', unit:'kg',
+      nameAliases:['mass'], symbolAliases:['m'], unitAliases:['kg','kilogram','kilograms'],
+      clues:[
+        "The mass of the object moving in a circle, or orbiting another body.",
+        "A 1200 kg car rounds a roundabout at a steady speed. What quantity is 1200 kg?",
+        "A 150 kg satellite orbits Earth at a steady altitude. What quantity is 150 kg?",
+        "A ball on a string is swung in a horizontal circle above someone's head. What quantity describes how much matter the ball has?",
+        "This quantity appears in both Fc = mv²/r and Fg = GMm/r² — the mass of whichever object is moving in the circle."
+      ],
+      definition:"Mass is how much matter the orbiting or circling object has. It is measured in kilograms.",
+      kind:'slider', min:1, max:20, step:1, def:5,
+      colorLight:'#2B7A8A', colorDark:'#6FC5D6', fill:'#2B7A8A' },
+    { key:'v', order:2, name:'Speed', symbol:'v', unit:'m/s',
+      nameAliases:['speed','tangential speed','tangential velocity'], symbolAliases:['v'], unitAliases:['m/s','ms','m per s','metrespersecond','metrepersecond','meterspersecond'],
+      clues:[
+        "How fast an object travels around its circular path, measured along the curve.",
+        "A car rounds a corner of radius 50 m at a steady 15 m/s. What quantity is 15 m/s?",
+        "A ball on a string traces a circle at a constant pace. What quantity describes that pace?",
+        "This quantity, together with an object's mass and the radius of its path, determines the centripetal force needed to keep it circling.",
+        "Increasing this quantity while keeping the radius the same requires a bigger centripetal force to match."
+      ],
+      definition:"Speed is how fast the object travels around its circular path. It is measured in metres per second.",
+      kind:'slider', min:1, max:30, step:1, def:10,
+      colorLight:'#8A2B6C', colorDark:'#D67FB2', fill:'#8A2B6C' },
+    { key:'r', order:3, name:'Radius', symbol:'r', unit:'m',
+      nameAliases:['radius','orbital radius','distance from centre'], symbolAliases:['r'], unitAliases:['m','metre','metres','meter','meters'],
+      clues:[
+        "The distance from the centre of a circular path to the object moving around it.",
+        "A car takes a roundabout with a radius of 15 m. What quantity is 15 m?",
+        "A satellite orbits Earth at a distance of 6.86×10⁶ m from Earth's centre. What quantity is 6.86×10⁶ m?",
+        "A ball on a string traces a circle of a fixed size around the point where it's held. What quantity describes that circle's size?",
+        "Doubling this quantity, while keeping speed the same, reduces the centripetal force needed to maintain the circular path."
+      ],
+      definition:"Radius is the distance from the centre of a circular path to the object moving around it. It is measured in metres.",
+      kind:'slider', min:1, max:50, step:1, def:10,
+      colorLight:'#6C8A2B', colorDark:'#C5D67F', fill:'#6C8A2B' },
+    { key:'Fc', order:4, name:'Centripetal force', symbol:'Fc', unit:'N',
+      nameAliases:['centripetal force'], symbolAliases:['fc'], unitAliases:['n','newton','newtons'],
+      clues:[
+        "The force that keeps an object moving in a circle, always pointing toward the centre.",
+        "A string pulls a swung ball toward the centre of its circular path, stopping it flying off in a straight line. What quantity is that pull?",
+        "A car's tyres grip the road, pushing the car toward the centre of a roundabout as it turns. What quantity is that grip force providing?",
+        "This quantity is calculated using Fc = mv² ÷ r — worked out from an object's mass, speed and the radius of its path.",
+        "Without enough of this quantity, an object moving in a circle would fly off in a straight line instead of curving."
+      ],
+      definition:"Centripetal force is the force that keeps an object moving in a circle. It is measured in newtons.",
+      note:"Fc isn't independent — it's calculated from m, v and r. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return state.m * state.v * state.v / state.r; },
+      colorLight:'#8A4A2B', colorDark:'#D6957F', fill:'#8A4A2B' },
+    { key:'M', order:5, name:'Mass of central body', symbol:'M', unit:'kg',
+      nameAliases:['mass of central body','mass of the planet','planet mass','central mass'], symbolAliases:['m'], unitAliases:['kg','kilogram','kilograms'],
+      clues:[
+        "The mass of the large body being orbited — a planet, moon, or star.",
+        "A satellite orbits Earth, whose mass is 5.97×10²⁴ kg. What quantity is 5.97×10²⁴ kg?",
+        "A probe orbits Mars instead of Earth, held by Mars's own gravity. What quantity differs between orbiting Mars and orbiting Earth?",
+        "This quantity belongs to the body being orbited, not the satellite or probe orbiting it — don't confuse it with the smaller object's own mass.",
+        "A more massive central body pulls harder on anything orbiting it, at the same orbital distance."
+      ],
+      definition:"Mass of central body is the mass of the large body being orbited. It is measured in kilograms.",
+      kind:'slider', min:100, max:2000, step:50, def:800,
+      colorLight:'#2B4A8A', colorDark:'#7F95D6', fill:'#2B4A8A' },
+    { key:'G', order:6, name:'Gravitational constant', symbol:'G', unit:'N m² kg⁻²',
+      nameAliases:['gravitational constant','universal gravitational constant'], symbolAliases:['g'], unitAliases:['n m2 kg-2','n m^2 kg^-2','newton metre squared per kilogram squared'],
+      clues:[
+        "A fixed number that never changes, used to calculate the gravitational pull between any two masses anywhere in the universe.",
+        "This quantity has the value 6.67×10⁻¹¹ N m² kg⁻² — always the same, whether calculating the pull between planets or between two apples.",
+        "Unlike mass or radius, this quantity is never given differently from one question to the next — it's always the same universal number.",
+        "This quantity appears in Fg = GMm ÷ r², multiplying the two masses before dividing by the squared distance.",
+        "A physics data sheet lists this quantity's value so students don't need to memorise it — only recognise where it belongs in the formula."
+      ],
+      definition:"The gravitational constant is a fixed universal number used to calculate gravitational force. It never changes.",
+      note:"G is a universal constant — always 6.67×10⁻¹¹ N m² kg⁻², never adjustable.",
+      kind:'derived', deriveFn:function(){ return GRAV_CONST; },
+      colorLight:'#8A2B2B', colorDark:'#D67F7F', fill:'#8A2B2B' },
+    { key:'Fg', order:7, name:'Gravitational force', symbol:'Fg', unit:'N',
+      nameAliases:['gravitational force','gravity force'], symbolAliases:['fg'], unitAliases:['n','newton','newtons'],
+      clues:[
+        "The attractive force between any two masses — the force holding a satellite in orbit around a planet.",
+        "A 150 kg satellite orbiting Earth is pulled toward Earth's centre by a force of about 1270 N. What quantity is 1270 N?",
+        "The force keeping the Moon in orbit around Earth, and the force pulling an apple off a tree, are really the same quantity acting at different scales.",
+        "This quantity is calculated using Fg = GMm ÷ r² — worked out from the gravitational constant, both masses, and the distance between them.",
+        "This quantity gets weaker the further apart the two masses are, dropping off with the square of the distance."
+      ],
+      definition:"Gravitational force is the attractive force between any two masses. It is measured in newtons.",
+      note:"Fg isn't independent — it's calculated from G, M, m and r. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return GRAV_CONST * state.M * state.m / (state.r*state.r); },
+      colorLight:'#4A2B8A', colorDark:'#957FD6', fill:'#4A2B8A' }
+  ];
+
+  var FIELD_ORDER = ['name','symbol','unit'];
+  var FIELD_LABELS = { name:'Name', symbol:'Symbol', unit:'Unit of measurement' };
+  var ALL_SYMBOLS = QUANTITIES.map(function(x){ return x.symbol; });
+  var ALL_NAMES = QUANTITIES.map(function(x){ return x.name; });
+  var ALL_UNITS_UNIQUE = (function(){
+    var seen = {}, out = [];
+    QUANTITIES.forEach(function(x){ if(!seen[x.unit]){ seen[x.unit]=true; out.push(x.unit); } });
+    return out;
+  })();
+  var qByKey = {};
+  QUANTITIES.forEach(function(x){ qByKey[x.key] = x; });
+
+  var waveState = { m:5, v:10, r:10, M:800 };
+  var unlocked = { m:false, v:false, r:false, Fc:false, M:false, G:false, Fg:false };
+  var FIELD_MODE = 'learner';
+  var playing = true, userPaused = false, autoPaused = false;
+  var seenClues = { learner:{}, confident:{}, expert:{} };
+  var fullyCycled = { learner:{}, confident:{}, expert:{} };
+  var currentClueIndex = {};
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+  function normalize(s){
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9]/gi,'');
+  }
+
+  function saveKey(){ return 'mechLab_circular_v1'; }
+  function save(){
+    try{
+      localStorage.setItem(saveKey(), JSON.stringify({ unlocked:unlocked, seenClues:seenClues, fullyCycled:fullyCycled, FIELD_MODE:FIELD_MODE, waveState:waveState }));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      var raw = localStorage.getItem(saveKey());
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      if(data.unlocked) unlocked = data.unlocked;
+      if(data.seenClues) seenClues = data.seenClues;
+      if(data.fullyCycled) fullyCycled = data.fullyCycled;
+      if(data.FIELD_MODE) FIELD_MODE = data.FIELD_MODE;
+      if(data.waveState) waveState = data.waveState;
+    }catch(e){}
+  }
+  function ensureClueIndices(){
+    QUANTITIES.forEach(function(q){ if(!(q.key in currentClueIndex)) currentClueIndex[q.key] = 0; });
+  }
+  load();
+  ensureClueIndices();
+
+  var grid = panel.querySelector('.grid');
+
+  function fieldIsDropdown(f){ return FIELD_MODE === 'learner'; }
+  function fieldPool(f){
+    if(f === 'symbol') return ALL_SYMBOLS;
+    if(f === 'name') return ALL_NAMES;
+    return ALL_UNITS_UNIQUE;
+  }
+  function buildFieldHtml(f, q){
+    if(fieldIsDropdown(f)){
+      var opts = shuffle(fieldPool(f));
+      var optHtml = '<option value="">— choose —</option>';
+      opts.forEach(function(s){
+        var label = f === 'symbol' ? symbolOptionLabel(s) : s;
+        optHtml += '<option value="'+s+'">'+label+'</option>';
+      });
+      return '<label>'+FIELD_LABELS[f]+'<select data-field="'+f+'">'+optHtml+'</select></label>';
+    }
+    var helper = '';
+    if(f === 'symbol'){
+      var optsHtml = GREEK_LETTERS.map(function(g){
+        return '<button type="button" class="greek-opt" data-char="'+g.ch+'">'+g.ch+'<span>'+g.name+'</span></button>';
+      }).join('');
+      helper =
+        '<div class="greek-wrap">' +
+          '<button type="button" class="greek-trigger">Greek ▾</button>' +
+          '<div class="greek-popup" hidden>'+optsHtml+'</div>' +
+        '</div>';
+    }
+    return '<label>'+FIELD_LABELS[f]+'<input data-field="'+f+'" autocomplete="off" spellcheck="false">'+helper+'</label>';
+  }
+  function closeAllGreekPopups(){
+    document.querySelectorAll('.greek-popup').forEach(function(p){ p.hidden = true; });
+  }
+  document.addEventListener('click', closeAllGreekPopups);
+
+  function fieldCorrect(q, f, el){
+    var correctVal = f==='name' ? q.name : (f==='symbol' ? q.symbol : q.unit);
+    if(el.tagName === 'SELECT') return el.value === correctVal;
+    var val = normalize(el.value);
+    if(val === '') return false;
+    var aliases = f==='name' ? q.nameAliases : (f==='symbol' ? q.symbolAliases : q.unitAliases);
+    return aliases.map(normalize).indexOf(val) !== -1;
+  }
+
+  function applyQColor(card, q){
+    card.style.setProperty('--qcolor', isDarkMode() ? q.colorDark : q.colorLight);
+    card.style.setProperty('--qfill', q.fill);
+  }
+
+  function pickCluesForMode(q){
+    var mode = FIELD_MODE;
+    if(!seenClues[mode][q.key]) seenClues[mode][q.key] = {};
+    var total = q.clues.length;
+    var seenCount = Object.keys(seenClues[mode][q.key]).length;
+    if(seenCount >= total){
+      seenClues[mode][q.key] = {};
+      fullyCycled[mode][q.key] = true;
+    }
+  }
+
+  function nextClueIndex(q){
+    pickCluesForMode(q);
+    var mode = FIELD_MODE;
+    var total = q.clues.length;
+    var tries = 0;
+    var idx;
+    do{
+      idx = Math.floor(Math.random()*total);
+      tries++;
+    } while(seenClues[mode][q.key][idx] && tries < 20);
+    seenClues[mode][q.key][idx] = true;
+    return idx;
+  }
+
+  function renderCard(q){
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.setAttribute('data-key', q.key);
+    applyQColor(card, q);
+
+    card.innerHTML =
+      '<span class="tag" hidden></span>' +
+      '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
+      '<p class="clue"></p>' +
+      '<div class="quiz"></div>' +
+      '<div class="unlocked-panel" hidden></div>';
+
+    renderQuizState(q, card);
+    return card;
+  }
+
+  function renderQuizState(q, card){
+    if(unlocked[q.key]){
+      unlockCard(q, card, true);
+      return;
+    }
+    currentClueIndex[q.key] = nextClueIndex(q);
+    var clueEl = card.querySelector('.clue');
+    clueEl.textContent = q.clues[currentClueIndex[q.key]];
+
+    var quiz = card.querySelector('.quiz');
+    var rowHtml = '';
+    FIELD_ORDER.forEach(function(f){
+      rowHtml += '<div class="quiz-row">' + buildFieldHtml(f, q) + '</div>';
+    });
+    rowHtml += '<div class="quiz-actions"><button class="check-btn" type="button">Check</button><span class="feedback" aria-live="polite"></span></div>';
+    quiz.innerHTML = rowHtml;
+
+    var btn = quiz.querySelector('.check-btn');
+    var fields = quiz.querySelectorAll('[data-field]');
+    function attempt(){ checkCard(q, card); }
+    btn.addEventListener('click', attempt);
+    fields.forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); attempt(); } });
+      el.addEventListener('focus', function(){ if(playing){ autoPaused = true; setPlaying(false); } });
+      el.addEventListener('blur', function(){ if(autoPaused && !userPaused){ autoPaused = false; setPlaying(true); } });
+    });
+    quiz.querySelectorAll('.greek-wrap').forEach(function(wrap){
+      var trigger = wrap.querySelector('.greek-trigger');
+      var popup = wrap.querySelector('.greek-popup');
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        var wasOpen = !popup.hidden;
+        closeAllGreekPopups();
+        popup.hidden = wasOpen;
+      });
+      popup.querySelectorAll('.greek-opt').forEach(function(opt){
+        opt.addEventListener('click', function(e){
+          e.stopPropagation();
+          var input = wrap.closest('label').querySelector('input');
+          if(input){
+            input.value = opt.getAttribute('data-char');
+            input.classList.remove('ok','bad');
+          }
+          popup.hidden = true;
+          if(input) input.focus();
+        });
+      });
+    });
+
+    if(q.kind === 'slider'){
+      var panelEl = card.querySelector('.unlocked-panel');
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else {
+      var panelEl2 = card.querySelector('.unlocked-panel');
+      panelEl2.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+  }
+
+  function checkCard(q, card){
+    var quiz = card.querySelector('.quiz');
+    var fields = quiz.querySelectorAll('[data-field]');
+    var allOk = true;
+    fields.forEach(function(el){
+      var f = el.getAttribute('data-field');
+      var ok = fieldCorrect(q, f, el);
+      el.classList.remove('ok','bad');
+      el.classList.add(ok ? 'ok' : 'bad');
+      if(!ok) allOk = false;
+    });
+    var feedback = quiz.querySelector('.feedback');
+    if(allOk){
+      feedback.textContent = '';
+      unlockCard(q, card, false);
+    } else {
+      feedback.textContent = 'Not quite — check name, symbol AND unit, then try again.';
+    }
+  }
+
+  function updateLiveValue(q, card){
+    var el = card.querySelector('.derived-value');
+    if(!el) return;
+    var val = q.kind === 'derived' ? q.deriveFn(waveState) : waveState[q.key];
+    el.textContent = formatValue(val) + ' ' + q.unit;
+  }
+
+  function unlockCard(q, card, silent){
+    unlocked[q.key] = true;
+    card.classList.add('is-unlocked');
+    var tagEl = card.querySelector('.tag');
+    tagEl.hidden = false;
+    tagEl.className = 'tag unlocked';
+    tagEl.textContent = 'DONE';
+    card.querySelector('.qcard-title').textContent = q.symbol + ' — ' + q.name + ' (' + q.unit + ')';
+    card.querySelector('.quiz').hidden = true;
+    var panelEl = card.querySelector('.unlocked-panel');
+    panelEl.hidden = false;
+    if(q.kind === 'slider' && !panelEl.querySelector('.qslider')){
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else if(q.kind === 'derived' && !panelEl.querySelector('.qnote')){
+      panelEl.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+    updateLiveValue(q, card);
+    if(q.kind === 'slider'){
+      var slider = panelEl.querySelector('.qslider');
+      slider.addEventListener('input', function(){
+        waveState[q.key] = parseFloat(slider.value);
+        updateLiveValue(q, card);
+        renderGrid(true);
+        save();
+      });
+    }
+    if(!silent){
+      save();
+      grid.appendChild(card);
+      showCelebration(q);
+      updateProgress();
+    }
+  }
+
+  function showCelebration(q){
+    var modal = document.getElementById('celebrateModal');
+    var symbolEl = document.getElementById('celebrateSymbol');
+    var titleEl = document.getElementById('celebrateTitle');
+    var summaryEl = document.getElementById('celebrateSummary');
+    symbolEl.textContent = q.symbol + ' — ' + q.name;
+    titleEl.textContent = 'Wahoo — well done!';
+    summaryEl.textContent = q.definition;
+    modal.hidden = false;
+    setTimeout(function(){
+      modal.hidden = true;
+      checkAllDone();
+    }, 1000);
+  }
+
+  function updateProgress(){
+    var done = Object.keys(unlocked).filter(function(k){ return unlocked[k]; }).length;
+    document.getElementById('progressBadge-cir').innerHTML = '<b>'+done+'</b> / '+QUANTITIES.length+' done';
+  }
+
+  function allFullyCycled(){
+    return QUANTITIES.every(function(q){ return fullyCycled[FIELD_MODE][q.key]; });
+  }
+
+  function checkAllDone(){
+    var allUnlocked = QUANTITIES.every(function(q){ return unlocked[q.key]; });
+    if(!allUnlocked) return;
+    var modal = document.getElementById('allDoneModal');
+    var title = document.getElementById('allDoneTitle');
+    var summary = document.getElementById('allDoneSummary');
+    var btn = document.getElementById('allDoneBtn');
+    if(allFullyCycled()){
+      title.textContent = "You've mastered Circular Motion!";
+      summary.textContent = "Every quantity, every clue variation, in " + FIELD_MODE + " mode. Time for the next mode, or the next topic.";
+      btn.textContent = 'Keep going';
+    } else {
+      title.textContent = "Amazing progress!";
+      summary.textContent = "All quantities unlocked at least once in " + FIELD_MODE + " mode — next set will cycle through the clues you haven't seen yet.";
+      btn.textContent = 'Next set';
+    }
+    btn.onclick = function(){ modal.hidden = true; fullReset(false); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function renderGrid(preserveScroll){
+    grid.innerHTML = '';
+    var order = QUANTITIES.slice().sort(function(a,b){
+      var au = unlocked[a.key] ? 1 : 0, bu = unlocked[b.key] ? 1 : 0;
+      if(au !== bu) return au - bu;
+      return a.order - b.order;
+    });
+    order.forEach(function(q){ grid.appendChild(renderCard(q)); });
+  }
+
+  function fullReset(clearStorage){
+    unlocked = {};
+    QUANTITIES.forEach(function(q){ unlocked[q.key] = false; });
+    if(clearStorage){
+      seenClues = { learner:{}, confident:{}, expert:{} };
+      fullyCycled = { learner:{}, confident:{}, expert:{} };
+      waveState = { m:5, v:10, r:10, M:800 };
+      FIELD_MODE = 'learner';
+      updateModeButtons();
+    }
+    currentClueIndex = {};
+    save();
+    renderGrid();
+    updateProgress();
+  }
+  window.mechLabTopics = window.mechLabTopics || [];
+  window.mechLabTopics.push(function(){ fullReset(true); });
+
+  var playBtn = document.getElementById('playBtn-cir');
+  function setPlaying(p){ playing = p; playBtn.textContent = playing ? 'Pause' : 'Play'; }
+  playBtn.addEventListener('click', function(){ setPlaying(!playing); userPaused = !playing; });
+  document.getElementById('resetBtn-cir').addEventListener('click', function(){ fullReset(false); });
+
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){
+    modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+  }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if(m === FIELD_MODE) return;
+      FIELD_MODE = m;
+      save();
+      updateModeButtons();
+      renderGrid();
+    });
+  });
+  updateModeButtons();
+
+  // ---------- canvas ----------
+  var canvas = document.getElementById('waveCanvas-cir');
+  var cctx = canvas.getContext('2d');
+  var cw = 0, ch = 140;
+  var t = 0, lastTime = null;
+  var pal = {};
+  function readPalette(){
+    var cs = getComputedStyle(document.documentElement);
+    pal.ink = cs.getPropertyValue('--ink').trim();
+    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
+    pal.border = cs.getPropertyValue('--border').trim();
+    pal.m = isDarkMode() ? qByKey.m.colorDark : qByKey.m.colorLight;
+    pal.Fc = isDarkMode() ? qByKey.Fc.colorDark : qByKey.Fc.colorLight;
+  }
+  readPalette();
+  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
+
+  function sizeCanvas(){
+    var rect = canvas.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    cw = rect.width;
+    canvas.width = cw*dpr; canvas.height = ch*dpr;
+    cctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  function render(now){
+    if(lastTime===null) lastTime = now;
+    var dt = Math.min((now-lastTime)/1000, 0.05);
+    lastTime = now;
+    if(playing) t += dt;
+
+    cctx.clearRect(0,0,cw,ch);
+    var midX = cw/2, midY = 70;
+    var pxRadius = Math.min(40 + waveState.r*3, 60);
+
+    cctx.strokeStyle = pal.border;
+    cctx.beginPath(); cctx.arc(midX, midY, pxRadius, 0, 2*Math.PI); cctx.stroke();
+
+    cctx.fillStyle = pal.inkMuted;
+    cctx.beginPath(); cctx.arc(midX, midY, 4, 0, 2*Math.PI); cctx.fill();
+
+    var angularSpeed = waveState.v / Math.max(waveState.r, 1);
+    var angle = t * angularSpeed;
+    var objX = midX + pxRadius*Math.cos(angle);
+    var objY = midY + pxRadius*Math.sin(angle);
+
+    cctx.strokeStyle = unlocked.Fc ? pal.Fc : pal.inkMuted;
+    cctx.beginPath(); cctx.moveTo(midX, midY); cctx.lineTo(objX, objY); cctx.stroke();
+
+    var objR = 6 + waveState.m*0.6;
+    cctx.fillStyle = unlocked.m ? pal.m : pal.ink;
+    cctx.beginPath(); cctx.arc(objX, objY, objR, 0, 2*Math.PI); cctx.fill();
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  renderGrid();
+  updateProgress();
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var panel = document.querySelector('.topic-panel[data-topic="angular"]');
+
+  function isDarkMode(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  var GREEK_LETTERS = [
+    { ch:'Δ', name:'delta' },
+    { ch:'θ', name:'theta' },
+    { ch:'ω', name:'omega' },
+    { ch:'α', name:'alpha' },
+    { ch:'τ', name:'tau' }
+  ];
+  var SYMBOL_PRONOUNCE = {};
+  GREEK_LETTERS.forEach(function(g){ SYMBOL_PRONOUNCE[g.ch] = g.name; });
+  function symbolOptionLabel(s){
+    return SYMBOL_PRONOUNCE[s] ? (s + ' (' + SYMBOL_PRONOUNCE[s] + ')') : s;
+  }
+
+  var QUANTITIES = [
+    { key:'dtheta', order:1, name:'Angular displacement', symbol:'Δθ', unit:'rad', symbolIsGreek:true,
+      nameAliases:['angular displacement','swept angle','angle swept'], symbolAliases:['δθ','deltatheta','dtheta'], unitAliases:['rad','radian','radians'],
+      clues:[
+        "How far something has rotated, measured as an angle rather than a distance.",
+        "A wheel turns through 6.28 radians — one full turn. What quantity is 6.28 rad?",
+        "A playground roundabout sweeps through a quarter turn before slowing. What quantity describes that swept angle?",
+        "This quantity is measured in radians, not degrees, throughout this standard.",
+        "This quantity divided by the time taken gives the average angular velocity."
+      ],
+      definition:"Angular displacement is how far something has rotated, measured as an angle. It is measured in radians.",
+      kind:'slider', min:1, max:10, step:0.1, def:6.28,
+      colorLight:'#2B8A5E', colorDark:'#6FD6A6', fill:'#2B8A5E' },
+    { key:'dt', order:2, name:'Time interval', symbol:'Δt', unit:'s', symbolIsGreek:true,
+      nameAliases:['time interval','change in time','time taken','duration'], symbolAliases:['δt','deltat','dt'], unitAliases:['s','sec','second','seconds'],
+      clues:[
+        "How long the rotation being measured actually takes.",
+        "A roundabout completes one full turn in 1.23 s. What quantity is 1.23 s?",
+        "A flywheel spins up over a measured stretch of time. What quantity is that stretch?",
+        "This quantity appears on the bottom of ω = Δθ ÷ Δt.",
+        "A shorter version of this quantity, for the same swept angle, means a faster spin."
+      ],
+      definition:"Time interval is how long the rotation being measured takes. It is measured in seconds.",
+      kind:'slider', min:0.5, max:5, step:0.01, def:1.23,
+      colorLight:'#2B5E8A', colorDark:'#6FA6D6', fill:'#2B5E8A' },
+    { key:'omega', order:3, name:'Angular velocity', symbol:'ω', unit:'rad/s', symbolIsGreek:true,
+      nameAliases:['angular velocity','spin rate','turning rate'], symbolAliases:['ω','omega'], unitAliases:['rad/s','radian per second','radians per second'],
+      clues:[
+        "How fast something is rotating, measured in radians per second rather than metres per second.",
+        "A roundabout completing one full turn (2π rad) every 1.23 s spins at about 5.11 rad/s. What quantity is 5.11 rad/s?",
+        "A millwheel's steady spinning pace, measured continuously rather than as a single swept angle. What quantity is that pace?",
+        "This quantity is calculated using ω = Δθ ÷ Δt — worked out from the angle swept and the time it took.",
+        "This quantity connects to angular momentum through L = Iω — a faster spin means more angular momentum, for the same moment of inertia."
+      ],
+      definition:"Angular velocity is how fast something is rotating. It is measured in radians per second.",
+      note:"ω isn't independent — it's calculated from Δθ and Δt. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return state.dtheta / state.dt; },
+      colorLight:'#8A5E2B', colorDark:'#D6A66F', fill:'#8A5E2B' },
+    { key:'alpha', order:4, name:'Angular acceleration', symbol:'α', unit:'rad/s²', symbolIsGreek:true,
+      nameAliases:['angular acceleration'], symbolAliases:['α','alpha'], unitAliases:['rad/s2','rad/s^2','radian per second squared','radians per second squared'],
+      clues:[
+        "How quickly an object's spin rate is changing, speeding up or slowing down.",
+        "A flywheel's spin rate increases at 16.6 rad/s² as a motor drives it. What quantity is 16.6 rad/s²?",
+        "A spinning wheel gradually slowing to a stop has this quantity acting against its spin.",
+        "This quantity is the rotational equivalent of ordinary acceleration — a change in angular velocity over time.",
+        "This quantity, multiplied by an object's moment of inertia, gives the torque needed to produce it."
+      ],
+      definition:"Angular acceleration is how quickly an object's spin rate is changing. It is measured in radians per second squared.",
+      kind:'slider', min:1, max:20, step:0.1, def:16.6,
+      colorLight:'#5E8A2B', colorDark:'#A6D66F', fill:'#5E8A2B' },
+    { key:'I', order:5, name:'Moment of inertia', symbol:'I', unit:'kg m²',
+      nameAliases:['moment of inertia','rotational inertia'], symbolAliases:['i'], unitAliases:['kg m2','kg m^2','kilogram metres squared'],
+      clues:[
+        "How stubbornly an object resists having its spin changed — bigger when mass sits further from the axis of rotation.",
+        "A flywheel with its mass concentrated near the rim resists spinning up more than one with the same mass near the centre. What quantity is bigger for the rim-heavy wheel?",
+        "A figure skater pulling their arms in reduces this quantity, letting them spin faster for the same angular momentum.",
+        "This quantity is the rotational equivalent of ordinary mass — resistance to a change in spin, rather than straight-line motion.",
+        "This quantity appears in both τ = Iα and L = Iω."
+      ],
+      definition:"Moment of inertia is how stubbornly an object resists a change in its spin. It is measured in kilogram metres squared.",
+      kind:'slider', min:1, max:20, step:0.5, def:5,
+      colorLight:'#8A2B5E', colorDark:'#D66FA6', fill:'#8A2B5E' },
+    { key:'tau', order:6, name:'Torque', symbol:'τ', unit:'N m', symbolIsGreek:true,
+      nameAliases:['torque'], symbolAliases:['τ','tau'], unitAliases:['n m','nm','newton metre','newton metres'],
+      clues:[
+        "A twisting force that changes an object's spin, applied at some distance from the axis of rotation.",
+        "A wrench applies a twist to a stubborn bolt, trying to make it turn. What quantity is that twist?",
+        "A motor drives a flywheel, applying this quantity to increase its spin rate.",
+        "This quantity is calculated using τ = Iα — the moment of inertia multiplied by the angular acceleration produced.",
+        "The same push applied further from the axis of rotation produces more of this quantity than the same push applied close to it."
+      ],
+      definition:"Torque is a twisting force that changes an object's spin. It is measured in newton metres.",
+      note:"τ isn't independent — it's calculated from I and α. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return state.I * state.alpha; },
+      colorLight:'#5E2B8A', colorDark:'#A66FD6', fill:'#5E2B8A' },
+    { key:'L', order:7, name:'Angular momentum', symbol:'L', unit:'kg m²/s',
+      nameAliases:['angular momentum'], symbolAliases:['l'], unitAliases:['kg m2/s','kg m^2/s','kilogram metres squared per second'],
+      clues:[
+        "The rotational equivalent of ordinary momentum — how much 'spin' an object carries.",
+        "A spinning ice skater with their arms pulled in has the same value of this quantity as when their arms were spread wide, just spinning faster to compensate.",
+        "A spinning wheel, left alone with no twisting force acting on it, keeps this quantity constant forever.",
+        "This quantity is calculated using L = Iω — the moment of inertia multiplied by the angular velocity.",
+        "This quantity is measured in kilogram metres squared per second — quite different from ordinary momentum's units."
+      ],
+      definition:"Angular momentum is the rotational equivalent of ordinary momentum. It is measured in kilogram metres squared per second.",
+      note:"L isn't independent — it's calculated from I, Δθ and Δt. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return state.I * (state.dtheta / state.dt); },
+      colorLight:'#8A5E5E', colorDark:'#D6A6A6', fill:'#8A5E5E' }
+  ];
+
+  var FIELD_ORDER = ['name','symbol','unit'];
+  var FIELD_LABELS = { name:'Name', symbol:'Symbol', unit:'Unit of measurement' };
+  var ALL_SYMBOLS = QUANTITIES.map(function(x){ return x.symbol; });
+  var ALL_NAMES = QUANTITIES.map(function(x){ return x.name; });
+  var ALL_UNITS_UNIQUE = (function(){
+    var seen = {}, out = [];
+    QUANTITIES.forEach(function(x){ if(!seen[x.unit]){ seen[x.unit]=true; out.push(x.unit); } });
+    return out;
+  })();
+  var qByKey = {};
+  QUANTITIES.forEach(function(x){ qByKey[x.key] = x; });
+
+  var waveState = { dtheta:6.28, dt:1.23, alpha:16.6, I:5 };
+  var unlocked = { dtheta:false, dt:false, omega:false, alpha:false, I:false, tau:false, L:false };
+  var FIELD_MODE = 'learner';
+  var playing = true, userPaused = false, autoPaused = false;
+  var seenClues = { learner:{}, confident:{}, expert:{} };
+  var fullyCycled = { learner:{}, confident:{}, expert:{} };
+  var currentClueIndex = {};
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+  function normalize(s){
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατ]/gi,'');
+  }
+
+  function saveKey(){ return 'mechLab_angular_v1'; }
+  function save(){
+    try{
+      localStorage.setItem(saveKey(), JSON.stringify({ unlocked:unlocked, seenClues:seenClues, fullyCycled:fullyCycled, FIELD_MODE:FIELD_MODE, waveState:waveState }));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      var raw = localStorage.getItem(saveKey());
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      if(data.unlocked) unlocked = data.unlocked;
+      if(data.seenClues) seenClues = data.seenClues;
+      if(data.fullyCycled) fullyCycled = data.fullyCycled;
+      if(data.FIELD_MODE) FIELD_MODE = data.FIELD_MODE;
+      if(data.waveState) waveState = data.waveState;
+    }catch(e){}
+  }
+  function ensureClueIndices(){
+    QUANTITIES.forEach(function(q){ if(!(q.key in currentClueIndex)) currentClueIndex[q.key] = 0; });
+  }
+  load();
+  ensureClueIndices();
+
+  var grid = panel.querySelector('.grid');
+
+  function fieldIsDropdown(f){ return FIELD_MODE === 'learner'; }
+  function fieldPool(f){
+    if(f === 'symbol') return ALL_SYMBOLS;
+    if(f === 'name') return ALL_NAMES;
+    return ALL_UNITS_UNIQUE;
+  }
+  function buildFieldHtml(f, q){
+    if(fieldIsDropdown(f)){
+      var opts = shuffle(fieldPool(f));
+      var optHtml = '<option value="">— choose —</option>';
+      opts.forEach(function(s){
+        var label = f === 'symbol' ? symbolOptionLabel(s) : s;
+        optHtml += '<option value="'+s+'">'+label+'</option>';
+      });
+      return '<label>'+FIELD_LABELS[f]+'<select data-field="'+f+'">'+optHtml+'</select></label>';
+    }
+    var helper = '';
+    if(f === 'symbol'){
+      var optsHtml = GREEK_LETTERS.map(function(g){
+        return '<button type="button" class="greek-opt" data-char="'+g.ch+'">'+g.ch+'<span>'+g.name+'</span></button>';
+      }).join('');
+      helper =
+        '<div class="greek-wrap">' +
+          '<button type="button" class="greek-trigger">Greek ▾</button>' +
+          '<div class="greek-popup" hidden>'+optsHtml+'</div>' +
+        '</div>';
+    }
+    return '<label>'+FIELD_LABELS[f]+'<input data-field="'+f+'" autocomplete="off" spellcheck="false">'+helper+'</label>';
+  }
+  function closeAllGreekPopups(){
+    document.querySelectorAll('.greek-popup').forEach(function(p){ p.hidden = true; });
+  }
+  document.addEventListener('click', closeAllGreekPopups);
+
+  function fieldCorrect(q, f, el){
+    var correctVal = f==='name' ? q.name : (f==='symbol' ? q.symbol : q.unit);
+    if(el.tagName === 'SELECT') return el.value === correctVal;
+    var val = normalize(el.value);
+    if(val === '') return false;
+    var aliases = f==='name' ? q.nameAliases : (f==='symbol' ? q.symbolAliases : q.unitAliases);
+    return aliases.map(normalize).indexOf(val) !== -1;
+  }
+
+  function applyQColor(card, q){
+    card.style.setProperty('--qcolor', isDarkMode() ? q.colorDark : q.colorLight);
+    card.style.setProperty('--qfill', q.fill);
+  }
+
+  function pickCluesForMode(q){
+    var mode = FIELD_MODE;
+    if(!seenClues[mode][q.key]) seenClues[mode][q.key] = {};
+    var total = q.clues.length;
+    var seenCount = Object.keys(seenClues[mode][q.key]).length;
+    if(seenCount >= total){
+      seenClues[mode][q.key] = {};
+      fullyCycled[mode][q.key] = true;
+    }
+  }
+
+  function nextClueIndex(q){
+    pickCluesForMode(q);
+    var mode = FIELD_MODE;
+    var total = q.clues.length;
+    var tries = 0;
+    var idx;
+    do{
+      idx = Math.floor(Math.random()*total);
+      tries++;
+    } while(seenClues[mode][q.key][idx] && tries < 20);
+    seenClues[mode][q.key][idx] = true;
+    return idx;
+  }
+
+  function renderCard(q){
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.setAttribute('data-key', q.key);
+    applyQColor(card, q);
+
+    card.innerHTML =
+      '<span class="tag" hidden></span>' +
+      '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
+      '<p class="clue"></p>' +
+      '<div class="quiz"></div>' +
+      '<div class="unlocked-panel" hidden></div>';
+
+    renderQuizState(q, card);
+    return card;
+  }
+
+  function renderQuizState(q, card){
+    if(unlocked[q.key]){
+      unlockCard(q, card, true);
+      return;
+    }
+    currentClueIndex[q.key] = nextClueIndex(q);
+    var clueEl = card.querySelector('.clue');
+    clueEl.textContent = q.clues[currentClueIndex[q.key]];
+
+    var quiz = card.querySelector('.quiz');
+    var rowHtml = '';
+    FIELD_ORDER.forEach(function(f){
+      rowHtml += '<div class="quiz-row">' + buildFieldHtml(f, q) + '</div>';
+    });
+    rowHtml += '<div class="quiz-actions"><button class="check-btn" type="button">Check</button><span class="feedback" aria-live="polite"></span></div>';
+    quiz.innerHTML = rowHtml;
+
+    var btn = quiz.querySelector('.check-btn');
+    var fields = quiz.querySelectorAll('[data-field]');
+    function attempt(){ checkCard(q, card); }
+    btn.addEventListener('click', attempt);
+    fields.forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); attempt(); } });
+      el.addEventListener('focus', function(){ if(playing){ autoPaused = true; setPlaying(false); } });
+      el.addEventListener('blur', function(){ if(autoPaused && !userPaused){ autoPaused = false; setPlaying(true); } });
+    });
+    quiz.querySelectorAll('.greek-wrap').forEach(function(wrap){
+      var trigger = wrap.querySelector('.greek-trigger');
+      var popup = wrap.querySelector('.greek-popup');
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        var wasOpen = !popup.hidden;
+        closeAllGreekPopups();
+        popup.hidden = wasOpen;
+      });
+      popup.querySelectorAll('.greek-opt').forEach(function(opt){
+        opt.addEventListener('click', function(e){
+          e.stopPropagation();
+          var input = wrap.closest('label').querySelector('input');
+          if(input){
+            input.value = opt.getAttribute('data-char');
+            input.classList.remove('ok','bad');
+          }
+          popup.hidden = true;
+          if(input) input.focus();
+        });
+      });
+    });
+
+    if(q.kind === 'slider'){
+      var panelEl = card.querySelector('.unlocked-panel');
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else {
+      var panelEl2 = card.querySelector('.unlocked-panel');
+      panelEl2.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+  }
+
+  function checkCard(q, card){
+    var quiz = card.querySelector('.quiz');
+    var fields = quiz.querySelectorAll('[data-field]');
+    var allOk = true;
+    fields.forEach(function(el){
+      var f = el.getAttribute('data-field');
+      var ok = fieldCorrect(q, f, el);
+      el.classList.remove('ok','bad');
+      el.classList.add(ok ? 'ok' : 'bad');
+      if(!ok) allOk = false;
+    });
+    var feedback = quiz.querySelector('.feedback');
+    if(allOk){
+      feedback.textContent = '';
+      unlockCard(q, card, false);
+    } else {
+      feedback.textContent = 'Not quite — check name, symbol AND unit, then try again.';
+    }
+  }
+
+  function formatValue(val){
+    if(val === 0) return '0';
+    var abs = Math.abs(val);
+    if(abs < 0.01 || abs >= 100000){ return val.toExponential(2); }
+    return val.toFixed(2);
+  }
+
+  function updateLiveValue(q, card){
+    var el = card.querySelector('.derived-value');
+    if(!el) return;
+    var val = q.kind === 'derived' ? q.deriveFn(waveState) : waveState[q.key];
+    el.textContent = formatValue(val) + ' ' + q.unit;
+  }
+
+  function unlockCard(q, card, silent){
+    unlocked[q.key] = true;
+    card.classList.add('is-unlocked');
+    var tagEl = card.querySelector('.tag');
+    tagEl.hidden = false;
+    tagEl.className = 'tag unlocked';
+    tagEl.textContent = 'DONE';
+    card.querySelector('.qcard-title').textContent = q.symbol + ' — ' + q.name + ' (' + q.unit + ')';
+    card.querySelector('.quiz').hidden = true;
+    var panelEl = card.querySelector('.unlocked-panel');
+    panelEl.hidden = false;
+    if(q.kind === 'slider' && !panelEl.querySelector('.qslider')){
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else if(q.kind === 'derived' && !panelEl.querySelector('.qnote')){
+      panelEl.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+    updateLiveValue(q, card);
+    if(q.kind === 'slider'){
+      var slider = panelEl.querySelector('.qslider');
+      slider.addEventListener('input', function(){
+        waveState[q.key] = parseFloat(slider.value);
+        updateLiveValue(q, card);
+        renderGrid(true);
+        save();
+      });
+    }
+    if(!silent){
+      save();
+      grid.appendChild(card);
+      showCelebration(q);
+      updateProgress();
+    }
+  }
+
+  function showCelebration(q){
+    var modal = document.getElementById('celebrateModal');
+    var symbolEl = document.getElementById('celebrateSymbol');
+    var titleEl = document.getElementById('celebrateTitle');
+    var summaryEl = document.getElementById('celebrateSummary');
+    symbolEl.textContent = q.symbol + ' — ' + q.name;
+    titleEl.textContent = 'Wahoo — well done!';
+    summaryEl.textContent = q.definition;
+    modal.hidden = false;
+    setTimeout(function(){
+      modal.hidden = true;
+      checkAllDone();
+    }, 1000);
+  }
+
+  function updateProgress(){
+    var done = Object.keys(unlocked).filter(function(k){ return unlocked[k]; }).length;
+    document.getElementById('progressBadge-ang').innerHTML = '<b>'+done+'</b> / '+QUANTITIES.length+' done';
+  }
+
+  function allFullyCycled(){
+    return QUANTITIES.every(function(q){ return fullyCycled[FIELD_MODE][q.key]; });
+  }
+
+  function checkAllDone(){
+    var allUnlocked = QUANTITIES.every(function(q){ return unlocked[q.key]; });
+    if(!allUnlocked) return;
+    var modal = document.getElementById('allDoneModal');
+    var title = document.getElementById('allDoneTitle');
+    var summary = document.getElementById('allDoneSummary');
+    var btn = document.getElementById('allDoneBtn');
+    if(allFullyCycled()){
+      title.textContent = "You've mastered Angular Mechanics!";
+      summary.textContent = "Every quantity, every clue variation, in " + FIELD_MODE + " mode. Time for the next mode, or the next topic.";
+      btn.textContent = 'Keep going';
+    } else {
+      title.textContent = "Amazing progress!";
+      summary.textContent = "All quantities unlocked at least once in " + FIELD_MODE + " mode — next set will cycle through the clues you haven't seen yet.";
+      btn.textContent = 'Next set';
+    }
+    btn.onclick = function(){ modal.hidden = true; fullReset(false); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function renderGrid(preserveScroll){
+    grid.innerHTML = '';
+    var order = QUANTITIES.slice().sort(function(a,b){
+      var au = unlocked[a.key] ? 1 : 0, bu = unlocked[b.key] ? 1 : 0;
+      if(au !== bu) return au - bu;
+      return a.order - b.order;
+    });
+    order.forEach(function(q){ grid.appendChild(renderCard(q)); });
+  }
+
+  function fullReset(clearStorage){
+    unlocked = {};
+    QUANTITIES.forEach(function(q){ unlocked[q.key] = false; });
+    if(clearStorage){
+      seenClues = { learner:{}, confident:{}, expert:{} };
+      fullyCycled = { learner:{}, confident:{}, expert:{} };
+      waveState = { dtheta:6.28, dt:1.23, alpha:16.6, I:5 };
+      FIELD_MODE = 'learner';
+      updateModeButtons();
+    }
+    currentClueIndex = {};
+    save();
+    renderGrid();
+    updateProgress();
+  }
+  window.mechLabTopics = window.mechLabTopics || [];
+  window.mechLabTopics.push(function(){ fullReset(true); });
+
+  var playBtn = document.getElementById('playBtn-ang');
+  function setPlaying(p){ playing = p; playBtn.textContent = playing ? 'Pause' : 'Play'; }
+  playBtn.addEventListener('click', function(){ setPlaying(!playing); userPaused = !playing; });
+  document.getElementById('resetBtn-ang').addEventListener('click', function(){ fullReset(false); });
+
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){
+    modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+  }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if(m === FIELD_MODE) return;
+      FIELD_MODE = m;
+      save();
+      updateModeButtons();
+      renderGrid();
+    });
+  });
+  updateModeButtons();
+
+  // ---------- canvas ----------
+  var canvas = document.getElementById('waveCanvas-ang');
+  var cctx = canvas.getContext('2d');
+  var cw = 0, ch = 140;
+  var t = 0, lastTime = null;
+  var pal = {};
+  function readPalette(){
+    var cs = getComputedStyle(document.documentElement);
+    pal.ink = cs.getPropertyValue('--ink').trim();
+    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
+    pal.border = cs.getPropertyValue('--border').trim();
+    pal.omega = isDarkMode() ? qByKey.omega.colorDark : qByKey.omega.colorLight;
+  }
+  readPalette();
+  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
+
+  function sizeCanvas(){
+    var rect = canvas.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    cw = rect.width;
+    canvas.width = cw*dpr; canvas.height = ch*dpr;
+    cctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  function render(now){
+    if(lastTime===null) lastTime = now;
+    var dt = Math.min((now-lastTime)/1000, 0.05);
+    lastTime = now;
+    if(playing) t += dt;
+
+    cctx.clearRect(0,0,cw,ch);
+    var midX = cw/2, midY = 70;
+    var pxRadius = 45;
+
+    var omega = waveState.dtheta / waveState.dt;
+    var angle = t * omega;
+
+    cctx.strokeStyle = pal.border;
+    cctx.beginPath(); cctx.arc(midX, midY, pxRadius, 0, 2*Math.PI); cctx.stroke();
+    cctx.fillStyle = pal.inkMuted;
+    cctx.beginPath(); cctx.arc(midX, midY, 4, 0, 2*Math.PI); cctx.fill();
+
+    var spokeX = midX + pxRadius*Math.cos(angle);
+    var spokeY = midY + pxRadius*Math.sin(angle);
+    cctx.strokeStyle = unlocked.omega ? pal.omega : pal.ink;
+    cctx.lineWidth = 3;
+    cctx.beginPath(); cctx.moveTo(midX, midY); cctx.lineTo(spokeX, spokeY); cctx.stroke();
+    cctx.lineWidth = 1;
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  renderGrid();
+  updateProgress();
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var panel = document.querySelector('.topic-panel[data-topic="shm"]');
+
+  function isDarkMode(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  var GREEK_LETTERS = [
+    { ch:'Δ', name:'delta' },
+    { ch:'θ', name:'theta' },
+    { ch:'ω', name:'omega' },
+    { ch:'α', name:'alpha' },
+    { ch:'τ', name:'tau' }
+  ];
+  var SYMBOL_PRONOUNCE = {};
+  GREEK_LETTERS.forEach(function(g){ SYMBOL_PRONOUNCE[g.ch] = g.name; });
+  function symbolOptionLabel(s){
+    return SYMBOL_PRONOUNCE[s] ? (s + ' (' + SYMBOL_PRONOUNCE[s] + ')') : s;
+  }
+
+  var QUANTITIES = [
+    { key:'m', order:1, name:'Mass', symbol:'m', unit:'kg',
+      nameAliases:['mass','oscillating mass','mass on spring'], symbolAliases:['m'], unitAliases:['kg','kilogram','kilograms'],
+      clues:[
+        "The mass of the object attached to a spring, oscillating back and forth.",
+        "A 0.500 kg mass sits on the end of a spring, bouncing up and down. What quantity is 0.500 kg, here?",
+        "A heavier trolley attached to a spring takes longer to complete each oscillation than a lighter one on the same spring. What quantity, increased, slows the oscillation?",
+        "This quantity appears under the square root in T = 2π√(m/k), on the top.",
+        "Doubling this quantity, while keeping the spring the same, makes the period longer — but not twice as long."
+      ],
+      definition:"Mass is the mass of the object attached to a spring. It is measured in kilograms.",
+      kind:'slider', min:0.2, max:5, step:0.1, def:1,
+      colorLight:'#2B6E8A', colorDark:'#6FC0D6', fill:'#2B6E8A' },
+    { key:'k', order:2, name:'Spring constant', symbol:'k', unit:'N/m',
+      nameAliases:['spring constant','stiffness'], symbolAliases:['k'], unitAliases:['n/m','newton per metre','newtons per metre','n per m'],
+      clues:[
+        "How stiff a spring is — how much force it takes to stretch or compress it by a given amount.",
+        "A spring needs 5.0 N to stretch it 0.10 m. This tells you about a quantity of the spring itself — what quantity?",
+        "A stiffer spring, with a larger value of this quantity, oscillates faster for the same attached mass.",
+        "This quantity appears under the square root in T = 2π√(m/k), on the bottom.",
+        "This quantity also determines how much force is needed to hold a spring at a given displacement — F = −ky."
+      ],
+      definition:"Spring constant is how stiff a spring is. It is measured in newtons per metre.",
+      kind:'slider', min:5, max:100, step:1, def:20,
+      colorLight:'#8A6E2B', colorDark:'#D6C06F', fill:'#8A6E2B' },
+    { key:'T', order:3, name:'Period', symbol:'T', unit:'s',
+      nameAliases:['period','period of oscillation'], symbolAliases:['t'], unitAliases:['s','sec','second','seconds'],
+      clues:[
+        "The time taken for one complete oscillation — out, back, and returning to the same point moving the same way.",
+        "A mass on a spring completes one full bounce every 0.89 s. What quantity is 0.89 s?",
+        "This quantity is calculated using T = 2π√(m/k) — the mass and spring constant together.",
+        "The reciprocal of this quantity is the frequency of oscillation.",
+        "A stiffer spring or a lighter mass makes this quantity smaller — faster oscillations."
+      ],
+      definition:"Period is the time taken for one complete oscillation. It is measured in seconds.",
+      note:"T isn't independent — it's calculated from m and k. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return 2*Math.PI*Math.sqrt(state.m/state.k); },
+      colorLight:'#6E2B8A', colorDark:'#C06FD6', fill:'#6E2B8A' },
+    { key:'y', order:4, name:'Displacement', symbol:'y', unit:'m',
+      nameAliases:['displacement','displacement from equilibrium'], symbolAliases:['y'], unitAliases:['m','metre','metres','meter','meters'],
+      clues:[
+        "How far the oscillating mass currently sits from its equilibrium (resting) position.",
+        "A mass sits 0.15 m above its resting position on a stretched spring. What quantity is 0.15 m, here?",
+        "This quantity is zero at the equilibrium position and reaches its greatest size at the extremes of the oscillation.",
+        "This quantity, multiplied by the spring constant, gives the size of the restoring force pulling the mass back.",
+        "The sign of this quantity shows which side of equilibrium the mass is on."
+      ],
+      definition:"Displacement is how far the oscillating mass sits from its equilibrium position. It is measured in metres.",
+      kind:'slider', min:-0.3, max:0.3, step:0.01, def:0.15,
+      colorLight:'#2B8A6E', colorDark:'#6FD6C0', fill:'#2B8A6E' },
+    { key:'F', order:5, name:'Restoring force', symbol:'F', unit:'N',
+      nameAliases:['restoring force','spring force'], symbolAliases:['f'], unitAliases:['n','newton','newtons'],
+      clues:[
+        "The force pulling an oscillating mass back toward its equilibrium position — always opposite in direction to the displacement.",
+        "A stretched spring pulls back on its mass with 3.0 N, trying to restore it to rest. What quantity is 3.0 N, here?",
+        "This quantity is calculated using F = −ky — the spring constant multiplied by the displacement, with a minus sign showing its direction.",
+        "The bigger the displacement from equilibrium, the bigger this quantity becomes, for a fixed spring.",
+        "Without this quantity acting, a displaced mass on a spring would never return to equilibrium at all."
+      ],
+      definition:"Restoring force is the force pulling an oscillating mass back toward equilibrium. It is measured in newtons.",
+      note:"F isn't independent — it's calculated from k and y. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return -state.k * state.y; },
+      colorLight:'#8A2B6E', colorDark:'#D66FC0', fill:'#8A2B6E' },
+    { key:'Ep', order:6, name:'Elastic potential energy', symbol:'Ep', unit:'J',
+      nameAliases:['elastic potential energy','spring potential energy','elastic pe'], symbolAliases:['ep'], unitAliases:['j','joule','joules'],
+      clues:[
+        "The potential energy stored in a stretched or compressed spring.",
+        "A spring stretched by 0.20 m, with a spring constant of 40 N/m, stores 0.80 J of a certain quantity. What quantity is 0.80 J, here?",
+        "This quantity is calculated using Ep = ½ky² — the spring constant and the square of the displacement.",
+        "This quantity is greatest at the extremes of an oscillation, where displacement is largest, and zero at equilibrium.",
+        "As a spring's stored version of this quantity falls, the oscillating mass's kinetic energy rises to match, and vice versa."
+      ],
+      definition:"Elastic potential energy is the potential energy stored in a stretched or compressed spring. It is measured in joules.",
+      note:"Ep isn't independent — it's calculated from k and y. Adjust those above to see it change.",
+      kind:'derived', deriveFn:function(state){ return 0.5 * state.k * state.y * state.y; },
+      colorLight:'#6E8A2B', colorDark:'#C0D66F', fill:'#6E8A2B' }
+  ];
+
+  var FIELD_ORDER = ['name','symbol','unit'];
+  var FIELD_LABELS = { name:'Name', symbol:'Symbol', unit:'Unit of measurement' };
+  var ALL_SYMBOLS = QUANTITIES.map(function(x){ return x.symbol; });
+  var ALL_NAMES = QUANTITIES.map(function(x){ return x.name; });
+  var ALL_UNITS_UNIQUE = (function(){
+    var seen = {}, out = [];
+    QUANTITIES.forEach(function(x){ if(!seen[x.unit]){ seen[x.unit]=true; out.push(x.unit); } });
+    return out;
+  })();
+  var qByKey = {};
+  QUANTITIES.forEach(function(x){ qByKey[x.key] = x; });
+
+  var waveState = { m:1, k:20, y:0.15 };
+  var unlocked = { m:false, k:false, T:false, y:false, F:false, Ep:false };
+  var FIELD_MODE = 'learner';
+  var playing = true, userPaused = false, autoPaused = false;
+  var seenClues = { learner:{}, confident:{}, expert:{} };
+  var fullyCycled = { learner:{}, confident:{}, expert:{} };
+  var currentClueIndex = {};
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+  function normalize(s){
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατ]/gi,'');
+  }
+
+  function saveKey(){ return 'mechLab_shm_v1'; }
+  function save(){
+    try{
+      localStorage.setItem(saveKey(), JSON.stringify({ unlocked:unlocked, seenClues:seenClues, fullyCycled:fullyCycled, FIELD_MODE:FIELD_MODE, waveState:waveState }));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      var raw = localStorage.getItem(saveKey());
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      if(data.unlocked) unlocked = data.unlocked;
+      if(data.seenClues) seenClues = data.seenClues;
+      if(data.fullyCycled) fullyCycled = data.fullyCycled;
+      if(data.FIELD_MODE) FIELD_MODE = data.FIELD_MODE;
+      if(data.waveState) waveState = data.waveState;
+    }catch(e){}
+  }
+  function ensureClueIndices(){
+    QUANTITIES.forEach(function(q){ if(!(q.key in currentClueIndex)) currentClueIndex[q.key] = 0; });
+  }
+  load();
+  ensureClueIndices();
+
+  var grid = panel.querySelector('.grid');
+
+  function fieldIsDropdown(f){ return FIELD_MODE === 'learner'; }
+  function fieldPool(f){
+    if(f === 'symbol') return ALL_SYMBOLS;
+    if(f === 'name') return ALL_NAMES;
+    return ALL_UNITS_UNIQUE;
+  }
+  function buildFieldHtml(f, q){
+    if(fieldIsDropdown(f)){
+      var opts = shuffle(fieldPool(f));
+      var optHtml = '<option value="">— choose —</option>';
+      opts.forEach(function(s){
+        var label = f === 'symbol' ? symbolOptionLabel(s) : s;
+        optHtml += '<option value="'+s+'">'+label+'</option>';
+      });
+      return '<label>'+FIELD_LABELS[f]+'<select data-field="'+f+'">'+optHtml+'</select></label>';
+    }
+    var helper = '';
+    if(f === 'symbol'){
+      var optsHtml = GREEK_LETTERS.map(function(g){
+        return '<button type="button" class="greek-opt" data-char="'+g.ch+'">'+g.ch+'<span>'+g.name+'</span></button>';
+      }).join('');
+      helper =
+        '<div class="greek-wrap">' +
+          '<button type="button" class="greek-trigger">Greek ▾</button>' +
+          '<div class="greek-popup" hidden>'+optsHtml+'</div>' +
+        '</div>';
+    }
+    return '<label>'+FIELD_LABELS[f]+'<input data-field="'+f+'" autocomplete="off" spellcheck="false">'+helper+'</label>';
+  }
+  function closeAllGreekPopups(){
+    document.querySelectorAll('.greek-popup').forEach(function(p){ p.hidden = true; });
+  }
+  document.addEventListener('click', closeAllGreekPopups);
+
+  function fieldCorrect(q, f, el){
+    var correctVal = f==='name' ? q.name : (f==='symbol' ? q.symbol : q.unit);
+    if(el.tagName === 'SELECT') return el.value === correctVal;
+    var val = normalize(el.value);
+    if(val === '') return false;
+    var aliases = f==='name' ? q.nameAliases : (f==='symbol' ? q.symbolAliases : q.unitAliases);
+    return aliases.map(normalize).indexOf(val) !== -1;
+  }
+
+  function applyQColor(card, q){
+    card.style.setProperty('--qcolor', isDarkMode() ? q.colorDark : q.colorLight);
+    card.style.setProperty('--qfill', q.fill);
+  }
+
+  function pickCluesForMode(q){
+    var mode = FIELD_MODE;
+    if(!seenClues[mode][q.key]) seenClues[mode][q.key] = {};
+    var total = q.clues.length;
+    var seenCount = Object.keys(seenClues[mode][q.key]).length;
+    if(seenCount >= total){
+      seenClues[mode][q.key] = {};
+      fullyCycled[mode][q.key] = true;
+    }
+  }
+
+  function nextClueIndex(q){
+    pickCluesForMode(q);
+    var mode = FIELD_MODE;
+    var total = q.clues.length;
+    var tries = 0;
+    var idx;
+    do{
+      idx = Math.floor(Math.random()*total);
+      tries++;
+    } while(seenClues[mode][q.key][idx] && tries < 20);
+    seenClues[mode][q.key][idx] = true;
+    return idx;
+  }
+
+  function renderCard(q){
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.setAttribute('data-key', q.key);
+    applyQColor(card, q);
+
+    card.innerHTML =
+      '<span class="tag" hidden></span>' +
+      '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
+      '<p class="clue"></p>' +
+      '<div class="quiz"></div>' +
+      '<div class="unlocked-panel" hidden></div>';
+
+    renderQuizState(q, card);
+    return card;
+  }
+
+  function renderQuizState(q, card){
+    if(unlocked[q.key]){
+      unlockCard(q, card, true);
+      return;
+    }
+    currentClueIndex[q.key] = nextClueIndex(q);
+    var clueEl = card.querySelector('.clue');
+    clueEl.textContent = q.clues[currentClueIndex[q.key]];
+
+    var quiz = card.querySelector('.quiz');
+    var rowHtml = '';
+    FIELD_ORDER.forEach(function(f){
+      rowHtml += '<div class="quiz-row">' + buildFieldHtml(f, q) + '</div>';
+    });
+    rowHtml += '<div class="quiz-actions"><button class="check-btn" type="button">Check</button><span class="feedback" aria-live="polite"></span></div>';
+    quiz.innerHTML = rowHtml;
+
+    var btn = quiz.querySelector('.check-btn');
+    var fields = quiz.querySelectorAll('[data-field]');
+    function attempt(){ checkCard(q, card); }
+    btn.addEventListener('click', attempt);
+    fields.forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); attempt(); } });
+      el.addEventListener('focus', function(){ if(playing){ autoPaused = true; setPlaying(false); } });
+      el.addEventListener('blur', function(){ if(autoPaused && !userPaused){ autoPaused = false; setPlaying(true); } });
+    });
+    quiz.querySelectorAll('.greek-wrap').forEach(function(wrap){
+      var trigger = wrap.querySelector('.greek-trigger');
+      var popup = wrap.querySelector('.greek-popup');
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        var wasOpen = !popup.hidden;
+        closeAllGreekPopups();
+        popup.hidden = wasOpen;
+      });
+      popup.querySelectorAll('.greek-opt').forEach(function(opt){
+        opt.addEventListener('click', function(e){
+          e.stopPropagation();
+          var input = wrap.closest('label').querySelector('input');
+          if(input){
+            input.value = opt.getAttribute('data-char');
+            input.classList.remove('ok','bad');
+          }
+          popup.hidden = true;
+          if(input) input.focus();
+        });
+      });
+    });
+
+    if(q.kind === 'slider'){
+      var panelEl = card.querySelector('.unlocked-panel');
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else {
+      var panelEl2 = card.querySelector('.unlocked-panel');
+      panelEl2.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+  }
+
+  function checkCard(q, card){
+    var quiz = card.querySelector('.quiz');
+    var fields = quiz.querySelectorAll('[data-field]');
+    var allOk = true;
+    fields.forEach(function(el){
+      var f = el.getAttribute('data-field');
+      var ok = fieldCorrect(q, f, el);
+      el.classList.remove('ok','bad');
+      el.classList.add(ok ? 'ok' : 'bad');
+      if(!ok) allOk = false;
+    });
+    var feedback = quiz.querySelector('.feedback');
+    if(allOk){
+      feedback.textContent = '';
+      unlockCard(q, card, false);
+    } else {
+      feedback.textContent = 'Not quite — check name, symbol AND unit, then try again.';
+    }
+  }
+
+  function formatValue(val){
+    if(val === 0) return '0';
+    var abs = Math.abs(val);
+    if(abs < 0.01 || abs >= 100000){ return val.toExponential(2); }
+    return val.toFixed(2);
+  }
+
+  function updateLiveValue(q, card){
+    var el = card.querySelector('.derived-value');
+    if(!el) return;
+    var val = q.kind === 'derived' ? q.deriveFn(waveState) : waveState[q.key];
+    el.textContent = formatValue(val) + ' ' + q.unit;
+  }
+
+  function unlockCard(q, card, silent){
+    unlocked[q.key] = true;
+    card.classList.add('is-unlocked');
+    var tagEl = card.querySelector('.tag');
+    tagEl.hidden = false;
+    tagEl.className = 'tag unlocked';
+    tagEl.textContent = 'DONE';
+    card.querySelector('.qcard-title').textContent = q.symbol + ' — ' + q.name + ' (' + q.unit + ')';
+    card.querySelector('.quiz').hidden = true;
+    var panelEl = card.querySelector('.unlocked-panel');
+    panelEl.hidden = false;
+    if(q.kind === 'slider' && !panelEl.querySelector('.qslider')){
+      panelEl.innerHTML =
+        '<div class="live-row"><span class="derived-value"></span></div>' +
+        '<input type="range" class="qslider" min="'+q.min+'" max="'+q.max+'" step="'+q.step+'" value="'+waveState[q.key]+'">';
+    } else if(q.kind === 'derived' && !panelEl.querySelector('.qnote')){
+      panelEl.innerHTML = '<div class="live-row"><span class="derived-value"></span></div><p class="qnote">'+(q.note||'')+'</p>';
+    }
+    updateLiveValue(q, card);
+    if(q.kind === 'slider'){
+      var slider = panelEl.querySelector('.qslider');
+      slider.addEventListener('input', function(){
+        waveState[q.key] = parseFloat(slider.value);
+        updateLiveValue(q, card);
+        renderGrid(true);
+        save();
+      });
+    }
+    if(!silent){
+      save();
+      grid.appendChild(card);
+      showCelebration(q);
+      updateProgress();
+    }
+  }
+
+  function showCelebration(q){
+    var modal = document.getElementById('celebrateModal');
+    var symbolEl = document.getElementById('celebrateSymbol');
+    var titleEl = document.getElementById('celebrateTitle');
+    var summaryEl = document.getElementById('celebrateSummary');
+    symbolEl.textContent = q.symbol + ' — ' + q.name;
+    titleEl.textContent = 'Wahoo — well done!';
+    summaryEl.textContent = q.definition;
+    modal.hidden = false;
+    setTimeout(function(){
+      modal.hidden = true;
+      checkAllDone();
+    }, 1000);
+  }
+
+  function updateProgress(){
+    var done = Object.keys(unlocked).filter(function(k){ return unlocked[k]; }).length;
+    document.getElementById('progressBadge-shm').innerHTML = '<b>'+done+'</b> / '+QUANTITIES.length+' done';
+  }
+
+  function allFullyCycled(){
+    return QUANTITIES.every(function(q){ return fullyCycled[FIELD_MODE][q.key]; });
+  }
+
+  function checkAllDone(){
+    var allUnlocked = QUANTITIES.every(function(q){ return unlocked[q.key]; });
+    if(!allUnlocked) return;
+    var modal = document.getElementById('allDoneModal');
+    var title = document.getElementById('allDoneTitle');
+    var summary = document.getElementById('allDoneSummary');
+    var btn = document.getElementById('allDoneBtn');
+    if(allFullyCycled()){
+      title.textContent = "You've mastered SHM!";
+      summary.textContent = "Every quantity, every clue variation, in " + FIELD_MODE + " mode. Time for the next mode, or head to the Formula Lab.";
+      btn.textContent = 'Keep going';
+    } else {
+      title.textContent = "Amazing progress!";
+      summary.textContent = "All quantities unlocked at least once in " + FIELD_MODE + " mode — next set will cycle through the clues you haven't seen yet.";
+      btn.textContent = 'Next set';
+    }
+    btn.onclick = function(){ modal.hidden = true; fullReset(false); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function renderGrid(preserveScroll){
+    grid.innerHTML = '';
+    var order = QUANTITIES.slice().sort(function(a,b){
+      var au = unlocked[a.key] ? 1 : 0, bu = unlocked[b.key] ? 1 : 0;
+      if(au !== bu) return au - bu;
+      return a.order - b.order;
+    });
+    order.forEach(function(q){ grid.appendChild(renderCard(q)); });
+  }
+
+  function fullReset(clearStorage){
+    unlocked = {};
+    QUANTITIES.forEach(function(q){ unlocked[q.key] = false; });
+    if(clearStorage){
+      seenClues = { learner:{}, confident:{}, expert:{} };
+      fullyCycled = { learner:{}, confident:{}, expert:{} };
+      waveState = { m:1, k:20, y:0.15 };
+      FIELD_MODE = 'learner';
+      updateModeButtons();
+    }
+    currentClueIndex = {};
+    save();
+    renderGrid();
+    updateProgress();
+  }
+  window.mechLabTopics = window.mechLabTopics || [];
+  window.mechLabTopics.push(function(){ fullReset(true); });
+
+  var playBtn = document.getElementById('playBtn-shm');
+  function setPlaying(p){ playing = p; playBtn.textContent = playing ? 'Pause' : 'Play'; }
+  playBtn.addEventListener('click', function(){ setPlaying(!playing); userPaused = !playing; });
+  document.getElementById('resetBtn-shm').addEventListener('click', function(){ fullReset(false); });
+
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){
+    modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+  }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if(m === FIELD_MODE) return;
+      FIELD_MODE = m;
+      save();
+      updateModeButtons();
+      renderGrid();
+    });
+  });
+  updateModeButtons();
+
+  // ---------- canvas ----------
+  var canvas = document.getElementById('waveCanvas-shm');
+  var cctx = canvas.getContext('2d');
+  var cw = 0, ch = 140;
+  var t = 0, lastTime = null;
+  var pal = {};
+  function readPalette(){
+    var cs = getComputedStyle(document.documentElement);
+    pal.ink = cs.getPropertyValue('--ink').trim();
+    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
+    pal.border = cs.getPropertyValue('--border').trim();
+    pal.y = isDarkMode() ? qByKey.y.colorDark : qByKey.y.colorLight;
+  }
+  readPalette();
+  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
+
+  function sizeCanvas(){
+    var rect = canvas.getBoundingClientRect();
+    var dpr = window.devicePixelRatio || 1;
+    cw = rect.width;
+    canvas.width = cw*dpr; canvas.height = ch*dpr;
+    cctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  sizeCanvas();
+  window.addEventListener('resize', sizeCanvas);
+
+  function render(now){
+    if(lastTime===null) lastTime = now;
+    var dt = Math.min((now-lastTime)/1000, 0.05);
+    lastTime = now;
+    if(playing) t += dt;
+
+    cctx.clearRect(0,0,cw,ch);
+    var midX = cw/2;
+    var anchorY = 15;
+    var restY = 75;
+    var pxPerMetre = 130;
+
+    var T = 2*Math.PI*Math.sqrt(waveState.m/waveState.k);
+    var amp = Math.max(Math.abs(waveState.y), 0.02);
+    var yNow = amp * Math.cos((2*Math.PI/T) * t);
+    var massY = restY - yNow*pxPerMetre;
+
+    cctx.strokeStyle = pal.border;
+    cctx.lineWidth = 2;
+    cctx.beginPath();
+    cctx.moveTo(midX, anchorY);
+    var coils = 6;
+    var coilLen = massY - anchorY;
+    for(var i=0;i<=coils;i++){
+      var frac = i/coils;
+      var cx = midX + (i%2===0 ? -10 : 10);
+      var cy = anchorY + frac*coilLen;
+      cctx.lineTo(cx, cy);
+    }
+    cctx.lineTo(midX, massY);
+    cctx.stroke();
+    cctx.lineWidth = 1;
+
+    cctx.strokeStyle = pal.inkMuted;
+    cctx.setLineDash([3,3]);
+    cctx.beginPath(); cctx.moveTo(midX-40, restY); cctx.lineTo(midX+40, restY); cctx.stroke();
+    cctx.setLineDash([]);
+
+    cctx.fillStyle = unlocked.y ? pal.y : pal.ink;
+    cctx.fillRect(midX-16, massY-10, 32, 20);
+
+    requestAnimationFrame(render);
+  }
+  requestAnimationFrame(render);
+
+  renderGrid();
+  updateProgress();
+})();
+</script>
+</body>
+</html>

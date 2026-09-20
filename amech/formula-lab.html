@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mechanics Formula Lab</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Trocchi&display=swap">
+<style>
+  :root{
+    --bg:#F5F7F8; --surface:#FFFFFF; --surface-2:#EDF1F2;
+    --ink:#1B2730; --ink-muted:#5B6870; --border:#D6DEE1;
+    --accent:#0E6E6B; --on-accent:#F6FBFA;
+    --input-line:#B6C1C5; --focus-ring: rgba(14,110,107,0.25);
+    --bad:#B3432E; --good:#1E7A46;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#10171B; --surface:#17222A; --surface-2:#1E2B31;
+      --ink:#E7EEF0; --ink-muted:#9FB0B6; --border:#2B3C43;
+      --accent:#4FD1C0; --on-accent:#082220;
+      --input-line:#3A4B52; --focus-ring: rgba(79,209,192,0.28);
+      --bad:#E5806A; --good:#5FCB8C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10171B; --surface:#17222A; --surface-2:#1E2B31;
+    --ink:#E7EEF0; --ink-muted:#9FB0B6; --border:#2B3C43;
+    --accent:#4FD1C0; --on-accent:#082220;
+    --input-line:#3A4B52; --focus-ring: rgba(79,209,192,0.28);
+    --bad:#E5806A; --good:#5FCB8C;
+  }
+  *{ box-sizing:border-box; }
+  body{ background:var(--bg); color:var(--ink); font-family:'Public Sans', -apple-system, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:12px 22px 60px; }
+
+  .title-row{ margin-bottom:10px; display:flex; align-items:baseline; flex-wrap:wrap; gap:8px 10px; }
+  h1{ font-family:'Fraunces', Georgia, serif; font-weight:700; font-size:clamp(1.15rem,2vw,1.5rem); line-height:1.2; margin:0; display:inline; text-wrap:balance; }
+  .eyebrow-inline{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--ink-muted); }
+  .header-actions{ margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .nav-link{ text-decoration:none; align-self:center; }
+
+  button.ghost-btn, a.ghost-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem;
+    color:var(--ink-muted); background:var(--surface); border:1px solid var(--border);
+    border-radius:7px; padding:7px 12px; cursor:pointer; display:inline-block;
+  }
+  button.ghost-btn:hover, a.ghost-btn:hover{ color:var(--ink); border-color:var(--input-line); }
+  button.ghost-btn:focus-visible, a.ghost-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  button.danger-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem;
+    color:var(--bad); background:var(--surface); border:1px solid var(--bad);
+    border-radius:7px; padding:7px 12px; cursor:pointer;
+  }
+  button.danger-btn:hover{ background:var(--bad); color:#fff; }
+  button.danger-btn:focus-visible{ outline:2px solid var(--bad); outline-offset:2px; }
+
+  .control-row{ display:flex; align-items:center; gap:10px 14px; flex-wrap:wrap; margin-bottom:20px; }
+  .toprow{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+
+  .topic-select{
+    font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem;
+    padding:8px 34px 8px 14px; border-radius:9px; border:1.5px solid var(--border);
+    background:var(--surface) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%235B6870"><path d="M5.5 7.5l4.5 5 4.5-5z"/></svg>') no-repeat right 10px center;
+    background-size:16px; color:var(--ink); cursor:pointer; appearance:none; -webkit-appearance:none;
+    max-width:100%;
+  }
+  .topic-select:disabled{ opacity:0.45; cursor:not-allowed; }
+  .topic-select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .topic-panel{ display:contents; }
+  .topic-panel[hidden]{ display:none; }
+
+  .badge{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:5px 12px; color:var(--ink-muted); }
+  .mode-toggle{ display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+  .mode-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.75rem; padding:6px 13px; background:var(--surface); color:var(--ink-muted); border:none; cursor:pointer; }
+  .mode-btn.active{ background:var(--accent); color:var(--on-accent); }
+  .mode-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .problem-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 26px; flex-basis:100%; width:100%; }
+  .problem-text{ font-family:'Fraunces', serif; font-size:1.15rem; line-height:1.5; margin:0 0 18px; text-wrap:balance; }
+  .facts-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px; }
+  .fact-chip{ font-family:'Trocchi', serif; font-size:0.95rem; font-weight:600; padding:8px 14px; border-radius:9px; border:1.5px solid; background:var(--surface-2); }
+  .find-chip{ font-family:'Trocchi', serif; font-size:0.95rem; font-weight:700; padding:8px 14px; border-radius:9px; border:1.5px dashed; }
+
+  .id-block{ margin-bottom:22px; }
+  .id-block-label{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.02em; color:var(--ink-muted); margin:0 0 10px; }
+  .id-grid{ display:grid; gap:12px; }
+  .id-grid-2{ grid-template-columns:repeat(auto-fit, minmax(100px,1fr)); }
+  .id-grid-3{ grid-template-columns:repeat(auto-fit, minmax(110px,1fr)); }
+  .id-grid-4{ grid-template-columns:repeat(auto-fit, minmax(90px,1fr)); }
+  .id-field{ display:flex; flex-direction:column; gap:6px; }
+  .id-field label{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-muted); }
+  .id-field input{ font-family:'Trocchi', serif; font-size:0.92rem; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:9px 10px; width:100%; box-sizing:border-box; }
+  .id-field input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--focus-ring); }
+  .id-field input.ok{ border-color:var(--good); }
+  .id-field input.bad{ border-color:var(--bad); }
+  .known-fact-block{ margin-bottom:14px; }
+  .known-fact-block:last-child{ margin-bottom:0; }
+  .known-fact-heading{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-muted); margin:0 0 6px; }
+
+  .fact-guess-grid{ display:flex; gap:16px; flex-wrap:wrap; margin-bottom:22px; }
+  .fact-guess{ display:flex; flex-direction:column; gap:8px; min-width:220px; flex:1 1 220px; }
+  .fact-value-chip{ font-family:'Trocchi', serif; font-size:0.95rem; font-weight:600; padding:8px 14px; border-radius:9px; border:1.5px solid var(--border); background:var(--surface-2); color:var(--ink); text-align:center; }
+  .fact-guess label{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-muted); }
+  .fact-guess-input{ font-family:'Trocchi', serif; font-size:0.95rem; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:10px 12px; }
+  .fact-guess-input:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--focus-ring); }
+  .fact-guess-input.ok{ border-color:var(--good); }
+  .fact-guess-input.bad{ border-color:var(--bad); }
+
+  .formula-input-wrap{ display:block; }
+  .formula-input-wrap input{ width:100%; box-sizing:border-box; }
+  .input-sub-row{ display:flex; align-items:center; gap:8px 14px; flex-wrap:wrap; margin-top:8px; }
+  .input-sub-row .field-hint{ margin:0; }
+  .greek-wrap{ position:relative; display:inline-block; }
+  .greek-trigger{ font-family:'Public Sans', sans-serif; font-size:0.78rem; font-style:italic; background:none; border:none; border-bottom:1px dotted var(--ink-muted); padding:2px 0; cursor:pointer; color:var(--ink-muted); }
+  .greek-trigger:hover{ color:var(--accent); border-bottom-color:var(--accent); }
+  .greek-trigger:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .greek-popup{ position:absolute; top:100%; left:0; margin-top:6px; z-index:20; background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:8px; display:grid; grid-template-columns:repeat(3, 1fr); gap:6px; box-shadow:0 10px 28px rgba(0,0,0,0.25); min-width:230px; }
+  .greek-popup[hidden]{ display:none; }
+  .greek-opt{ display:flex; flex-direction:column; align-items:center; gap:2px; font-family:'IBM Plex Mono', monospace; font-size:1.15rem; color:var(--ink); background:var(--surface-2); border:1px solid var(--border); border-radius:8px; padding:8px 4px; cursor:pointer; }
+  .greek-opt span{ font-family:'Public Sans', sans-serif; font-size:0.62rem; color:var(--ink-muted); font-style:italic; }
+  .greek-opt:hover{ border-color:var(--accent); }
+  .greek-opt:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .calc-wrap{ position:relative; display:inline-block; }
+  .calc-trigger{ font-family:'IBM Plex Mono', monospace; font-size:1rem; line-height:1; background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:10px 12px; cursor:pointer; color:var(--ink-muted); }
+  .calc-trigger:hover{ color:var(--ink); border-color:var(--accent); }
+  .calc-trigger:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .calc-popup{ position:absolute; bottom:100%; right:0; margin-bottom:8px; z-index:30; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; box-shadow:0 12px 32px rgba(0,0,0,0.28); width:230px; }
+  .calc-popup[hidden]{ display:none; }
+  .calc-display{ width:100%; box-sizing:border-box; font-family:'IBM Plex Mono', monospace; font-size:1.3rem; text-align:right; padding:10px 12px; margin-bottom:8px; border:1.5px solid var(--input-line); border-radius:8px; background:var(--surface-2); color:var(--ink); }
+  .calc-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
+  .calc-btn{ font-family:'IBM Plex Mono', monospace; font-size:1rem; padding:10px 0; border:1px solid var(--border); border-radius:7px; background:var(--surface-2); color:var(--ink); cursor:pointer; }
+  .calc-btn:hover{ border-color:var(--accent); }
+  .calc-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .calc-btn.calc-op{ color:var(--accent); font-weight:600; }
+  .calc-btn.calc-clear{ color:var(--bad); }
+  .calc-btn.calc-eq{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
+  .calc-btn.calc-zero{ grid-column:span 2; }
+  .calc-use-row{ margin-top:8px; }
+  .calc-use-btn{ width:100%; font-family:'IBM Plex Mono', monospace; font-size:0.82rem; font-weight:600; padding:9px 0; border:none; border-radius:8px; background:var(--accent); color:var(--on-accent); cursor:pointer; }
+  .calc-use-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .field-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .field-row label{ font-family:'IBM Plex Mono', monospace; font-size:0.74rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-muted); }
+  .field-row input, .field-row select, .field-row textarea{ font-family:'Trocchi', serif; font-size:1.05rem; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:12px 14px; }
+  .field-row textarea{ width:100%; box-sizing:border-box; resize:vertical; }
+  .field-row input:focus, .field-row select:focus, .field-row textarea:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--focus-ring); }
+  .field-row input.ok, .field-row select.ok, .field-row textarea.ok{ border-color:var(--good); }
+  .field-row input.bad, .field-row select.bad, .field-row textarea.bad{ border-color:var(--bad); }
+  .field-hint{ font-size:0.8rem; color:var(--ink-muted); font-style:italic; margin:2px 0 0; }
+
+  .answer-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+  .answer-row #answerInput{ flex:2 1 120px; }
+  .answer-row .answer-unit-input{ flex:1 1 90px; }
+
+  .actions-row{ display:flex; align-items:center; gap:12px; margin-top:20px; flex-wrap:wrap; }
+  .check-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.9rem; font-weight:600; color:var(--on-accent); background:var(--accent); border:none; border-radius:9px; padding:11px 22px; cursor:pointer; }
+  .check-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .feedback{ font-size:0.9rem; color:var(--ink-muted); }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-box{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:30px 32px; max-width:420px; text-align:center; box-shadow:0 16px 50px rgba(0,0,0,0.3); animation: celebrate-pop 0.55s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes celebrate-pop{ 0%{ transform:scale(0.3) rotate(-20deg); opacity:0; } 60%{ transform:scale(1.08) rotate(8deg); opacity:1; } 80%{ transform:scale(0.96) rotate(-3deg); } 100%{ transform:scale(1) rotate(0deg); } }
+  .modal-title{ font-family:'Fraunces', serif; font-weight:700; font-size:1.4rem; margin:0 0 12px; }
+  .modal-summary{ color:var(--ink-muted); line-height:1.55; margin:0 0 22px; }
+  .modal-box-compact{ padding:22px 34px; }
+  .modal-box-compact .modal-title{ margin:0; color:var(--good); }
+  .next-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.9rem; font-weight:600; color:var(--on-accent); background:var(--accent); border:none; border-radius:9px; padding:11px 26px; cursor:pointer; }
+  .next-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .modal-box{ animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-row">
+    <h1>Mechanics Formula Lab</h1><span class="eyebrow-inline">91524 &middot; Mech Systems</span>
+    <div class="header-actions">
+      <select id="topicSelect" class="topic-select">
+        <option value="com">Centre of Mass</option>
+        <option value="momentum">🧠 Momentum Conservation</option>
+        <option value="impulse">Impulse &amp; Force</option>
+        <option value="centripetal">Centripetal Force</option>
+        <option value="gravitation">Gravitation</option>
+        <option value="angvel">Angular Velocity</option>
+        <option value="torque">Torque</option>
+        <option value="angmom">Angular Momentum</option>
+        <option value="pendulum">Pendulum Period</option>
+        <option value="springperiod">Spring Period</option>
+        <option value="hooke">Hooke's Law</option>
+        <option value="springpe">Spring PE</option>
+      </select>
+      <button class="ghost-btn danger-btn" id="newStudentBtn" type="button">New student &mdash; clear everything</button>
+      <a class="ghost-btn nav-link" href="../">&#127968; All tools</a>
+    </div>
+  </div>
+
+  <div class="control-row">
+  <section class="topic-panel" data-topic="com">
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-com"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-com" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-com"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="momentum" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-mom"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-mom" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-mom"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="impulse" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-imp"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-imp" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-imp"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="centripetal" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-cf"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-cf" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-cf"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="gravitation" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-grav"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-grav" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-grav"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="angvel" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-av"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-av" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-av"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="torque" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-tau"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-tau" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-tau"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="angmom" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-am"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-am" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-am"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="pendulum" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-pend"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-pend" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-pend"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="springperiod" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-sp"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-sp" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-sp"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="hooke" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-hk"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-hk" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-hk"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="springpe" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-pe"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown — just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-pe" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-pe"></div>
+  </section>
+  </div>
+</div>
+
+<div class="modal-overlay" id="roundDoneModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <h2 class="modal-title" id="roundDoneTitle">Round complete!</h2>
+    <p class="modal-summary" id="roundDoneSummary"></p>
+    <button class="next-btn" id="roundDoneBtn" type="button">Next round</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="correctModal" hidden>
+  <div class="modal-box modal-box-compact" role="status" aria-live="polite">
+    <h2 class="modal-title">Correct!</h2>
+  </div>
+</div>
+
+<script>
+  // Shared helpers used by every topic's script below -- pure UI/utility
+  // functions with no topic-specific data, so they're defined once here
+  // instead of duplicated in each topic's own script block.
+  "use strict";
+
+  window.formulaLabTopics = window.formulaLabTopics || [];
+
+  function isDarkMode(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+  function normalizeNumber(s){
+    // keeps e/E and + so real scientific notation (5.97e24, 6.67E-11)
+    // parses correctly -- mechanics' Fg problems genuinely need this,
+    // unlike anything in the wave-systems Formula Lab.
+    return parseFloat((s||'').toString().trim().replace(/[^0-9.\-eE+]/g,''));
+  }
+  function normalizeGuess(s){
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατ]/gi,'');
+  }
+
+  // Greek letters a student will actually meet across NCEA L3 Physics
+  // mechanics topics -- not exhaustive, just the ones actually used here.
+  var GREEK_LETTERS = [
+    { ch:'Δ', name:'delta' },
+    { ch:'θ', name:'theta' },
+    { ch:'ω', name:'omega' },
+    { ch:'α', name:'alpha' },
+    { ch:'τ', name:'tau' }
+  ];
+
+  function buildGreekHelper(){
+    var optsHtml = GREEK_LETTERS.map(function(g){
+      return '<button type="button" class="greek-opt" data-char="'+g.ch+'">'+g.ch+'<span>'+g.name+'</span></button>';
+    }).join('');
+    return '<div class="greek-wrap">' +
+      '<button type="button" class="greek-trigger">Greek ▾</button>' +
+      '<div class="greek-popup" hidden>'+optsHtml+'</div>' +
+    '</div>';
+  }
+  function buildGreekInputHtml(extraAttrs, placeholder, hint){
+    return '<div class="formula-input-wrap">' +
+      '<input type="text" autocomplete="off" spellcheck="false" ' + extraAttrs +
+        (placeholder ? ' placeholder="'+placeholder+'"' : '') + '>' +
+      '<div class="input-sub-row">' +
+        buildGreekHelper() +
+        (hint ? '<p class="field-hint">'+hint+'</p>' : '') +
+      '</div>' +
+    '</div>';
+  }
+  function buildFormulaInputHtml(id, placeholder, hint){
+    return buildGreekInputHtml('id="'+id+'"', placeholder, hint);
+  }
+  function closeAllGreekPopups(){
+    document.querySelectorAll('.greek-popup').forEach(function(p){ p.hidden = true; });
+  }
+  document.addEventListener('click', closeAllGreekPopups);
+  function wireGreekPopups(scope){
+    scope.querySelectorAll('.greek-wrap').forEach(function(wrap){
+      var trigger = wrap.querySelector('.greek-trigger');
+      var popup = wrap.querySelector('.greek-popup');
+      trigger.addEventListener('click', function(e){
+        e.stopPropagation();
+        var wasOpen = !popup.hidden;
+        closeAllGreekPopups();
+        closeCalcPopup();
+        popup.hidden = wasOpen;
+      });
+      popup.querySelectorAll('.greek-opt').forEach(function(opt){
+        opt.addEventListener('click', function(e){
+          e.stopPropagation();
+          var input = wrap.parentElement.querySelector('input');
+          if(input){
+            var ch = opt.getAttribute('data-char');
+            var start = input.selectionStart != null ? input.selectionStart : input.value.length;
+            var end = input.selectionEnd != null ? input.selectionEnd : input.value.length;
+            input.value = input.value.slice(0,start) + ch + input.value.slice(end);
+            input.focus();
+            input.selectionStart = input.selectionEnd = start + ch.length;
+            input.classList.remove('ok','bad');
+          }
+          popup.hidden = true;
+        });
+      });
+    });
+  }
+
+  // Simple four-function calculator, toggled beside the answer field.
+  function buildCalculatorHtml(){
+    return '<div class="calc-wrap">' +
+      '<button type="button" class="calc-trigger" aria-label="Open calculator">🖩</button>' +
+      '<div class="calc-popup" hidden>' +
+        '<input class="calc-display" type="text" readonly value="0" aria-label="Calculator display">' +
+        '<div class="calc-grid">' +
+          '<button type="button" class="calc-btn calc-clear" data-calc-key="C">C</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="±">±</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="⌫">⌫</button>' +
+          '<button type="button" class="calc-btn calc-op" data-calc-key="÷">÷</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="7">7</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="8">8</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="9">9</button>' +
+          '<button type="button" class="calc-btn calc-op" data-calc-key="×">×</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="4">4</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="5">5</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="6">6</button>' +
+          '<button type="button" class="calc-btn calc-op" data-calc-key="−">−</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="1">1</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="2">2</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="3">3</button>' +
+          '<button type="button" class="calc-btn calc-op" data-calc-key="+">+</button>' +
+          '<button type="button" class="calc-btn calc-zero" data-calc-key="0">0</button>' +
+          '<button type="button" class="calc-btn" data-calc-key=".">.</button>' +
+          '<button type="button" class="calc-btn calc-eq" data-calc-key="=">=</button>' +
+        '</div>' +
+        '<div class="calc-use-row">' +
+          '<button type="button" class="calc-use-btn" type="button">Use this answer ↓</button>' +
+        '</div>' +
+      '</div>' +
+    '</div>';
+  }
+  function closeCalcPopup(){
+    document.querySelectorAll('.calc-popup').forEach(function(p){ p.hidden = true; });
+  }
+  document.addEventListener('click', closeCalcPopup);
+  function wireCalculator(scope){
+    var wrap = scope.querySelector('.calc-wrap');
+    if(!wrap) return;
+    var trigger = wrap.querySelector('.calc-trigger');
+    var popup = wrap.querySelector('.calc-popup');
+    var display = wrap.querySelector('.calc-display');
+    var useBtn = wrap.querySelector('.calc-use-btn');
+
+    var current = '0', pending = null, pendingOp = null, awaitingNew = false;
+
+    function render(){ display.value = current; }
+    function compute(a, op, b){
+      if(op === '+') return a + b;
+      if(op === '−') return a - b;
+      if(op === '×') return a * b;
+      if(op === '÷') return b === 0 ? NaN : a / b;
+      return b;
+    }
+    function pressDigit(d){
+      if(current === 'Error' || awaitingNew || current === '0'){ current = d; awaitingNew = false; }
+      else { current += d; }
+      render();
+    }
+    function pressDot(){
+      if(current === 'Error' || awaitingNew){ current = '0.'; awaitingNew = false; render(); return; }
+      if(current.indexOf('.') === -1){ current += '.'; render(); }
+    }
+    function pressOp(op){
+      var num = parseFloat(current);
+      if(pendingOp !== null && !awaitingNew){
+        num = compute(pending, pendingOp, num);
+        current = isNaN(num) ? 'Error' : String(num);
+        render();
+      }
+      pending = parseFloat(current);
+      pendingOp = op;
+      awaitingNew = true;
+    }
+    function pressEquals(){
+      if(pendingOp === null) return;
+      var num = parseFloat(current);
+      var result = compute(pending, pendingOp, num);
+      current = isNaN(result) ? 'Error' : String(result);
+      pendingOp = null; pending = null; awaitingNew = true;
+      render();
+    }
+    function pressClear(){
+      current = '0'; pending = null; pendingOp = null; awaitingNew = false; render();
+    }
+    function pressBackspace(){
+      if(current === 'Error' || awaitingNew) return;
+      current = current.length > 1 ? current.slice(0,-1) : '0';
+      render();
+    }
+    function pressSign(){
+      if(current === '0' || current === 'Error') return;
+      current = current.charAt(0) === '-' ? current.slice(1) : ('-' + current);
+      render();
+    }
+
+    trigger.addEventListener('click', function(e){
+      e.stopPropagation();
+      var wasOpen = !popup.hidden;
+      closeAllGreekPopups();
+      closeCalcPopup();
+      popup.hidden = wasOpen;
+    });
+    popup.addEventListener('click', function(e){ e.stopPropagation(); });
+    popup.querySelectorAll('.calc-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var key = btn.getAttribute('data-calc-key');
+        if(key === 'C'){ pressClear(); }
+        else if(key === '⌫'){ pressBackspace(); }
+        else if(key === '±'){ pressSign(); }
+        else if(key === '='){ pressEquals(); }
+        else if(key === '+' || key === '−' || key === '×' || key === '÷'){ pressOp(key); }
+        else if(key === '.'){ pressDot(); }
+        else { pressDigit(key); }
+      });
+    });
+    useBtn.addEventListener('click', function(){
+      var answerInput = scope.querySelector('.answer-value-input');
+      if(answerInput && current !== 'Error'){
+        answerInput.value = current;
+        answerInput.classList.remove('ok','bad');
+      }
+      popup.hidden = true;
+    });
+  }
+
+  // ---------------------------------------------------------------
+  // Generic multi-target formula-topic engine, added 2026-09-10 so
+  // every topic can vary which quantity is unknown each round (like
+  // awave's Basic Wave/Interference already did) instead of always
+  // solving for the same fixed variable. See project memory for why.
+  // ---------------------------------------------------------------
+  function normalizeFormulaGeneric(s){
+    return (s||'').toString().trim().toLowerCase()
+      .replace(/½/g,'1/2')
+      .replace(/²/g,'^2')
+      .replace(/δ/g,'delta')
+      .replace(/θ/g,'theta')
+      .replace(/π/g,'pi')
+      .replace(/ω/g,'omega')
+      .replace(/α/g,'alpha')
+      .replace(/τ/g,'tau')
+      .replace(/√/g,'sqrt')
+      .replace(/−/g,'-')
+      .replace(/[×✕✗*]/g,'')
+      .replace(/[₀-₉]/g, function(ch){ return '0123456789'.charAt(ch.charCodeAt(0)-8320); })
+      .replace(/\bx\b/g,'')
+      .replace(/÷/g,'/')
+      .replace(/\s+/g,'');
+  }
+  function autoDecoys(correct){
+    var out = [correct];
+    if(correct.indexOf('×') !== -1){ out.push(correct.replace('×','÷')); }
+    else if(correct.indexOf('÷') !== -1){ out.push(correct.replace('÷','×')); }
+    var m = correct.match(/^(.*=\s*)(.+?)\s*(×|÷)\s*(.+)$/);
+    if(m){ out.push(m[1] + m[4] + ' ' + m[3] + ' ' + m[2]); }
+    while(out.length < 3){ out.push(correct + '​'); }
+    return out;
+  }
+
+  function buildFormulaTopic(cfg){
+    var id = cfg.idSuffix;
+    var panel = document.querySelector('.topic-panel[data-topic="'+cfg.dataTopic+'"]');
+    function colorOf(k){ return isDarkMode() ? cfg.CLR[k].dark : cfg.CLR[k].light; }
+    function fmtVal(k, v){
+      if(cfg.fmt){ var custom = cfg.fmt(k, v); if(custom != null) return custom; }
+      if(typeof v !== 'number') return v;
+      if(Math.abs(v - Math.round(v)) < 1e-9) return String(Math.round(v));
+      if(Math.abs(v) >= 1e5 || (Math.abs(v) < 1e-3 && v !== 0)) return v.toExponential(2);
+      return v.toFixed(2);
+    }
+    function identifyFieldOk(key, field, raw){
+      var list = field === 'name' ? cfg.NAME_ALIASES[key] : (field === 'symbol' ? cfg.SYMBOL_ALIASES[key] : cfg.UNIT_ALIASES[key]);
+      return list.map(normalizeGuess).indexOf(normalizeGuess(raw)) !== -1;
+    }
+
+    var FIELD_MODE = 'learner';
+    var score = 0, asked = 0;
+    var ROUND_SIZE = 6;
+    var current = null;
+
+    function newProblem(){
+      var target = pick(cfg.targets);
+      var gen = cfg.generate(target);
+      var values = gen.values;
+      var givenKeys = cfg.keys.filter(function(k){ return k !== target; });
+      var scenario = pick(cfg.scenarios[target]);
+      givenKeys.forEach(function(k){
+        scenario = scenario.split('{'+k+'}').join(fmtVal(k, values[k]));
+      });
+      if(gen.extra){
+        Object.keys(gen.extra).forEach(function(k){
+          scenario = scenario.split('{'+k+'}').join(gen.extra[k]);
+        });
+      }
+      current = { target: target, values: values, correct: values[target], scenario: scenario };
+      renderProblem();
+    }
+
+    function renderProblem(){
+      var card = document.getElementById('problemCard-'+id);
+      var t = current.target;
+      var givenKeys = cfg.keys.filter(function(k){ return k !== t; });
+
+      var learnerFactsHtml = givenKeys.map(function(k){
+        return '<span class="fact-chip" style="color:'+colorOf(k)+';border-color:'+colorOf(k)+'">'
+          + cfg.LABEL[k] + ' = ' + fmtVal(k, current.values[k]) + ' ' + cfg.UNIT[k] + '</span>';
+      }).join('');
+
+      var factGuessHtml = '';
+      if(FIELD_MODE === 'confident'){
+        factGuessHtml = '<div class="fact-guess-grid">' + givenKeys.map(function(k){
+          return '<div class="fact-guess">' +
+            '<span class="fact-value-chip">' + fmtVal(k, current.values[k]) + ' ' + cfg.UNIT[k] + '</span>' +
+            '<div class="id-grid id-grid-2">' +
+              '<div class="id-field"><label>Name</label><input class="fact-guess-input" data-fact-key="'+k+'" data-fact-guess-field="name" autocomplete="off" spellcheck="false" placeholder="name"></div>' +
+              '<div class="id-field"><label>Symbol</label><input class="fact-guess-input" data-fact-key="'+k+'" data-fact-guess-field="symbol" autocomplete="off" spellcheck="false" placeholder="symbol"></div>' +
+            '</div>' +
+          '</div>';
+        }).join('') + '</div>';
+      }
+
+      var factsRowHtml = '';
+      if(FIELD_MODE !== 'expert'){
+        var findHtml = '<span class="find-chip" style="color:'+colorOf(t)+';border-color:'+colorOf(t)+'">Find: '
+          + cfg.LABEL[t] + ' (' + cfg.NAME[t] + ')</span>';
+        factsRowHtml = '<div class="facts-row">' + (FIELD_MODE === 'learner' ? learnerFactsHtml : '') + findHtml + '</div>';
+      }
+
+      var targetIdHtml = '';
+      var knownFactsHtml = '';
+      if(FIELD_MODE === 'expert'){
+        targetIdHtml =
+          '<div class="id-block">' +
+            '<p class="id-block-label">What are you trying to find?</p>' +
+            '<div class="id-grid id-grid-3">' +
+              '<div class="id-field"><label>Name</label><input class="target-id-input" data-target-field="name" autocomplete="off" spellcheck="false"></div>' +
+              '<div class="id-field"><label>Symbol</label><input class="target-id-input" data-target-field="symbol" autocomplete="off" spellcheck="false"></div>' +
+              '<div class="id-field"><label>Unit</label><input class="target-id-input" data-target-field="unit" autocomplete="off" spellcheck="false"></div>' +
+            '</div>' +
+          '</div>';
+        knownFactsHtml =
+          '<div class="id-block">' +
+            '<p class="id-block-label">What do you know? (write down every fact from the question)</p>' +
+            givenKeys.map(function(k, idx){
+              return '<div class="known-fact-block">' +
+                '<p class="known-fact-heading">Fact ' + (idx+1) + '</p>' +
+                '<div class="id-grid id-grid-4">' +
+                  '<div class="id-field"><label>Value</label><input class="known-fact-input" data-fact-key="'+k+'" data-fact-field="value" autocomplete="off" inputmode="decimal" placeholder="0.00"></div>' +
+                  '<div class="id-field"><label>Name</label><input class="known-fact-input" data-fact-key="'+k+'" data-fact-field="name" autocomplete="off" spellcheck="false"></div>' +
+                  '<div class="id-field"><label>Symbol</label><input class="known-fact-input" data-fact-key="'+k+'" data-fact-field="symbol" autocomplete="off" spellcheck="false"></div>' +
+                  '<div class="id-field"><label>Unit</label><input class="known-fact-input" data-fact-key="'+k+'" data-fact-field="unit" autocomplete="off" spellcheck="false"></div>' +
+                '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>';
+      }
+
+      var hasSheet = !!cfg.formulaSheetOptions;
+      var origFormulaHtml, formulaFieldHtml;
+      var hint = cfg.formulaHint || 'Use × or * for multiply, ÷ or / for divide.';
+
+      if(hasSheet && FIELD_MODE === 'learner'){
+        var sheetOptHtml = '<option value="">— choose —</option>' + shuffle(cfg.formulaSheetOptions).map(function(o){
+          return '<option value="'+o+'">'+o+'</option>';
+        }).join('');
+        origFormulaHtml =
+          '<div class="field-row">' +
+            '<label>Which formula from your sheet applies here?</label>' +
+            '<select id="origFormulaInput-'+id+'">'+sheetOptHtml+'</select>' +
+            '<p class="field-hint">These are real formulae from the NCEA mechanical-systems reference sheet, in the exam you will see many of them at once and have to pick the right one, same as here.</p>' +
+          '</div>';
+        var choiceOpts = shuffle((cfg.formulaChoices && cfg.formulaChoices[t]) ? cfg.formulaChoices[t].slice() : autoDecoys(cfg.formulaCorrectDisplay[t]));
+        var choiceOptHtml = '<option value="">— choose —</option>' + choiceOpts.map(function(o){ return '<option value="'+o+'">'+o+'</option>'; }).join('');
+        formulaFieldHtml =
+          '<div class="field-row">' +
+            '<label>Rearranged formula</label>' +
+            '<select id="formulaInput-'+id+'">'+choiceOptHtml+'</select>' +
+          '</div>';
+      } else if(hasSheet){
+        origFormulaHtml =
+          '<div class="field-row">' +
+            '<label>Original formula (before rearranging)</label>' +
+            buildFormulaInputHtml('origFormulaInput-'+id, '') +
+            '<p class="field-hint">Write it exactly as printed on your formula sheet.</p>' +
+          '</div>';
+        formulaFieldHtml =
+          '<div class="field-row">' +
+            '<label>Rearranged formula (write it before you substitute, or type &quot;same&quot; if it is already in the right order)</label>' +
+            buildFormulaInputHtml('formulaInput-'+id, FIELD_MODE === 'confident' ? 'e.g. '+cfg.formulaCorrectDisplay[t] : '', hint) +
+          '</div>';
+      } else {
+        origFormulaHtml =
+          '<div class="field-row">' +
+            '<label>Original formula (before rearranging)</label>' +
+            buildFormulaInputHtml('origFormulaInput-'+id, '') +
+            '<p class="field-hint">Write it exactly as you learned it, this one is not on your formula sheet, so it has to come from memory.</p>' +
+          '</div>';
+        formulaFieldHtml =
+          '<div class="field-row">' +
+            '<label>Rearranged formula (write it before you substitute, or type &quot;same&quot; if it is already in the right order)</label>' +
+            buildFormulaInputHtml('formulaInput-'+id, FIELD_MODE === 'confident' ? 'e.g. '+cfg.formulaCorrectDisplay[t] : '', hint) +
+          '</div>';
+      }
+
+      card.innerHTML =
+        '<p class="problem-text">' + current.scenario + '</p>' +
+        factsRowHtml +
+        targetIdHtml +
+        knownFactsHtml +
+        factGuessHtml +
+        origFormulaHtml +
+        formulaFieldHtml +
+        '<div class="field-row">' +
+          '<label>Working (optional, show your substitution)</label>' +
+          '<textarea id="workingInput-'+id+'" rows="3" autocomplete="off" spellcheck="false" placeholder="e.g. 5 / 12"></textarea>' +
+        '</div>' +
+        '<div class="field-row">' +
+          '<label>Your answer</label>' +
+          '<div class="answer-row">' +
+            '<input id="answerInput-'+id+'" class="answer-value-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00">' +
+            '<input id="answerUnitInput-'+id+'" class="answer-unit-input" type="text" autocomplete="off" spellcheck="false" placeholder="unit">' +
+            buildCalculatorHtml() +
+          '</div>' +
+        '</div>' +
+        '<div class="actions-row">' +
+          '<button class="check-btn" id="checkBtn-'+id+'" type="button">Check</button>' +
+          '<span class="feedback" id="feedback-'+id+'" aria-live="polite"></span>' +
+        '</div>';
+
+      document.getElementById('checkBtn-'+id).addEventListener('click', checkAnswer);
+      var answerInput = document.getElementById('answerInput-'+id);
+      answerInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+      var answerUnitInput = document.getElementById('answerUnitInput-'+id);
+      answerUnitInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+      var origFormulaInput = document.getElementById('origFormulaInput-'+id);
+      if(origFormulaInput){ origFormulaInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } }); }
+      var formulaInput = document.getElementById('formulaInput-'+id);
+      if(formulaInput){ formulaInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } }); }
+      var workingInput = document.getElementById('workingInput-'+id);
+      workingInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+      wireGreekPopups(card);
+      wireCalculator(card);
+
+      var focusEl = card.querySelector('.target-id-input') || card.querySelector('.fact-guess-input') || origFormulaInput || formulaInput || answerInput;
+      focusEl.focus();
+    }
+
+    function checkAnswer(){
+      var t = current.target;
+      var card = document.getElementById('problemCard-'+id);
+      var origFormulaEl = document.getElementById('origFormulaInput-'+id);
+      var formulaEl = document.getElementById('formulaInput-'+id);
+      var answerEl = document.getElementById('answerInput-'+id);
+      var answerUnitEl = document.getElementById('answerUnitInput-'+id);
+      var feedback = document.getElementById('feedback-'+id);
+      var checkBtn = document.getElementById('checkBtn-'+id);
+
+      var allOk = true, message = '';
+
+      var factGuessEls = card.querySelectorAll('.fact-guess-input');
+      if(factGuessEls.length){
+        var factsOk = true;
+        factGuessEls.forEach(function(el){
+          var k = el.getAttribute('data-fact-key');
+          var field = el.getAttribute('data-fact-guess-field');
+          var ok = identifyFieldOk(k, field, el.value);
+          el.classList.remove('ok','bad'); el.classList.add(ok ? 'ok' : 'bad');
+          if(!ok) factsOk = false;
+        });
+        if(!factsOk){ allOk = false; message = message || 'Check which value is which fact, one or more is not right yet.'; }
+      }
+
+      var targetIdEls = card.querySelectorAll('.target-id-input');
+      if(targetIdEls.length){
+        var targetIdOk = true;
+        targetIdEls.forEach(function(el){
+          var field = el.getAttribute('data-target-field');
+          var ok = identifyFieldOk(t, field, el.value);
+          el.classList.remove('ok','bad'); el.classList.add(ok ? 'ok' : 'bad');
+          if(!ok) targetIdOk = false;
+        });
+        if(!targetIdOk){ allOk = false; message = message || 'Check the name, symbol and unit of what you are finding.'; }
+      }
+
+      var knownFactEls = card.querySelectorAll('.known-fact-input');
+      if(knownFactEls.length){
+        var knownFactsOk = true;
+        knownFactEls.forEach(function(el){
+          var k = el.getAttribute('data-fact-key');
+          var field = el.getAttribute('data-fact-field');
+          var ok;
+          if(field === 'value'){
+            var correctVal = current.values[k];
+            var typedVal = normalizeNumber(el.value);
+            ok = !isNaN(typedVal) && Math.abs(typedVal - correctVal) <= Math.max(0.02*Math.abs(correctVal), 0.03);
+          } else {
+            ok = identifyFieldOk(k, field, el.value);
+          }
+          el.classList.remove('ok','bad'); el.classList.add(ok ? 'ok' : 'bad');
+          if(!ok) knownFactsOk = false;
+        });
+        if(!knownFactsOk){ allOk = false; message = message || 'One of your known facts (value, name, symbol or unit) is not right yet.'; }
+      }
+
+      if(origFormulaEl){
+        var origOk = cfg.formulaOriginalOk.indexOf(normalizeFormulaGeneric(origFormulaEl.value)) !== -1;
+        origFormulaEl.classList.remove('ok','bad'); origFormulaEl.classList.add(origOk ? 'ok' : 'bad');
+        if(!origOk){ allOk = false; message = message || 'That is not the formula that applies here, check your sheet again.'; }
+      }
+
+      if(formulaEl){
+        var formulaRaw = formulaEl.value.trim().toLowerCase() === 'same' ? (origFormulaEl ? origFormulaEl.value : '') : formulaEl.value;
+        var formulaOk = cfg.formulaOk[t].indexOf(normalizeFormulaGeneric(formulaRaw)) !== -1;
+        formulaEl.classList.remove('ok','bad'); formulaEl.classList.add(formulaOk ? 'ok' : 'bad');
+        if(!formulaOk){ allOk = false; message = message || 'The rearranged formula is not quite right yet, try again.'; }
+      }
+
+      var typed = normalizeNumber(answerEl.value);
+      var answerOk = !isNaN(typed) && Math.abs(typed - current.correct) <= Math.max(0.02*Math.abs(current.correct), 0.03);
+      answerEl.classList.remove('ok','bad'); answerEl.classList.add(answerOk ? 'ok' : 'bad');
+      if(!answerOk){ allOk = false; message = message || 'Not quite, check your substitution and try again.'; }
+
+      var unitOk = identifyFieldOk(t, 'unit', answerUnitEl.value);
+      answerUnitEl.classList.remove('ok','bad'); answerUnitEl.classList.add(unitOk ? 'ok' : 'bad');
+      if(!unitOk){ allOk = false; message = message || 'Do not forget to write the unit, check it matches your answer.'; }
+
+      asked++;
+      if(allOk){
+        score++;
+        document.getElementById('scoreBadge-'+id).innerHTML = '<b>'+score+'</b> / '+ROUND_SIZE+' correct this round';
+        checkBtn.disabled = true;
+        var correctModal = document.getElementById('correctModal');
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = message;
+        asked--;
+      }
+    }
+
+    function showRoundDone(){
+      var modal = document.getElementById('roundDoneModal');
+      var title = document.getElementById('roundDoneTitle');
+      var summary = document.getElementById('roundDoneSummary');
+      var btn = document.getElementById('roundDoneBtn');
+      if(score === ROUND_SIZE){
+        title.textContent = "Perfect round!";
+        summary.textContent = "All " + ROUND_SIZE + " correct in this mode.";
+      } else {
+        title.textContent = "Round complete";
+        summary.textContent = score + " out of " + ROUND_SIZE + " correct. Have another go to lock it in.";
+      }
+      btn.onclick = function(){ modal.hidden = true; startRound(); };
+      modal.hidden = false;
+      btn.focus();
+    }
+
+    function startRound(){
+      score = 0; asked = 0;
+      document.getElementById('scoreBadge-'+id).innerHTML = '<b>0</b> / '+ROUND_SIZE+' correct this round';
+      newProblem();
+    }
+
+    document.getElementById('newRoundBtn-'+id).addEventListener('click', startRound);
+
+    var modeButtons = panel.querySelectorAll('.mode-btn');
+    function updateModeButtons(){
+      modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+    }
+    modeButtons.forEach(function(b){
+      b.addEventListener('click', function(){
+        var m = b.getAttribute('data-mode');
+        if(m === FIELD_MODE) return;
+        FIELD_MODE = m;
+        updateModeButtons();
+        startRound();
+      });
+    });
+    updateModeButtons();
+
+    window.formulaLabTopics = window.formulaLabTopics || [];
+    window.formulaLabTopics.push(startRound);
+    startRound();
+  }
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var topicSelect = document.getElementById('topicSelect');
+  topicSelect.addEventListener('change', function(){
+    var id = topicSelect.value;
+    document.querySelectorAll('.topic-panel').forEach(function(p){
+      p.hidden = (p.getAttribute('data-topic') !== id);
+    });
+  });
+
+  document.getElementById('newStudentBtn').addEventListener('click', function(){
+    (window.formulaLabTopics || []).forEach(function(fn){ fn(); });
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      var modal = document.getElementById('roundDoneModal');
+      if(!modal.hidden){ document.getElementById('roundDoneBtn').click(); }
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var CLR = {
+    m1:{light:'#2B6CB0',dark:'#7FB2E8'}, x1:{light:'#1B8A6B',dark:'#5FD1AC'},
+    m2:{light:'#B0562B',dark:'#E8A67F'}, x2:{light:'#8A5A1B',dark:'#D1A05F'},
+    xCOM:{light:'#6B2BB0',dark:'#B27FE8'}
+  };
+  var LABEL = { m1:'m₁', x1:'x₁', m2:'m₂', x2:'x₂', xCOM:'xCOM' };
+  var NAME = { m1:'mass 1', x1:'position 1', m2:'mass 2', x2:'position 2', xCOM:'centre of mass position' };
+  var UNIT = { m1:'kg', x1:'m', m2:'kg', x2:'m', xCOM:'m' };
+  var M1_VALUES = [1,2,3,4,5,6,8,10];
+  var X1_VALUES = [0,1,2,3,4,5];
+  var M2_VALUES = [1,2,3,4,5,6,8,10];
+  var X2_VALUES = [5,6,7,8,9,10];
+  var SCENARIOS = {
+    xCOM: [
+      "Two masses sit on a long beam: {m1} kg at {x1} m from one end, and {m2} kg at {x2} m from the same end. Find the position of the system's centre of mass.",
+      "A see-saw carries a {m1} kg child at {x1} m from one reference edge, and a {m2} kg child at {x2} m from the same edge. Calculate the centre of mass position.",
+      "Two connected trolleys sit on a track: one of mass {m1} kg at {x1} m, the other {m2} kg at {x2} m, both measured from the same end. Find the centre of mass of the pair.",
+      "A student models their forearm as two point masses: {m1} kg at {x1} m from the elbow, and {m2} kg at {x2} m from the elbow. Find the centre of mass position.",
+      "A wizard balances a duelling staff on one finger: a {m1} kg crystal orb is fixed {x1} m from the grip, and a {m2} kg rune-weight sits {x2} m from the grip. Find the position of the staff's centre of mass.",
+      "A knight's jousting lance carries a {m1} kg enchanted counterweight {x1} m from the base, and a {m2} kg iron tip {x2} m from the base. Calculate the centre of mass position.",
+      "Two goblins ride a see-saw cart: one of mass {m1} kg sits {x1} m from the pivot end, the other {m2} kg sits {x2} m from the same end. Find the centre of mass of the pair.",
+      "An alchemist models a troll's arm as two lumps: {m1} kg of stony muscle {x1} m from the elbow, and {m2} kg of bone {x2} m from the elbow. Find the centre of mass position."
+    ],
+    x1: [
+      "A {m1} kg mass and a {m2} kg mass sit on a beam, with the second mass at {x2} m from one end. The system's centre of mass is at {xCOM} m. Find the position of the first mass.",
+      "On a see-saw, a {m1} kg child balances with a {m2} kg child at {x2} m, giving a combined centre of mass at {xCOM} m. Find the position of the first child.",
+      "A wizard's crystal orb ({m1} kg) and a rune-weight ({m2} kg, at {x2} m from the grip) balance on a staff with centre of mass at {xCOM} m. Find the orb's position.",
+      "A goblin cart's two riders, {m1} kg and {m2} kg (the second at {x2} m), give the cart a centre of mass at {xCOM} m. Find the first rider's position."
+    ],
+    x2: [
+      "A {m1} kg mass (at {x1} m) and a {m2} kg mass sit on a beam. The system's centre of mass is at {xCOM} m. Find the position of the second mass.",
+      "On a see-saw, a {m1} kg child at {x1} m balances with a {m2} kg child, giving a combined centre of mass at {xCOM} m. Find the position of the second child.",
+      "A knight's lance has a {m1} kg counterweight at {x1} m and a {m2} kg iron tip, with the whole lance's centre of mass at {xCOM} m. Find the tip's position.",
+      "A troll's arm is modelled as {m1} kg of muscle at {x1} m and {m2} kg of bone, with a centre of mass at {xCOM} m. Find the bone's position."
+    ],
+    m1: [
+      "A mass at {x1} m and a {m2} kg mass at {x2} m sit on a beam. The system's centre of mass is at {xCOM} m. Find the size of the first mass.",
+      "On a see-saw, an unknown mass at {x1} m balances a {m2} kg child at {x2} m, giving a centre of mass at {xCOM} m. Find the size of the unknown mass.",
+      "A wizard's crystal orb at {x1} m balances a {m2} kg rune-weight at {x2} m on a staff whose centre of mass is at {xCOM} m. Find the orb's mass.",
+      "A goblin sits at {x1} m opposite a {m2} kg goblin at {x2} m on a see-saw cart with centre of mass at {xCOM} m. Find the first goblin's mass."
+    ],
+    m2: [
+      "A {m1} kg mass at {x1} m and a second mass at {x2} m sit on a beam. The system's centre of mass is at {xCOM} m. Find the size of the second mass.",
+      "On a see-saw, a {m1} kg child at {x1} m balances an unknown mass at {x2} m, giving a centre of mass at {xCOM} m. Find the size of the unknown mass.",
+      "A knight's lance has a {m1} kg counterweight at {x1} m and an iron tip at {x2} m, with the lance's centre of mass at {xCOM} m. Find the tip's mass.",
+      "A {m1} kg goblin sits at {x1} m opposite a second goblin at {x2} m on a see-saw cart with centre of mass at {xCOM} m. Find the second goblin's mass."
+    ]
+  };
+  var NAME_ALIASES = {
+    m1: ['mass 1', 'mass one', 'first mass'], x1: ['position 1', 'position one', 'first position'],
+    m2: ['mass 2', 'mass two', 'second mass'], x2: ['position 2', 'position two', 'second position'],
+    xCOM: ['centre of mass position', 'centre of mass', 'center of mass', 'com position']
+  };
+  var SYMBOL_ALIASES = { m1: ['m1'], x1: ['x1'], m2: ['m2'], x2: ['x2'], xCOM: ['xcom', 'xcm'] };
+  var UNIT_ALIASES = {
+    m1: ['kg', 'kilogram', 'kilograms'], x1: ['m', 'metre', 'metres', 'meter', 'meters'],
+    m2: ['kg', 'kilogram', 'kilograms'], x2: ['m', 'metre', 'metres', 'meter', 'meters'],
+    xCOM: ['m', 'metre', 'metres', 'meter', 'meters']
+  };
+  var FORMULA_ORIGINAL_OK = ['xcom=(m1x1+m2x2)/(m1+m2)'];
+  var FORMULA_SHEET_OPTIONS = ['xCOM = (m₁x₁ + m₂x₂) / (m₁ + m₂)', 'F = ma', 'p = mv', 'W = Fd', 'ΔEp = mgΔh'];
+  var FORMULA_OK = {
+    xCOM: ['xcom=(m1x1+m2x2)/(m1+m2)'],
+    x1: ['x1=(xcom(m1+m2)-m2x2)/m1'],
+    x2: ['x2=(xcom(m1+m2)-m1x1)/m2'],
+    m1: ['m1=m2(xcom-x2)/(x1-xcom)'],
+    m2: ['m2=m1(x1-xcom)/(xcom-x2)']
+  };
+  var FORMULA_CORRECT_DISPLAY = {
+    xCOM: 'xCOM = (m₁x₁ + m₂x₂) / (m₁ + m₂)',
+    x1: 'x₁ = (xCOM×(m₁+m₂) − m₂x₂) / m₁',
+    x2: 'x₂ = (xCOM×(m₁+m₂) − m₁x₁) / m₂',
+    m1: 'm₁ = m₂×(xCOM−x₂) / (x₁−xCOM)',
+    m2: 'm₂ = m₁×(x₁−xCOM) / (xCOM−x₂)'
+  };
+  buildFormulaTopic({
+    idSuffix: 'com', dataTopic: 'com',
+    keys: ['m1','x1','m2','x2','xCOM'], targets: ['xCOM','x1','x2','m1','m2'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var m1 = pick(M1_VALUES), x1 = pick(X1_VALUES), m2 = pick(M2_VALUES), x2 = pick(X2_VALUES);
+      var xCOM = (m1*x1 + m2*x2) / (m1 + m2);
+      return { values: { m1:m1, x1:x1, m2:m2, x2:x2, xCOM:xCOM } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = {
+    m1:{light:'#2B6CB0',dark:'#7FB2E8'}, u1:{light:'#B08A2B',dark:'#E8CC7F'},
+    m2:{light:'#B0562B',dark:'#E8A67F'}, u2:{light:'#5A2BB0',dark:'#A07FE8'},
+    v:{light:'#B02B6C',dark:'#E87FB2'}
+  };
+  var LABEL = { m1:'m₁', u1:'u₁', m2:'m₂', u2:'u₂', v:'v' };
+  var NAME = { m1:'mass 1', u1:'velocity 1', m2:'mass 2', u2:'velocity 2', v:'final velocity' };
+  var UNIT = { m1:'kg', u1:'m/s', m2:'kg', u2:'m/s', v:'m/s' };
+  var M1_VALUES = [1,2,3,4,5,6,8,10];
+  var U1_VALUES = [2,3,4,5,6,8,10];
+  var M2_VALUES = [1,2,3,4,5,6,8,10];
+  var U2_VALUES = [1,2,3,4,5];
+  var SCENARIOS = {
+    v: [
+      "A {m1} kg trolley moving at {u1} m/s collides with a {m2} kg trolley moving at {u2} m/s in the same direction, and they lock together. Find their combined velocity.",
+      "Two rollerbladers, one of mass {m1} kg moving at {u1} m/s and the other of mass {m2} kg moving at {u2} m/s, collide and tangle together. Find their combined speed immediately afterward.",
+      "A {m1} kg car moving at {u1} m/s rear-ends a {m2} kg car moving at {u2} m/s in the same direction, and the two lock together. Find their combined velocity.",
+      "A {m1} kg knight's warhorse charges at {u1} m/s and collides with a {m2} kg fleeing cart moving at {u2} m/s in the same direction, locking together. Find their combined velocity.",
+      "Two enchanted duelling carts, one of mass {m1} kg moving at {u1} m/s and the other of mass {m2} kg moving at {u2} m/s, crash and tangle together. Find their combined speed immediately afterward.",
+      "A {m1} kg dragon's sled moving at {u1} m/s rams a {m2} kg supply sled moving at {u2} m/s in the same direction, and the two lock together. Find their combined velocity."
+    ],
+    u1: [
+      "A {m1} kg trolley moving at some speed collides with a {m2} kg trolley moving at {u2} m/s in the same direction; they lock together and move off at {v} m/s. Find the first trolley's initial speed.",
+      "Two rail wagons, {m1} kg and {m2} kg (the second moving at {u2} m/s), couple together and move off at {v} m/s. Find the first wagon's initial speed.",
+      "A {m1} kg war-cart charges into a {m2} kg cart moving at {u2} m/s, and the two lock together, moving off at {v} m/s. Find the war-cart's initial speed.",
+      "A {m1} kg dragon's sled rams a {m2} kg supply sled moving at {u2} m/s; the wreckage moves off at {v} m/s. Find the dragon sled's initial speed."
+    ],
+    u2: [
+      "A {m1} kg trolley moving at {u1} m/s collides with a {m2} kg trolley moving in the same direction; they lock together and move off at {v} m/s. Find the second trolley's initial speed.",
+      "Two rail wagons, {m1} kg (at {u1} m/s) and {m2} kg, couple together and move off at {v} m/s. Find the second wagon's initial speed.",
+      "A {m1} kg war-cart moving at {u1} m/s crashes into a {m2} kg cart moving in the same direction; the two lock together, moving off at {v} m/s. Find the second cart's initial speed.",
+      "A {m1} kg dragon's sled moving at {u1} m/s rams a {m2} kg supply sled; the wreckage moves off at {v} m/s. Find the supply sled's initial speed."
+    ],
+    m1: [
+      "An object moving at {u1} m/s collides with a {m2} kg object moving at {u2} m/s in the same direction; they lock together and move off at {v} m/s. Find the mass of the first object.",
+      "A trolley moving at {u1} m/s collides with a {m2} kg trolley moving at {u2} m/s, coupling together and moving off at {v} m/s. Find the mass of the first trolley.",
+      "A knight's warhorse charging at {u1} m/s collides with a {m2} kg cart moving at {u2} m/s and they lock together, moving off at {v} m/s. Find the warhorse's mass.",
+      "A sled moving at {u1} m/s rams a {m2} kg supply sled moving at {u2} m/s, and the wreckage moves off at {v} m/s. Find the first sled's mass."
+    ],
+    m2: [
+      "A {m1} kg object moving at {u1} m/s collides with an object moving at {u2} m/s in the same direction; they lock together and move off at {v} m/s. Find the mass of the second object.",
+      "A {m1} kg trolley moving at {u1} m/s collides with a trolley moving at {u2} m/s, coupling together and moving off at {v} m/s. Find the mass of the second trolley.",
+      "A {m1} kg warhorse charging at {u1} m/s collides with a cart moving at {u2} m/s and they lock together, moving off at {v} m/s. Find the cart's mass.",
+      "A {m1} kg sled moving at {u1} m/s rams a supply sled moving at {u2} m/s, and the wreckage moves off at {v} m/s. Find the supply sled's mass."
+    ]
+  };
+  var NAME_ALIASES = {
+    m1: ['mass 1', 'mass one', 'first mass'], u1: ['velocity 1', 'initial velocity 1', 'speed 1', 'first velocity'],
+    m2: ['mass 2', 'mass two', 'second mass'], u2: ['velocity 2', 'initial velocity 2', 'speed 2', 'second velocity'],
+    v: ['final velocity', 'common velocity', 'velocity after collision', 'combined velocity']
+  };
+  var SYMBOL_ALIASES = { m1: ['m1'], u1: ['u1'], m2: ['m2'], u2: ['u2'], v: ['v'] };
+  var UNIT_ALIASES = {
+    m1: ['kg', 'kilogram', 'kilograms'], u1: ['m/s', 'm per s', 'metres per second', 'metre per second', 'meters per second', 'meter per second'],
+    m2: ['kg', 'kilogram', 'kilograms'], u2: ['m/s', 'm per s', 'metres per second', 'metre per second', 'meters per second', 'meter per second'],
+    v: ['m/s', 'm per s', 'metres per second', 'metre per second', 'meters per second', 'meter per second']
+  };
+  var FORMULA_ORIGINAL_OK = ['m1u1+m2u2=(m1+m2)v', 'm1u1+m2u2=m1v+m2v'];
+  var FORMULA_OK = {
+    v: ['v=(m1u1+m2u2)/(m1+m2)'],
+    u1: ['u1=((m1+m2)v-m2u2)/m1'],
+    u2: ['u2=((m1+m2)v-m1u1)/m2'],
+    m1: ['m1=m2(v-u2)/(u1-v)'],
+    m2: ['m2=m1(u1-v)/(v-u2)']
+  };
+  var FORMULA_CORRECT_DISPLAY = {
+    v: 'v = (m₁u₁ + m₂u₂) / (m₁ + m₂)',
+    u1: 'u₁ = ((m₁+m₂)v − m₂u₂) / m₁',
+    u2: 'u₂ = ((m₁+m₂)v − m₁u₁) / m₂',
+    m1: 'm₁ = m₂×(v−u₂) / (u₁−v)',
+    m2: 'm₂ = m₁×(u₁−v) / (v−u₂)'
+  };
+  buildFormulaTopic({
+    idSuffix: 'mom', dataTopic: 'momentum',
+    keys: ['m1','u1','m2','u2','v'], targets: ['v','u1','u2','m1','m2'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaOriginalOk: FORMULA_ORIGINAL_OK, formulaOk: FORMULA_OK,
+    formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var m1 = pick(M1_VALUES), u1 = pick(U1_VALUES), m2 = pick(M2_VALUES), u2 = pick(U2_VALUES);
+      var v = (m1*u1 + m2*u2) / (m1 + m2);
+      return { values: { m1:m1, u1:u1, m2:m2, u2:u2, v:v } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { F:{light:'#B02B2B',dark:'#E87F7F'}, dp:{light:'#7A6B2B',dark:'#C9BF7F'}, dt:{light:'#2B4FB0',dark:'#7FA0E8'} };
+  var LABEL = { F:'F', dp:'Δp', dt:'Δt' };
+  var NAME = { F:'force', dp:'change in momentum', dt:'time interval' };
+  var UNIT = { F:'N', dp:'kg m/s', dt:'s' };
+  var DP_VALUES = [5,10,15,20,25,30,40,50];
+  var DT_VALUES = [0.01,0.02,0.05,0.1,0.2,0.5,1];
+  var F_VALUES = [10,20,50,100,200,500,1000];
+  var SCENARIOS = {
+    F: [
+      "A tennis racquet changes a ball's momentum by {dp} kg m/s over a contact time of {dt} s. Find the average force exerted on the ball.",
+      "A bat is in contact with a ball for {dt} s, changing its momentum by {dp} kg m/s. Calculate the force applied by the bat.",
+      "A car's airbag increases the collision time to {dt} s while a passenger's momentum changes by {dp} kg m/s. Find the average force on the passenger.",
+      "A crash-test dummy's momentum changes by {dp} kg m/s over {dt} s during an impact. Calculate the average force involved.",
+      "A wizard's enchanted shield changes an incoming boulder's momentum by {dp} kg m/s over a contact time of {dt} s. Find the average force exerted on the boulder.",
+      "A knight's gauntlet is in contact with a jousting lance for {dt} s, changing its momentum by {dp} kg m/s. Calculate the force applied by the gauntlet.",
+      "A troll's padded armour increases the impact time to {dt} s while its momentum changes by {dp} kg m/s during a duel. Find the average force on the troll.",
+      "An enchanted training dummy's momentum changes by {dp} kg m/s over {dt} s when struck by a warhammer. Calculate the average force involved."
+    ],
+    dp: [
+      "A force of {F} N acts on a ball for {dt} s during a racquet strike. Find the change in momentum this produces.",
+      "A bat applies {F} N to a ball over a contact time of {dt} s. Calculate the resulting change in momentum.",
+      "A wizard's enchanted shield exerts {F} N on an incoming boulder for {dt} s. Find the change in the boulder's momentum.",
+      "A knight's gauntlet exerts {F} N on a jousting lance for {dt} s. Find the change in the lance's momentum."
+    ],
+    dt: [
+      "A force of {F} N changes a ball's momentum by {dp} kg m/s during a racquet strike. Find how long the racquet was in contact with the ball.",
+      "A bat applies {F} N to a ball, changing its momentum by {dp} kg m/s. Calculate the contact time.",
+      "A wizard's shield exerts {F} N on a boulder, changing its momentum by {dp} kg m/s. Find the contact time.",
+      "A knight's gauntlet exerts {F} N on a lance, changing its momentum by {dp} kg m/s. Find the contact time."
+    ]
+  };
+  var NAME_ALIASES = { F: ['force'], dp: ['change in momentum', 'momentum change', 'impulse'], dt: ['time interval', 'change in time', 'time taken', 'duration'] };
+  var SYMBOL_ALIASES = { F: ['f'], dp: ['δp', 'deltap', 'dp'], dt: ['δt', 'deltat', 'dt'] };
+  var UNIT_ALIASES = { F: ['n', 'newton', 'newtons'], dp: ['kg m/s', 'kgm/s', 'kilogram metres per second', 'kgms-1'], dt: ['s', 'sec', 'second', 'seconds'] };
+  var FORMULA_ORIGINAL_OK = ['deltap=fdeltat'];
+  var FORMULA_SHEET_OPTIONS = ['xCOM = (m1x1 + m2x2) / (m1 + m2)', 'F = ma', 'p = mv', 'Δp = FΔt', 'ΔEp = mgΔh'];
+  var FORMULA_OK = { F: ['f=deltap/deltat'], dp: ['deltap=fdeltat'], dt: ['deltat=deltap/f'] };
+  var FORMULA_CORRECT_DISPLAY = { F: 'F = Δp ÷ Δt', dp: 'Δp = F × Δt', dt: 'Δt = Δp ÷ F' };
+  buildFormulaTopic({
+    idSuffix: 'imp', dataTopic: 'impulse',
+    keys: ['F','dp','dt'], targets: ['F','dp','dt'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(target){
+      var values;
+      if(target === 'F'){ var dp=pick(DP_VALUES), dt=pick(DT_VALUES); values={dp:dp,dt:dt,F:dp/dt}; }
+      else if(target === 'dp'){ var F=pick(F_VALUES), dt2=pick(DT_VALUES); values={F:F,dt:dt2,dp:F*dt2}; }
+      else { var F2=pick(F_VALUES), dp2=pick(DP_VALUES); values={F:F2,dp:dp2,dt:dp2/F2}; }
+      return { values: values };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { m:{light:'#2B7A8A',dark:'#6FC5D6'}, v:{light:'#8A2B6C',dark:'#D67FB2'}, r:{light:'#6C8A2B',dark:'#C5D67F'}, Fc:{light:'#8A4A2B',dark:'#D6957F'} };
+  var LABEL = { m:'m', v:'v', r:'r', Fc:'Fc' };
+  var NAME = { m:'mass', v:'speed', r:'radius', Fc:'centripetal force' };
+  var UNIT = { m:'kg', v:'m/s', r:'m', Fc:'N' };
+  var M_VALUES = [10,20,50,100,500,1000];
+  var V_VALUES = [2,4,6,8,10,15];
+  var R_VALUES = [5,10,15,20,25,30];
+  var FC_VALUES = [50,100,200,500,1000,2000,5000];
+  var SCENARIOS = {
+    Fc: [
+      "A {m} kg car rounds a flat roundabout of radius {r} m at a steady {v} m/s. Find the centripetal force acting on it.",
+      "A {m} kg ball on a string is swung in a horizontal circle of radius {r} m at {v} m/s. Calculate the centripetal force needed to keep it moving in a circle.",
+      "A {m} kg cyclist rides around a flat circular track of radius {r} m at {v} m/s. Find the centripetal force required.",
+      "A {m} kg go-kart takes a flat corner of radius {r} m at {v} m/s. Calculate the centripetal force acting on it.",
+      "A {m} kg enchanted carousel horse circles a flat magical carousel of radius {r} m at a steady {v} m/s. Find the centripetal force acting on it.",
+      "A {m} kg orb is swung by a wizard on a chain in a horizontal circle of radius {r} m at {v} m/s. Calculate the centripetal force needed to keep it moving in a circle.",
+      "A {m} kg familiar flies in a flat circular patrol of radius {r} m around its wizard at {v} m/s. Find the centripetal force required.",
+      "A {m} kg goblin cart takes a flat bend around an arena of radius {r} m at {v} m/s. Calculate the centripetal force acting on it."
+    ],
+    m: [
+      "An object rounds a flat roundabout of radius {r} m at {v} m/s, needing a centripetal force of {Fc} N. Find the object's mass.",
+      "A ball on a string is swung in a horizontal circle of radius {r} m at {v} m/s, requiring a centripetal force of {Fc} N. Find the ball's mass.",
+      "A wizard's orb circles on a chain of radius {r} m at {v} m/s, needing {Fc} N of centripetal force. Find the orb's mass.",
+      "A go-kart takes a flat corner of radius {r} m at {v} m/s, needing a centripetal force of {Fc} N. Find the go-kart's mass."
+    ],
+    v: [
+      "A {m} kg car rounds a flat roundabout of radius {r} m, experiencing a centripetal force of {Fc} N. Find its speed.",
+      "A {m} kg ball on a string swings in a horizontal circle of radius {r} m under a centripetal force of {Fc} N. Find its speed.",
+      "A {m} kg enchanted carousel horse circles a carousel of radius {r} m under a centripetal force of {Fc} N. Find its speed.",
+      "A {m} kg go-kart takes a flat corner of radius {r} m, experiencing a centripetal force of {Fc} N. Find its speed."
+    ],
+    r: [
+      "A {m} kg car rounds a flat corner at {v} m/s, experiencing a centripetal force of {Fc} N. Find the radius of the corner.",
+      "A {m} kg ball on a string swings in a horizontal circle at {v} m/s under a centripetal force of {Fc} N. Find the radius of the circle.",
+      "A {m} kg wizard's orb circles on a chain at {v} m/s under a centripetal force of {Fc} N. Find the radius of the circle.",
+      "A {m} kg go-kart takes a flat corner at {v} m/s, experiencing a centripetal force of {Fc} N. Find the radius of the corner."
+    ]
+  };
+  var NAME_ALIASES = { m: ['mass'], v: ['speed', 'tangential speed', 'tangential velocity'], r: ['radius', 'orbital radius', 'distance from centre'], Fc: ['centripetal force'] };
+  var SYMBOL_ALIASES = { m: ['m'], v: ['v'], r: ['r'], Fc: ['fc'] };
+  var UNIT_ALIASES = { m: ['kg', 'kilogram', 'kilograms'], v: ['m/s', 'm per s', 'metres per second', 'metre per second', 'meters per second', 'meter per second'], r: ['m', 'metre', 'metres', 'meter', 'meters'], Fc: ['n', 'newton', 'newtons'] };
+  var FORMULA_ORIGINAL_OK = ['fc=mv^2/r'];
+  var FORMULA_SHEET_OPTIONS = ['xCOM = (m1x1 + m2x2) / (m1 + m2)', 'Fc = mv² ÷ r', 'p = mv', 'Δp = FΔt', 'ΔEp = mgΔh'];
+  var FORMULA_OK = { Fc: ['fc=mv^2/r'], m: ['m=fcr/v^2'], v: ['v=sqrt(fcr/m)'], r: ['r=mv^2/fc'] };
+  var FORMULA_CORRECT_DISPLAY = { Fc: 'Fc = mv² ÷ r', m: 'm = Fc·r ÷ v²', v: 'v = √(Fc·r ÷ m)', r: 'r = mv² ÷ Fc' };
+  buildFormulaTopic({
+    idSuffix: 'cf', dataTopic: 'centripetal',
+    keys: ['m','v','r','Fc'], targets: ['Fc','m','v','r'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(target){
+      var values;
+      if(target === 'Fc'){ var m=pick(M_VALUES), v=pick(V_VALUES), r=pick(R_VALUES); values={m:m,v:v,r:r,Fc:m*v*v/r}; }
+      else if(target === 'm'){ var Fc=pick(FC_VALUES), v2=pick(V_VALUES), r2=pick(R_VALUES); values={Fc:Fc,v:v2,r:r2,m:Fc*r2/(v2*v2)}; }
+      else if(target === 'v'){ var Fc2=pick(FC_VALUES), m2=pick(M_VALUES), r3=pick(R_VALUES); values={Fc:Fc2,m:m2,r:r3,v:Math.sqrt(Fc2*r3/m2)}; }
+      else { var Fc3=pick(FC_VALUES), m3=pick(M_VALUES), v3=pick(V_VALUES); values={Fc:Fc3,m:m3,v:v3,r:m3*v3*v3/Fc3}; }
+      return { values: values };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = {
+    M:{light:'#2B4A8A',dark:'#7F95D6'}, m:{light:'#2B7A8A',dark:'#6FC5D6'},
+    r:{light:'#6C8A2B',dark:'#C5D67F'}, Fg:{light:'#4A2B8A',dark:'#957FD6'}
+  };
+  var LABEL = { M:'M', m:'m', r:'r', Fg:'Fg' };
+  var NAME = { M:'mass of central body', m:'mass', r:'radius', Fg:'gravitational force' };
+  var UNIT = { M:'kg', m:'kg', r:'m', Fg:'N' };
+  var GRAV_CONST = 6.67e-11;
+  var BODIES = [ { name:'Earth', M:5.97e24 }, { name:'Mars', M:6.42e23 }, { name:'the Moon', M:7.35e22 } ];
+  var M_OBJ_VALUES = [150, 500, 800, 1000, 1500, 2000];
+  var R_VALUES = [6.86e6, 7.0e6, 1.0e7, 4.2e7];
+  var SUPER = {'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻','+':''};
+  function toSuper(n){ return String(n).split('').map(function(c){ return SUPER[c] != null ? SUPER[c] : c; }).join(''); }
+  function expDisplay(val){ var s = val.toExponential(2); var parts = s.split('e'); return parts[0] + '×10' + toSuper(parseInt(parts[1], 10)); }
+  var SCENARIOS = {
+    Fg: [
+      "A {m} kg satellite orbits {body} at a distance of {r} m from its centre. Given {body}'s mass is {M} kg, find the gravitational force acting on the satellite.",
+      "A {m} kg space probe orbits {body}, {r} m from its centre. {body}'s mass is {M} kg — calculate the gravitational force on the probe.",
+      "A {m} kg spacecraft holds an orbit {r} m from the centre of {body} (mass {M} kg). Find the gravitational force acting on it.",
+      "A {m} kg crystal satellite, enchanted by a wizard, orbits {body} at a distance of {r} m from its centre. Given {body}'s mass is {M} kg, find the gravitational force acting on the satellite.",
+      "A {m} kg flying fortress orbits {body}, {r} m from its centre. {body}'s mass is {M} kg — calculate the gravitational force on the fortress.",
+      "A {m} kg dragon holds a distant orbit {r} m from the centre of {body} (mass {M} kg). Find the gravitational force acting on it."
+    ],
+    M: [
+      "A {m} kg satellite orbits a body at a distance of {r} m from its centre, experiencing a gravitational force of {Fg} N. Find the mass of the body it orbits.",
+      "A {m} kg space probe orbits a planet {r} m from its centre under a gravitational force of {Fg} N. Calculate the planet's mass.",
+      "A {m} kg crystal satellite orbits a mysterious planet at {r} m from its centre, feeling a gravitational pull of {Fg} N. Find the planet's mass.",
+      "A {m} kg flying fortress orbits an unknown world {r} m from its centre under a gravitational force of {Fg} N. Calculate the world's mass."
+    ],
+    m: [
+      "A satellite orbits {body} at a distance of {r} m from its centre, experiencing a gravitational force of {Fg} N. Given {body}'s mass is {M} kg, find the mass of the satellite.",
+      "A space probe orbits {body}, {r} m from its centre, under a gravitational force of {Fg} N. {body}'s mass is {M} kg — find the probe's mass.",
+      "A crystal satellite enchanted by a wizard orbits {body} at {r} m from its centre, feeling a force of {Fg} N. Given {body}'s mass is {M} kg, find the satellite's mass.",
+      "A flying fortress orbits {body}, {r} m from its centre, under a gravitational force of {Fg} N. {body}'s mass is {M} kg — find the fortress's mass."
+    ],
+    r: [
+      "A {m} kg satellite orbits {body}, experiencing a gravitational force of {Fg} N. Given {body}'s mass is {M} kg, find the satellite's distance from the centre of {body}.",
+      "A {m} kg space probe orbits {body} under a gravitational force of {Fg} N. {body}'s mass is {M} kg — find the probe's orbital distance from the centre.",
+      "A {m} kg crystal satellite orbits {body}, feeling a gravitational pull of {Fg} N. Given {body}'s mass is {M} kg, find its distance from the centre of {body}.",
+      "A {m} kg flying fortress orbits {body} under a gravitational force of {Fg} N. {body}'s mass is {M} kg — find its distance from the centre."
+    ]
+  };
+  var NAME_ALIASES = {
+    M: ['mass of central body', 'mass of the planet', 'planet mass', 'central mass'],
+    m: ['mass'], r: ['radius', 'orbital radius', 'distance from centre'], Fg: ['gravitational force', 'gravity force']
+  };
+  var SYMBOL_ALIASES = { M: ['m'], m: ['m'], r: ['r'], Fg: ['fg'] };
+  var UNIT_ALIASES = {
+    M: ['kg', 'kilogram', 'kilograms'], m: ['kg', 'kilogram', 'kilograms'],
+    r: ['m', 'metre', 'metres', 'meter', 'meters'], Fg: ['n', 'newton', 'newtons']
+  };
+  var FORMULA_ORIGINAL_OK = ['fg=gmm/r^2'];
+  var FORMULA_SHEET_OPTIONS = ['xCOM = (m1x1 + m2x2) / (m1 + m2)', 'Fg = GMm ÷ r²', 'p = mv', 'Δp = FΔt', 'ΔEp = mgΔh'];
+  var FORMULA_OK = {
+    Fg: ['fg=gmm/r^2'], M: ['m=fgr^2/(gm)'], m: ['m=fgr^2/(gm)'], r: ['r=sqrt(gmm/fg)']
+  };
+  var FORMULA_CORRECT_DISPLAY = {
+    Fg: 'Fg = GMm ÷ r²', M: 'M = Fg×r² ÷ (G×m)', m: 'm = Fg×r² ÷ (G×M)', r: 'r = √(GMm ÷ Fg)'
+  };
+  buildFormulaTopic({
+    idSuffix: 'grav', dataTopic: 'gravitation',
+    keys: ['M','m','r','Fg'], targets: ['Fg','M','m','r'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    fmt: function(k, v){ if(k === 'M' || k === 'r'){ return expDisplay(v); } return null; },
+    generate: function(){
+      var body = pick(BODIES), m = pick(M_OBJ_VALUES), r = pick(R_VALUES);
+      var Fg = GRAV_CONST * body.M * m / (r*r);
+      return { values: { M:body.M, m:m, r:r, Fg:Fg }, extra: { body: body.name } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { dtheta:{light:'#2B8A5E',dark:'#6FD6A6'}, dt:{light:'#2B5E8A',dark:'#6FA6D6'}, omega:{light:'#8A5E2B',dark:'#D6A66F'} };
+  var LABEL = { dtheta:'Δθ', dt:'Δt', omega:'ω' };
+  var NAME = { dtheta:'angular displacement', dt:'time interval', omega:'angular velocity' };
+  var UNIT = { dtheta:'rad', dt:'s', omega:'rad/s' };
+  var DTHETA_VALUES = [4,6,8,10,12,15,18,20,25];
+  var DT_VALUES = [1,2,2.5,4,5];
+  var SCENARIOS = {
+    omega: [
+      "A flywheel sweeps through {dtheta} rad in {dt} s as it spins up. Find its average angular velocity.",
+      "A turntable rotates through {dtheta} rad while a record plays for {dt} s. Find its angular velocity.",
+      "A playground roundabout sweeps through {dtheta} rad in {dt} s. Calculate its angular velocity.",
+      "A ceiling fan blade sweeps through {dtheta} rad in {dt} s as it reaches full speed. Find its angular velocity.",
+      "An enchanted grindstone sweeps through {dtheta} rad in {dt} s as a blacksmith spins it up. Find its average angular velocity.",
+      "A golem's gear-heart rotates through {dtheta} rad while its magic charges for {dt} s. Find its angular velocity.",
+      "A wizard's spinning rune-disc sweeps through {dtheta} rad in {dt} s. Calculate its angular velocity.",
+      "A windmill blade on an enchanted mill sweeps through {dtheta} rad in {dt} s as it reaches full speed. Find its angular velocity."
+    ],
+    dtheta: [
+      "A flywheel spins at {omega} rad/s for {dt} s. Find the angular displacement it sweeps through.",
+      "A turntable spins at {omega} rad/s while a record plays for {dt} s. Calculate the angle it turns through.",
+      "An enchanted grindstone spins at {omega} rad/s for {dt} s as a blacksmith works it. Find the angular displacement it sweeps through.",
+      "A golem's gear-heart spins at {omega} rad/s while charging for {dt} s. Calculate the angle it turns through."
+    ],
+    dt: [
+      "A flywheel sweeps through {dtheta} rad while spinning at {omega} rad/s. Find how long this takes.",
+      "A turntable rotates through {dtheta} rad at {omega} rad/s. Calculate the time this takes.",
+      "An enchanted grindstone sweeps through {dtheta} rad while spinning at {omega} rad/s. Find how long this takes.",
+      "A golem's gear-heart rotates through {dtheta} rad at {omega} rad/s. Calculate how long this takes."
+    ]
+  };
+  var NAME_ALIASES = {
+    dtheta: ['angular displacement', 'swept angle', 'angle swept'],
+    dt: ['time interval', 'change in time', 'time taken', 'duration'],
+    omega: ['angular velocity', 'spin rate', 'turning rate']
+  };
+  var SYMBOL_ALIASES = { dtheta: ['δθ', 'deltatheta', 'dtheta'], dt: ['δt', 'deltat', 'dt'], omega: ['ω', 'omega'] };
+  var UNIT_ALIASES = {
+    dtheta: ['rad', 'radian', 'radians'], dt: ['s', 'sec', 'second', 'seconds'],
+    omega: ['rad/s', 'radian per second', 'radians per second']
+  };
+  var FORMULA_ORIGINAL_OK = ['omega=deltatheta/deltat'];
+  var FORMULA_SHEET_OPTIONS = ['ω = Δθ ÷ Δt', 'α = Δω ÷ Δt', 'τ = Iα', 'L = Iω', 'ω = 2πf'];
+  var FORMULA_OK = {
+    omega: ['omega=deltatheta/deltat'], dtheta: ['deltatheta=omegadeltat'], dt: ['deltat=deltatheta/omega']
+  };
+  var FORMULA_CORRECT_DISPLAY = { omega: 'ω = Δθ ÷ Δt', dtheta: 'Δθ = ω × Δt', dt: 'Δt = Δθ ÷ ω' };
+  buildFormulaTopic({
+    idSuffix: 'av', dataTopic: 'angvel',
+    keys: ['dtheta','dt','omega'], targets: ['omega','dtheta','dt'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var dtheta = pick(DTHETA_VALUES), dt = pick(DT_VALUES);
+      return { values: { dtheta:dtheta, dt:dt, omega: dtheta/dt } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { I:{light:'#8A2B5E',dark:'#D66FA6'}, alpha:{light:'#5E8A2B',dark:'#A6D66F'}, tau:{light:'#5E2B8A',dark:'#A66FD6'} };
+  var LABEL = { I:'I', alpha:'α', tau:'τ' };
+  var NAME = { I:'moment of inertia', alpha:'angular acceleration', tau:'torque' };
+  var UNIT = { I:'kg m²', alpha:'rad/s²', tau:'N m' };
+  var I_VALUES = [1,2,4,5,8,10,12,15,20];
+  var ALPHA_VALUES = [1,2,3,4,5,6,8,10,12];
+  var SCENARIOS = {
+    tau: [
+      "A flywheel with a moment of inertia of {I} kg m² is given an angular acceleration of {alpha} rad/s² by an electric motor. Find the torque the motor applies.",
+      "A grinding wheel with a moment of inertia of {I} kg m² accelerates at {alpha} rad/s² under a motor's drive. Calculate the torque supplied.",
+      "A merry-go-round with a moment of inertia of {I} kg m² is pushed until it accelerates at {alpha} rad/s². Find the torque applied.",
+      "A turbine rotor with a moment of inertia of {I} kg m² is spun up at {alpha} rad/s². Calculate the torque driving it.",
+      "A golem's gear-heart with a moment of inertia of {I} kg m² is given an angular acceleration of {alpha} rad/s² by a bound elemental. Find the torque the elemental applies.",
+      "An enchanted millstone with a moment of inertia of {I} kg m² accelerates at {alpha} rad/s² under a wizard's spell. Calculate the torque supplied.",
+      "A carnival carousel enchanted by a bard with a moment of inertia of {I} kg m² is pushed until it accelerates at {alpha} rad/s². Find the torque applied.",
+      "A dragon-powered turbine rotor with a moment of inertia of {I} kg m² is spun up at {alpha} rad/s². Calculate the torque driving it."
+    ],
+    I: [
+      "A motor applies a torque of {tau} N m to a flywheel, giving it an angular acceleration of {alpha} rad/s². Find the flywheel's moment of inertia.",
+      "A torque of {tau} N m accelerates a grinding wheel at {alpha} rad/s². Calculate the wheel's moment of inertia.",
+      "A bound elemental applies a torque of {tau} N m to a golem's gear-heart, giving it an angular acceleration of {alpha} rad/s². Find the gear-heart's moment of inertia.",
+      "A wizard's spell applies a torque of {tau} N m to an enchanted millstone, accelerating it at {alpha} rad/s². Calculate the millstone's moment of inertia."
+    ],
+    alpha: [
+      "A torque of {tau} N m is applied to a flywheel with a moment of inertia of {I} kg m². Find the angular acceleration produced.",
+      "A motor supplies a torque of {tau} N m to a turbine rotor with a moment of inertia of {I} kg m². Calculate its angular acceleration.",
+      "A bound elemental applies a torque of {tau} N m to a golem's gear-heart with a moment of inertia of {I} kg m². Find the angular acceleration produced.",
+      "A wizard's spell supplies a torque of {tau} N m to a dragon-powered turbine rotor with a moment of inertia of {I} kg m². Calculate its angular acceleration."
+    ]
+  };
+  var NAME_ALIASES = { I: ['moment of inertia', 'rotational inertia'], alpha: ['angular acceleration'], tau: ['torque'] };
+  var SYMBOL_ALIASES = { I: ['i'], alpha: ['α', 'alpha'], tau: ['τ', 'tau'] };
+  var UNIT_ALIASES = {
+    I: ['kg m2', 'kg m^2', 'kilogram metres squared'],
+    alpha: ['rad/s2', 'rad/s^2', 'radian per second squared', 'radians per second squared'],
+    tau: ['n m', 'nm', 'newton metre', 'newton metres']
+  };
+  var FORMULA_ORIGINAL_OK = ['tau=ialpha'];
+  var FORMULA_SHEET_OPTIONS = ['τ = Iα', 'ω = Δθ ÷ Δt', 'L = Iω', 'F = ma', 'Fc = mv² ÷ r'];
+  var FORMULA_OK = { tau: ['tau=ialpha'], I: ['i=tau/alpha'], alpha: ['alpha=tau/i'] };
+  var FORMULA_CORRECT_DISPLAY = { tau: 'τ = Iα', I: 'I = τ ÷ α', alpha: 'α = τ ÷ I' };
+  buildFormulaTopic({
+    idSuffix: 'tau', dataTopic: 'torque',
+    keys: ['I','alpha','tau'], targets: ['tau','I','alpha'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var I = pick(I_VALUES), alpha = pick(ALPHA_VALUES);
+      return { values: { I:I, alpha:alpha, tau: I*alpha } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { I:{light:'#8A2B5E',dark:'#D66FA6'}, omega:{light:'#8A5E2B',dark:'#D6A66F'}, L:{light:'#8A5E5E',dark:'#D6A6A6'} };
+  var LABEL = { I:'I', omega:'ω', L:'L' };
+  var NAME = { I:'moment of inertia', omega:'angular velocity', L:'angular momentum' };
+  var UNIT = { I:'kg m²', omega:'rad/s', L:'kg m²/s' };
+  var I_VALUES = [1,2,4,5,8,10,12,15,20];
+  var OMEGA_VALUES = [1,2,3,4,5,6,8,10,12,15];
+  var SCENARIOS = {
+    L: [
+      "A spinning flywheel has a moment of inertia of {I} kg m² and rotates at {omega} rad/s. Find its angular momentum.",
+      "A figure skater, modelled as a rigid rotor, has a moment of inertia of {I} kg m² while spinning at {omega} rad/s. Calculate their angular momentum.",
+      "A spinning bicycle wheel has a moment of inertia of {I} kg m² and rotates at {omega} rad/s. Find its angular momentum.",
+      "A rotating turbine has a moment of inertia of {I} kg m² and spins at {omega} rad/s. Calculate its angular momentum.",
+      "A spinning golem core has a moment of inertia of {I} kg m² and rotates at {omega} rad/s. Find its angular momentum.",
+      "A whirling dervish dancer, modelled as a rigid rotor, has a moment of inertia of {I} kg m² while spinning at {omega} rad/s. Calculate their angular momentum.",
+      "A spinning enchanted shield has a moment of inertia of {I} kg m² and rotates at {omega} rad/s. Find its angular momentum.",
+      "A rotating rune-turbine deep in a wizard's tower has a moment of inertia of {I} kg m² and spins at {omega} rad/s. Calculate its angular momentum."
+    ],
+    I: [
+      "A spinning flywheel has an angular momentum of {L} kg m²/s while rotating at {omega} rad/s. Find its moment of inertia.",
+      "A rotating turbine has an angular momentum of {L} kg m²/s and spins at {omega} rad/s. Calculate its moment of inertia.",
+      "A spinning golem core has an angular momentum of {L} kg m²/s while rotating at {omega} rad/s. Find its moment of inertia.",
+      "A rotating rune-turbine has an angular momentum of {L} kg m²/s and spins at {omega} rad/s. Calculate its moment of inertia."
+    ],
+    omega: [
+      "A spinning flywheel with a moment of inertia of {I} kg m² has an angular momentum of {L} kg m²/s. Find its angular velocity.",
+      "A rotating turbine with a moment of inertia of {I} kg m² has an angular momentum of {L} kg m²/s. Calculate its angular velocity.",
+      "A spinning golem core with a moment of inertia of {I} kg m² has an angular momentum of {L} kg m²/s. Find its angular velocity.",
+      "A rotating rune-turbine with a moment of inertia of {I} kg m² has an angular momentum of {L} kg m²/s. Calculate its angular velocity."
+    ]
+  };
+  var NAME_ALIASES = { I: ['moment of inertia', 'rotational inertia'], omega: ['angular velocity', 'spin rate', 'turning rate'], L: ['angular momentum'] };
+  var SYMBOL_ALIASES = { I: ['i'], omega: ['ω', 'omega'], L: ['l'] };
+  var UNIT_ALIASES = {
+    I: ['kg m2', 'kg m^2', 'kilogram metres squared'], omega: ['rad/s', 'radian per second', 'radians per second'],
+    L: ['kg m2/s', 'kg m^2/s', 'kilogram metres squared per second']
+  };
+  var FORMULA_ORIGINAL_OK = ['l=iomega'];
+  var FORMULA_SHEET_OPTIONS = ['L = Iω', 'τ = Iα', 'ω = Δθ ÷ Δt', 'p = mv', 'EK(ROT) = ½Iω²'];
+  var FORMULA_OK = { L: ['l=iomega'], I: ['i=l/omega'], omega: ['omega=l/i'] };
+  var FORMULA_CORRECT_DISPLAY = { L: 'L = Iω', I: 'I = L ÷ ω', omega: 'ω = L ÷ I' };
+  buildFormulaTopic({
+    idSuffix: 'am', dataTopic: 'angmom',
+    keys: ['I','omega','L'], targets: ['L','I','omega'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var I = pick(I_VALUES), omega = pick(OMEGA_VALUES);
+      return { values: { I:I, omega:omega, L: I*omega } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { l:{light:'#2B8A6E',dark:'#6FD6C0'}, T:{light:'#6E2B8A',dark:'#C06FD6'} };
+  var LABEL = { l:'l', T:'T' };
+  var NAME = { l:'length', T:'period' };
+  var UNIT = { l:'m', T:'s' };
+  var G_ACCEL = 9.8;
+  var L_VALUES = [0.25,0.5,0.75,1.0,1.5,2.0,2.5];
+  var SCENARIOS = {
+    T: [
+      "A pendulum of length {l} m swings back and forth. Taking g = 9.8 m/s², find its period.",
+      "A grandfather clock's pendulum is {l} m long. Taking g = 9.8 m/s², calculate its period.",
+      "A playground swing's chain acts like a pendulum of length {l} m. Taking g = 9.8 m/s², find the period of each swing.",
+      "A metronome's pendulum arm is {l} m long. Taking g = 9.8 m/s², calculate its period.",
+      "A bewitched pendulum clock in a wizard's tower has a pendulum of length {l} m. Taking g = 9.8 m/s², find its period.",
+      "A haunted grandfather clock's cursed pendulum is {l} m long. Taking g = 9.8 m/s², calculate its period.",
+      "A dungeon's swinging blade trap hangs like a pendulum of length {l} m. Taking g = 9.8 m/s², find the period of each swing.",
+      "A bard's enchanted metronome has a pendulum arm {l} m long. Taking g = 9.8 m/s², calculate its period."
+    ],
+    l: [
+      "A pendulum has a period of {T} s. Taking g = 9.8 m/s², find its length.",
+      "A grandfather clock's pendulum has a period of {T} s. Taking g = 9.8 m/s², calculate its length.",
+      "A bewitched pendulum clock ticks with a period of {T} s. Taking g = 9.8 m/s², find the length of its pendulum.",
+      "A haunted grandfather clock's cursed pendulum has a period of {T} s. Taking g = 9.8 m/s², calculate its length."
+    ]
+  };
+  var NAME_ALIASES = { l: ['length', 'pendulum length', 'string length'], T: ['period', 'period of oscillation'] };
+  var SYMBOL_ALIASES = { l: ['l'], T: ['t'] };
+  var UNIT_ALIASES = { l: ['m', 'metre', 'metres', 'meter', 'meters'], T: ['s', 'sec', 'second', 'seconds'] };
+  var FORMULA_ORIGINAL_OK = ['t=2pisqrt(l/g)'];
+  var FORMULA_SHEET_OPTIONS = ['T = 2π√(l/g)', 'T = 2π√(m/k)', 'F = −ky', 'Ep = ½ky²', 'ω = 2πf'];
+  var FORMULA_OK = { T: ['t=2pisqrt(l/g)'], l: ['l=gt^2/(4pi^2)'] };
+  var FORMULA_CORRECT_DISPLAY = { T: 'T = 2π√(l/g)', l: 'l = gT² ÷ (4π²)' };
+  buildFormulaTopic({
+    idSuffix: 'pend', dataTopic: 'pendulum',
+    keys: ['l','T'], targets: ['T','l'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var l = pick(L_VALUES);
+      return { values: { l:l, T: 2*Math.PI*Math.sqrt(l/G_ACCEL) } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { m:{light:'#2B6E8A',dark:'#6FC0D6'}, k:{light:'#8A6E2B',dark:'#D6C06F'}, T:{light:'#6E2B8A',dark:'#C06FD6'} };
+  var LABEL = { m:'m', k:'k', T:'T' };
+  var NAME = { m:'mass', k:'spring constant', T:'period' };
+  var UNIT = { m:'kg', k:'N/m', T:'s' };
+  var M_VALUES = [0.2,0.5,1,1.5,2,3,4,5];
+  var K_VALUES = [5,10,20,30,40,50,80,100];
+  var SCENARIOS = {
+    T: [
+      "A {m} kg mass hangs from a spring with spring constant {k} N/m. Find the period of its oscillation.",
+      "A {m} kg trolley is attached to a spring of spring constant {k} N/m and set bouncing. Calculate the period of its motion.",
+      "A {m} kg mass rests on a spring of spring constant {k} N/m and is set oscillating vertically. Find its period.",
+      "A test rig oscillates a {m} kg mass on a spring of spring constant {k} N/m. Calculate the period of oscillation.",
+      "A {m} kg enchanted amulet hangs from a magical spring with spring constant {k} N/m. Find the period of its oscillation.",
+      "A {m} kg alchemist's crucible is mounted on a spring of spring constant {k} N/m and set bouncing. Calculate the period of its motion.",
+      "A {m} kg crystal orb rests on a rune-spring of spring constant {k} N/m and is set oscillating vertically. Find its period.",
+      "A wizard's testing rig oscillates a {m} kg weight on a spring of spring constant {k} N/m. Calculate the period of oscillation."
+    ],
+    m: [
+      "A mass on a spring with spring constant {k} N/m oscillates with a period of {T} s. Find the mass.",
+      "A trolley attached to a spring of spring constant {k} N/m bounces with a period of {T} s. Calculate the trolley's mass.",
+      "An enchanted amulet on a magical spring with spring constant {k} N/m oscillates with a period of {T} s. Find its mass.",
+      "An alchemist's crucible on a spring of spring constant {k} N/m bounces with a period of {T} s. Calculate its mass."
+    ],
+    k: [
+      "A {m} kg mass on a spring oscillates with a period of {T} s. Find the spring constant.",
+      "A {m} kg trolley attached to a spring bounces with a period of {T} s. Calculate the spring's spring constant.",
+      "A {m} kg enchanted amulet on a magical spring oscillates with a period of {T} s. Find the spring constant.",
+      "A {m} kg alchemist's crucible on a spring bounces with a period of {T} s. Calculate the spring's spring constant."
+    ]
+  };
+  var NAME_ALIASES = { m: ['mass', 'oscillating mass', 'mass on spring'], k: ['spring constant', 'stiffness'], T: ['period', 'period of oscillation'] };
+  var SYMBOL_ALIASES = { m: ['m'], k: ['k'], T: ['t'] };
+  var UNIT_ALIASES = {
+    m: ['kg', 'kilogram', 'kilograms'], k: ['n/m', 'newton per metre', 'newtons per metre', 'n per m'],
+    T: ['s', 'sec', 'second', 'seconds']
+  };
+  var FORMULA_ORIGINAL_OK = ['t=2pisqrt(m/k)'];
+  var FORMULA_SHEET_OPTIONS = ['T = 2π√(m/k)', 'T = 2π√(l/g)', 'F = −ky', 'Ep = ½ky²', 'p = mv'];
+  var FORMULA_OK = { T: ['t=2pisqrt(m/k)'], m: ['m=kt^2/(4pi^2)'], k: ['k=4pi^2m/t^2'] };
+  var FORMULA_CORRECT_DISPLAY = { T: 'T = 2π√(m/k)', m: 'm = kT² ÷ (4π²)', k: 'k = 4π²m ÷ T²' };
+  buildFormulaTopic({
+    idSuffix: 'sp', dataTopic: 'springperiod',
+    keys: ['m','k','T'], targets: ['T','m','k'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var m = pick(M_VALUES), k = pick(K_VALUES);
+      return { values: { m:m, k:k, T: 2*Math.PI*Math.sqrt(m/k) } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { k:{light:'#8A6E2B',dark:'#D6C06F'}, y:{light:'#2B8A6E',dark:'#6FD6C0'}, F:{light:'#8A2B6E',dark:'#D66FC0'} };
+  var LABEL = { k:'k', y:'y', F:'F' };
+  var NAME = { k:'spring constant', y:'displacement', F:'restoring force' };
+  var UNIT = { k:'N/m', y:'m', F:'N' };
+  var K_VALUES = [10,20,30,40,50,60,80,100];
+  var Y_VALUES = [0.05,0.1,0.15,0.2,0.25,0.3];
+  var SCENARIOS = {
+    F: [
+      "A spring with spring constant {k} N/m is stretched {y} m from its natural length. Find the size of the restoring force it exerts.",
+      "A spring of spring constant {k} N/m is compressed {y} m. Calculate the size of the force pulling it back toward equilibrium.",
+      "A spring balance with spring constant {k} N/m is stretched {y} m by a hanging load. Find the size of the restoring force in the spring.",
+      "A test spring with spring constant {k} N/m is pulled {y} m out of shape. Calculate the size of the force trying to restore it.",
+      "A magical crossbow's rune-spring with spring constant {k} N/m is drawn back {y} m from its natural length. Find the size of the restoring force it exerts.",
+      "An enchanted trap-spring of spring constant {k} N/m is compressed {y} m. Calculate the size of the force pulling it back toward equilibrium.",
+      "A wizard's enchanted scale with spring constant {k} N/m is stretched {y} m by a hanging treasure sack. Find the size of the restoring force in the spring.",
+      "An alchemist's test spring with spring constant {k} N/m is pulled {y} m out of shape. Calculate the size of the force trying to restore it."
+    ],
+    k: [
+      "A spring is stretched {y} m and exerts a restoring force of {F} N. Find the spring constant.",
+      "A spring balance is stretched {y} m by a load, producing a restoring force of {F} N. Calculate its spring constant.",
+      "A magical crossbow's rune-spring is drawn back {y} m, exerting a restoring force of {F} N. Find the spring constant.",
+      "A wizard's enchanted scale is stretched {y} m, producing a restoring force of {F} N. Calculate its spring constant."
+    ],
+    y: [
+      "A spring with spring constant {k} N/m exerts a restoring force of {F} N. Find how far it has been stretched.",
+      "A spring balance with spring constant {k} N/m exerts a restoring force of {F} N under a load. Calculate the extension.",
+      "A magical crossbow's rune-spring with spring constant {k} N/m exerts a restoring force of {F} N. Find how far it has been drawn back.",
+      "A wizard's enchanted scale with spring constant {k} N/m exerts a restoring force of {F} N. Calculate the extension."
+    ]
+  };
+  var NAME_ALIASES = { k: ['spring constant', 'stiffness'], y: ['displacement', 'displacement from equilibrium'], F: ['restoring force', 'spring force'] };
+  var SYMBOL_ALIASES = { k: ['k'], y: ['y'], F: ['f'] };
+  var UNIT_ALIASES = {
+    k: ['n/m', 'newton per metre', 'newtons per metre', 'n per m'], y: ['m', 'metre', 'metres', 'meter', 'meters'],
+    F: ['n', 'newton', 'newtons']
+  };
+  var FORMULA_ORIGINAL_OK = ['f=-ky', 'f=ky'];
+  var FORMULA_SHEET_OPTIONS = ['F = −ky', 'T = 2π√(m/k)', 'T = 2π√(l/g)', 'Ep = ½ky²', 'Fc = mv² ÷ r'];
+  var FORMULA_OK = { F: ['f=-ky', 'f=ky'], k: ['k=f/y'], y: ['y=f/k'] };
+  var FORMULA_CORRECT_DISPLAY = { F: 'F = ky', k: 'k = F ÷ y', y: 'y = F ÷ k' };
+  buildFormulaTopic({
+    idSuffix: 'hk', dataTopic: 'hooke',
+    keys: ['k','y','F'], targets: ['F','k','y'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var k = pick(K_VALUES), y = pick(Y_VALUES);
+      return { values: { k:k, y:y, F: k*y } };
+    }
+  });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var CLR = { k:{light:'#8A6E2B',dark:'#D6C06F'}, y:{light:'#2B8A6E',dark:'#6FD6C0'}, Ep:{light:'#6E8A2B',dark:'#C0D66F'} };
+  var LABEL = { k:'k', y:'y', Ep:'Ep' };
+  var NAME = { k:'spring constant', y:'displacement', Ep:'elastic potential energy' };
+  var UNIT = { k:'N/m', y:'m', Ep:'J' };
+  var K_VALUES = [10,20,30,40,50,60,80,100];
+  var Y_VALUES = [0.05,0.1,0.15,0.2,0.25,0.3];
+  var SCENARIOS = {
+    Ep: [
+      "A spring with spring constant {k} N/m is stretched {y} m from its natural length. Find the elastic potential energy stored in it.",
+      "A spring of spring constant {k} N/m is compressed {y} m. Calculate the elastic potential energy stored.",
+      "A spring balance with spring constant {k} N/m is stretched {y} m by a hanging load. Find the elastic potential energy stored in the spring.",
+      "A test spring with spring constant {k} N/m is pulled {y} m out of shape. Calculate the elastic potential energy it now stores.",
+      "A magical crossbow's rune-spring with spring constant {k} N/m is drawn back {y} m from its natural length. Find the elastic potential energy stored in it.",
+      "An enchanted trap-spring of spring constant {k} N/m is compressed {y} m. Calculate the elastic potential energy stored.",
+      "A wizard's enchanted scale with spring constant {k} N/m is stretched {y} m by a hanging treasure sack. Find the elastic potential energy stored in the spring.",
+      "An alchemist's test spring with spring constant {k} N/m is pulled {y} m out of shape. Calculate the elastic potential energy it now stores."
+    ],
+    k: [
+      "A spring is stretched {y} m and stores {Ep} J of elastic potential energy. Find the spring constant.",
+      "A spring balance is stretched {y} m by a load, storing {Ep} J of elastic potential energy. Calculate its spring constant.",
+      "A magical crossbow's rune-spring is drawn back {y} m, storing {Ep} J of elastic potential energy. Find the spring constant.",
+      "A wizard's enchanted scale is stretched {y} m, storing {Ep} J of elastic potential energy. Calculate its spring constant."
+    ],
+    y: [
+      "A spring with spring constant {k} N/m stores {Ep} J of elastic potential energy. Find how far it has been stretched.",
+      "A spring balance with spring constant {k} N/m stores {Ep} J of elastic potential energy under a load. Calculate the extension.",
+      "A magical crossbow's rune-spring with spring constant {k} N/m stores {Ep} J of elastic potential energy. Find how far it has been drawn back.",
+      "A wizard's enchanted scale with spring constant {k} N/m stores {Ep} J of elastic potential energy. Calculate the extension."
+    ]
+  };
+  var NAME_ALIASES = { k: ['spring constant', 'stiffness'], y: ['displacement', 'displacement from equilibrium'], Ep: ['elastic potential energy', 'spring potential energy', 'elastic pe'] };
+  var SYMBOL_ALIASES = { k: ['k'], y: ['y'], Ep: ['ep'] };
+  var UNIT_ALIASES = {
+    k: ['n/m', 'newton per metre', 'newtons per metre', 'n per m'], y: ['m', 'metre', 'metres', 'meter', 'meters'],
+    Ep: ['j', 'joule', 'joules']
+  };
+  var FORMULA_ORIGINAL_OK = ['ep=1/2ky^2'];
+  var FORMULA_SHEET_OPTIONS = ['Ep = ½ky²', 'F = −ky', 'T = 2π√(m/k)', 'EK(LIN) = ½mv²', 'W = Fd'];
+  var FORMULA_OK = { Ep: ['ep=1/2ky^2'], k: ['k=2ep/y^2'], y: ['y=sqrt(2ep/k)'] };
+  var FORMULA_CORRECT_DISPLAY = { Ep: 'Ep = ½ky²', k: 'k = 2Ep ÷ y²', y: 'y = √(2Ep ÷ k)' };
+  buildFormulaTopic({
+    idSuffix: 'pe', dataTopic: 'springpe',
+    keys: ['k','y','Ep'], targets: ['Ep','k','y'],
+    CLR: CLR, LABEL: LABEL, NAME: NAME, UNIT: UNIT,
+    NAME_ALIASES: NAME_ALIASES, SYMBOL_ALIASES: SYMBOL_ALIASES, UNIT_ALIASES: UNIT_ALIASES,
+    formulaSheetOptions: FORMULA_SHEET_OPTIONS, formulaOriginalOk: FORMULA_ORIGINAL_OK,
+    formulaOk: FORMULA_OK, formulaCorrectDisplay: FORMULA_CORRECT_DISPLAY, scenarios: SCENARIOS,
+    generate: function(){
+      var k = pick(K_VALUES), y = pick(Y_VALUES);
+      return { values: { k:k, y:y, Ep: 0.5*k*y*y } };
+    }
+  });
+})();
+</script>
+</body>
+</html>

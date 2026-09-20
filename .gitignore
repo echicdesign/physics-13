@@ -1,0 +1,11 @@
+# Public repo: whitelist only. Anything not listed stays on the laptop.
+*
+!*/
+!index.html
+!amech/mech-lab.html
+!amech/formula-lab.html
+!awave/wave-lab.html
+!awave/formula-lab.html
+!.nojekyll
+!.gitignore
+!README.md
