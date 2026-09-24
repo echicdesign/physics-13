@@ -186,6 +186,12 @@
     <button class="tab-btn" data-topic="pr" type="button">Parallel Resistance</button>
     <button class="tab-btn" data-topic="sv" type="button">Series Voltage</button>
     <button class="tab-btn" data-topic="pc" type="button">Parallel Current</button>
+    <button class="tab-btn" data-topic="qcv" type="button">Capacitor Charge</button>
+    <button class="tab-btn" data-topic="plate" type="button">Plate Capacitance</button>
+    <button class="tab-btn" data-topic="ecap" type="button">Capacitor Energy</button>
+    <button class="tab-btn" data-topic="rc" type="button">RC Time Constant</button>
+    <button class="tab-btn" data-topic="cser" type="button">Series Capacitors</button>
+    <button class="tab-btn" data-topic="cpar" type="button">Parallel Capacitors</button>
   </div>
   <section class="topic-panel" data-topic="ohm">
     <div class="toprow">
@@ -316,6 +322,84 @@
     </div>
     <div class="problem-card" id="problemCard-pc"></div>
   </section>
+
+  <section class="topic-panel" data-topic="qcv" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-qcv"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-qcv" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-qcv"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="plate" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-plate"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-plate" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-plate"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="ecap" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-ecap"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-ecap" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-ecap"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="rc" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-rc"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-rc" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-rc"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="cser" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-cser"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-cser" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-cser"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="cpar" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-cpar"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-cpar" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-cpar"></div>
+  </section>
 </div>
 
 <div class="modal-overlay" id="roundDoneModal" hidden>
@@ -351,19 +435,25 @@
     for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
     return a;
   }
+  var SUPERSCRIPT_DIGITS = { '⁰':'0', '¹':'1', '²':'2', '³':'3', '⁴':'4', '⁵':'5', '⁶':'6', '⁷':'7', '⁸':'8', '⁹':'9', '⁻':'-' };
   function normalizeNumber(s){
     // keeps e/E and + so real scientific notation (5.97e24, 6.67E-11)
-    // parses correctly -- mechanics' Fg problems genuinely need this,
-    // unlike anything in the wave-systems Formula Lab.
-    return parseFloat((s||'').toString().trim().replace(/[^0-9.\-eE+]/g,''));
+    // parses correctly, and also turns calculator-style "4.7×10^-6",
+    // "4.7 x 10⁻⁶" or "4.7*10^(-6)" into 4.7e-6 for the capacitor topics.
+    var t = (s||'').toString().trim().replace(/\s+/g,'').replace(/[−–]/g,'-');
+    t = t.replace(/10([⁻]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, function(m, sup){
+      return '10^' + sup.split('').map(function(c){ return SUPERSCRIPT_DIGITS[c]; }).join('');
+    });
+    t = t.replace(/[×xX*]10\^\(?([+\-]?\d+)\)?/, 'e$1');
+    return parseFloat(t.replace(/[^0-9.\-eE+]/g,''));
   }
   function normalizeGuess(s){
-    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατ]/gi,'');
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατε]/gi,'');
   }
 
-  // Greek letters kept for parity with the other Formula Lab tools, though
-  // the Achieved-level electricity topics below don't currently need any.
+  // Greek letters: the capacitor topics need ε (ε₀, εᵣ) and τ.
   var GREEK_LETTERS = [
+    { ch:'ε', name:'epsilon' },
     { ch:'Δ', name:'delta' },
     { ch:'θ', name:'theta' },
     { ch:'ω', name:'omega' },
@@ -549,6 +639,364 @@
       }
       popup.hidden = true;
     });
+  }
+
+  // ---------------------------------------------------------------
+  // Generic multi-target formula-topic engine, ported from
+  // amech/formula-lab.html for the Level 3 capacitor topics, which need
+  // a different unknown each round (Q, C or V ...). Electricity changes vs
+  // the mechanics copy: values in standard form with superscripts, unit
+  // prefixes (µF, mC, mm) accepted and converted, and a purely relative
+  // 2% tolerance, since the old 0.03 absolute floor would accept 0 for
+  // answers like 4.23 × 10⁻³ C.
+  // ---------------------------------------------------------------
+  function normalizeFormulaGeneric(s){
+    return (s||'').toString().trim().toLowerCase()
+      .replace(/½/g,'1/2')
+      .replace(/²/g,'^2')
+      .replace(/ε/g,'e')
+      .replace(/δ/g,'delta')
+      .replace(/θ/g,'theta')
+      .replace(/π/g,'pi')
+      .replace(/ω/g,'omega')
+      .replace(/α/g,'alpha')
+      .replace(/τ/g,'tau')
+      .replace(/√/g,'sqrt')
+      .replace(/−/g,'-')
+      .replace(/[×✕✗*·]/g,'')
+      .replace(/[₀-₉]/g, function(ch){ return '0123456789'.charAt(ch.charCodeAt(0)-8320); })
+      .replace(/ᵣ/g,'r')
+      .replace(/ₜ/g,'t')
+      .replace(/÷/g,'/')
+      .replace(/\s+/g,'');
+  }
+  var SUPERSCRIPT = { '-':'⁻', '0':'⁰', '1':'¹', '2':'²', '3':'³', '4':'⁴', '5':'⁵', '6':'⁶', '7':'⁷', '8':'⁸', '9':'⁹' };
+  function sciDisplay(v){
+    var parts = v.toExponential(2).split('e');
+    var exp = String(parseInt(parts[1], 10)).split('').map(function(c){ return SUPERSCRIPT[c]; }).join('');
+    return parts[0] + ' × 10' + exp;
+  }
+  // 3 significant figures with trailing zeros kept (12.0, 3.00), the way NZQA
+  // prints data; whole numbers of 1000 or more stay as written (2200).
+  function sig3(v){
+    if(v === 0) return '0';
+    if(Math.abs(v) < 0.01 || Math.abs(v) >= 1e5) return sciDisplay(v);
+    if(Math.abs(v) >= 1000) return String(Math.round(v));
+    return v.toPrecision(3);
+  }
+  var UNIT_PREFIX = { 'µ':1e-6, 'μ':1e-6, 'u':1e-6, 'm':1e-3, 'n':1e-9, 'p':1e-12, 'k':1e3, 'M':1e6 };
+  // Returns the multiplier implied by a typed unit ("µF" -> 1e-6), or null if the
+  // unit does not match this quantity at all. An exact match always wins, so
+  // "m" for metres is scale 1, not milli-nothing.
+  function unitScale(aliases, raw){
+    var list = aliases.map(normalizeGuess);
+    var s = (raw||'').toString().trim();
+    var p0 = s.charAt(0);
+    if(p0 !== 'µ' && p0 !== 'μ' && list.indexOf(normalizeGuess(s)) !== -1) return 1;
+    var p = p0;
+    if(p === 'µ' || p === 'μ') return list.indexOf(normalizeGuess(s.slice(1))) !== -1 ? 1e-6 : null;
+    if(UNIT_PREFIX[p] && list.indexOf(normalizeGuess(s.slice(1))) !== -1) return UNIT_PREFIX[p];
+    return null;
+  }
+  function closeEnough(typed, correct){
+    return !isNaN(typed) && Math.abs(typed - correct) <= 0.02*Math.abs(correct);
+  }
+
+  function buildFormulaTopic(cfg){
+    var id = cfg.idSuffix;
+    var panel = document.querySelector('.topic-panel[data-topic="'+cfg.dataTopic+'"]');
+    function colorOf(k){ return isDarkMode() ? cfg.CLR[k].dark : cfg.CLR[k].light; }
+    function fmtVal(k, v){ return typeof v === 'number' ? sig3(v) : v; }
+    function scenarioVal(k, v){
+      if(cfg.scenarioFmt){ var custom = cfg.scenarioFmt(k, v); if(custom != null) return custom; }
+      return fmtVal(k, v) + ' ' + cfg.UNIT[k];
+    }
+    function identifyFieldOk(key, field, raw){
+      if(field === 'unit') return unitScale(cfg.UNIT_ALIASES[key], raw) !== null;
+      var list = field === 'name' ? cfg.NAME_ALIASES[key] : cfg.SYMBOL_ALIASES[key];
+      return list.map(normalizeGuess).indexOf(normalizeGuess(raw)) !== -1;
+    }
+
+    var FIELD_MODE = 'learner';
+    var score = 0, asked = 0;
+    var ROUND_SIZE = 6;
+    var current = null;
+
+    function newProblem(){
+      var target = pick(cfg.targets);
+      var values = cfg.generate(target);
+      var givenKeys = cfg.keys.filter(function(k){ return k !== target; });
+      var scenario = pick(cfg.scenarios[target]);
+      givenKeys.forEach(function(k){
+        scenario = scenario.split('{'+k+'}').join(scenarioVal(k, values[k]));
+      });
+      current = { target: target, values: values, correct: values[target], scenario: scenario };
+      renderProblem();
+    }
+
+    function renderProblem(){
+      var card = document.getElementById('problemCard-'+id);
+      var t = current.target;
+      var givenKeys = cfg.keys.filter(function(k){ return k !== t; });
+
+      var learnerFactsHtml = givenKeys.map(function(k){
+        return '<span class="fact-chip" style="color:'+colorOf(k)+';border-color:'+colorOf(k)+'">'
+          + cfg.LABEL[k] + ' = ' + fmtVal(k, current.values[k]) + ' ' + cfg.UNIT[k] + '</span>';
+      }).join('');
+
+      var factGuessHtml = '';
+      if(FIELD_MODE === 'confident'){
+        factGuessHtml = '<div class="fact-guess-grid">' + givenKeys.map(function(k){
+          return '<div class="fact-guess">' +
+            '<span class="fact-value-chip">' + fmtVal(k, current.values[k]) + ' ' + cfg.UNIT[k] + '</span>' +
+            '<div class="id-grid id-grid-2">' +
+              '<div class="id-field"><label>Name</label><input class="fact-guess-input" data-fact-key="'+k+'" data-fact-guess-field="name" autocomplete="off" spellcheck="false" placeholder="name"></div>' +
+              '<div class="id-field"><label>Symbol</label>' + buildGreekInputHtml('class="fact-guess-input" data-fact-key="'+k+'" data-fact-guess-field="symbol"', 'symbol') + '</div>' +
+            '</div>' +
+          '</div>';
+        }).join('') + '</div>';
+      }
+
+      var factsRowHtml = '';
+      if(FIELD_MODE !== 'expert'){
+        var findHtml = '<span class="find-chip" style="color:'+colorOf(t)+';border-color:'+colorOf(t)+'">Find: '
+          + cfg.LABEL[t] + ' (' + cfg.NAME[t] + ')</span>';
+        factsRowHtml = '<div class="facts-row">' + (FIELD_MODE === 'learner' ? learnerFactsHtml : '') + findHtml + '</div>';
+      }
+
+      var targetIdHtml = '';
+      var knownFactsHtml = '';
+      if(FIELD_MODE === 'expert'){
+        targetIdHtml =
+          '<div class="id-block">' +
+            '<p class="id-block-label">What are you trying to find?</p>' +
+            '<div class="id-grid id-grid-3">' +
+              '<div class="id-field"><label>Name</label><input class="target-id-input" data-target-field="name" autocomplete="off" spellcheck="false"></div>' +
+              '<div class="id-field"><label>Symbol</label>' + buildGreekInputHtml('class="target-id-input" data-target-field="symbol"', '') + '</div>' +
+              '<div class="id-field"><label>Unit</label><input class="target-id-input" data-target-field="unit" autocomplete="off" spellcheck="false"></div>' +
+            '</div>' +
+          '</div>';
+        knownFactsHtml =
+          '<div class="id-block">' +
+            '<p class="id-block-label">What do you know? (write down every fact from the question)</p>' +
+            givenKeys.map(function(k, idx){
+              return '<div class="known-fact-block">' +
+                '<p class="known-fact-heading">Fact ' + (idx+1) + '</p>' +
+                '<div class="id-grid id-grid-4">' +
+                  '<div class="id-field"><label>Value</label><input class="known-fact-input" data-fact-key="'+k+'" data-fact-field="value" autocomplete="off" inputmode="decimal" placeholder="0.00"></div>' +
+                  '<div class="id-field"><label>Name</label><input class="known-fact-input" data-fact-key="'+k+'" data-fact-field="name" autocomplete="off" spellcheck="false"></div>' +
+                  '<div class="id-field"><label>Symbol</label>' + buildGreekInputHtml('class="known-fact-input" data-fact-key="'+k+'" data-fact-field="symbol"', '') + '</div>' +
+                  '<div class="id-field"><label>Unit</label><input class="known-fact-input" data-fact-key="'+k+'" data-fact-field="unit" autocomplete="off" spellcheck="false"></div>' +
+                '</div>' +
+              '</div>';
+            }).join('') +
+          '</div>';
+      }
+
+      var origFormulaHtml, formulaFieldHtml;
+      var hint = 'Use × or * for multiply, ÷ or / for divide, ½ or 1/2 for a half. The Greek button has ε and τ.';
+
+      if(FIELD_MODE === 'learner'){
+        var sheetOptHtml = '<option value="">— choose —</option>' + shuffle(cfg.formulaSheetOptions).map(function(o){
+          return '<option value="'+o+'">'+o+'</option>';
+        }).join('');
+        origFormulaHtml =
+          '<div class="field-row">' +
+            '<label>Which formula from your sheet applies here?</label>' +
+            '<select id="origFormulaInput-'+id+'">'+sheetOptHtml+'</select>' +
+            '<p class="field-hint">These are real formulae from the NCEA electrical-systems reference sheet, in the exam you will see many of them at once and have to pick the right one, same as here.</p>' +
+          '</div>';
+        var choiceOpts = shuffle(cfg.formulaChoices[t].slice());
+        var choiceOptHtml = '<option value="">— choose —</option>' + choiceOpts.map(function(o){ return '<option value="'+o+'">'+o+'</option>'; }).join('');
+        formulaFieldHtml =
+          '<div class="field-row">' +
+            '<label>Rearranged formula</label>' +
+            '<select id="formulaInput-'+id+'">'+choiceOptHtml+'</select>' +
+          '</div>';
+      } else {
+        origFormulaHtml =
+          '<div class="field-row">' +
+            '<label>Original formula (before rearranging)</label>' +
+            buildFormulaInputHtml('origFormulaInput-'+id, '') +
+            '<p class="field-hint">Write it exactly as printed on your formula sheet.</p>' +
+          '</div>';
+        formulaFieldHtml =
+          '<div class="field-row">' +
+            '<label>Rearranged formula (write it before you substitute, or type &quot;same&quot; if it is already in the right order)</label>' +
+            buildFormulaInputHtml('formulaInput-'+id, FIELD_MODE === 'confident' ? 'e.g. '+cfg.formulaCorrectDisplay[t] : '') +
+            '<p class="field-hint">' + hint + '</p>' +
+          '</div>';
+      }
+
+      card.innerHTML =
+        '<p class="problem-text">' + current.scenario + '</p>' +
+        factsRowHtml +
+        targetIdHtml +
+        knownFactsHtml +
+        factGuessHtml +
+        origFormulaHtml +
+        formulaFieldHtml +
+        '<div class="field-row">' +
+          '<label>Working (optional, show your substitution)</label>' +
+          '<input id="workingInput-'+id+'" type="text" autocomplete="off" spellcheck="false" placeholder="e.g. 470 × 10^-6 × 9">' +
+        '</div>' +
+        '<div class="field-row">' +
+          '<label>Your answer</label>' +
+          '<div class="answer-row">' +
+            '<input id="answerInput-'+id+'" class="answer-value-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00">' +
+            '<input id="answerUnitInput-'+id+'" class="answer-unit-input" type="text" autocomplete="off" spellcheck="false" placeholder="unit">' +
+            buildCalculatorHtml() +
+          '</div>' +
+          '<p class="field-hint">Powers of ten: type 4.7e-6 or 4.7×10^-6. Prefixed units such as µF, mC or mm are fine in the unit box (type u for µ).</p>' +
+        '</div>' +
+        '<div class="actions-row">' +
+          '<button class="check-btn" id="checkBtn-'+id+'" type="button">Check</button>' +
+          '<span class="feedback" id="feedback-'+id+'" aria-live="polite"></span>' +
+        '</div>';
+
+      document.getElementById('checkBtn-'+id).addEventListener('click', checkAnswer);
+      card.querySelectorAll('input').forEach(function(el){
+        el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+      });
+      wireGreekPopups(card);
+      wireCalculator(card);
+
+      var focusEl = card.querySelector('.target-id-input') || card.querySelector('.fact-guess-input') || document.getElementById('origFormulaInput-'+id);
+      focusEl.focus();
+    }
+
+    function checkAnswer(){
+      var t = current.target;
+      var card = document.getElementById('problemCard-'+id);
+      var origFormulaEl = document.getElementById('origFormulaInput-'+id);
+      var formulaEl = document.getElementById('formulaInput-'+id);
+      var answerEl = document.getElementById('answerInput-'+id);
+      var answerUnitEl = document.getElementById('answerUnitInput-'+id);
+      var feedback = document.getElementById('feedback-'+id);
+      var checkBtn = document.getElementById('checkBtn-'+id);
+
+      var allOk = true, message = '';
+      function mark(el, ok){ el.classList.remove('ok','bad'); el.classList.add(ok ? 'ok' : 'bad'); }
+
+      var factGuessEls = card.querySelectorAll('.fact-guess-input');
+      if(factGuessEls.length){
+        var factsOk = true;
+        factGuessEls.forEach(function(el){
+          var ok = identifyFieldOk(el.getAttribute('data-fact-key'), el.getAttribute('data-fact-guess-field'), el.value);
+          mark(el, ok);
+          if(!ok) factsOk = false;
+        });
+        if(!factsOk){ allOk = false; message = message || 'Check which value is which fact, one or more is not right yet.'; }
+      }
+
+      var targetIdEls = card.querySelectorAll('.target-id-input');
+      if(targetIdEls.length){
+        var targetIdOk = true;
+        targetIdEls.forEach(function(el){
+          var ok = identifyFieldOk(t, el.getAttribute('data-target-field'), el.value);
+          mark(el, ok);
+          if(!ok) targetIdOk = false;
+        });
+        if(!targetIdOk){ allOk = false; message = message || 'Check the name, symbol and unit of what you are finding.'; }
+      }
+
+      var knownFactEls = card.querySelectorAll('.known-fact-input');
+      if(knownFactEls.length){
+        var knownFactsOk = true;
+        knownFactEls.forEach(function(el){
+          var k = el.getAttribute('data-fact-key');
+          var field = el.getAttribute('data-fact-field');
+          var ok;
+          if(field === 'value'){
+            var unitEl = card.querySelector('.known-fact-input[data-fact-key="'+k+'"][data-fact-field="unit"]');
+            var scale = unitScale(cfg.UNIT_ALIASES[k], unitEl ? unitEl.value : '') || 1;
+            ok = closeEnough(normalizeNumber(el.value) * scale, current.values[k]);
+          } else {
+            ok = identifyFieldOk(k, field, el.value);
+          }
+          mark(el, ok);
+          if(!ok) knownFactsOk = false;
+        });
+        if(!knownFactsOk){ allOk = false; message = message || 'One of your known facts (value, name, symbol or unit) is not right yet.'; }
+      }
+
+      var origOk = cfg.formulaOriginalOk.indexOf(normalizeFormulaGeneric(origFormulaEl.value)) !== -1;
+      mark(origFormulaEl, origOk);
+      if(!origOk){ allOk = false; message = message || 'That is not the formula that applies here, check your sheet again.'; }
+
+      var formulaRaw = formulaEl.value.trim().toLowerCase() === 'same' ? origFormulaEl.value : formulaEl.value;
+      var formulaOk = cfg.formulaOk[t].indexOf(normalizeFormulaGeneric(formulaRaw)) !== -1;
+      mark(formulaEl, formulaOk);
+      if(!formulaOk){ allOk = false; message = message || 'The rearranged formula is not quite right yet, try again.'; }
+
+      var unitScaleUsed = unitScale(cfg.UNIT_ALIASES[t], answerUnitEl.value);
+      var answerOk = closeEnough(normalizeNumber(answerEl.value) * (unitScaleUsed || 1), current.correct);
+      mark(answerEl, answerOk);
+      if(!answerOk){ allOk = false; message = message || 'Not quite, check your substitution (and your powers of ten) and try again.'; }
+
+      mark(answerUnitEl, unitScaleUsed !== null);
+      if(unitScaleUsed === null){ allOk = false; message = message || 'Do not forget to write the unit, check it matches your answer.'; }
+
+      asked++;
+      if(allOk){
+        score++;
+        document.getElementById('scoreBadge-'+id).innerHTML = '<b>'+score+'</b> / '+ROUND_SIZE+' correct this round';
+        checkBtn.disabled = true;
+        var correctModal = document.getElementById('correctModal');
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = message;
+        asked--;
+      }
+    }
+
+    function showRoundDone(){
+      var modal = document.getElementById('roundDoneModal');
+      var title = document.getElementById('roundDoneTitle');
+      var summary = document.getElementById('roundDoneSummary');
+      var btn = document.getElementById('roundDoneBtn');
+      if(score === ROUND_SIZE){
+        title.textContent = "Perfect round!";
+        summary.textContent = "All " + ROUND_SIZE + " correct in this mode.";
+      } else {
+        title.textContent = "Round complete";
+        summary.textContent = score + " out of " + ROUND_SIZE + " correct. Have another go to lock it in.";
+      }
+      btn.onclick = function(){ modal.hidden = true; startRound(); };
+      modal.hidden = false;
+      btn.focus();
+    }
+
+    function startRound(){
+      score = 0; asked = 0;
+      document.getElementById('scoreBadge-'+id).innerHTML = '<b>0</b> / '+ROUND_SIZE+' correct this round';
+      newProblem();
+    }
+
+    document.getElementById('newRoundBtn-'+id).addEventListener('click', startRound);
+
+    var modeButtons = panel.querySelectorAll('.mode-btn');
+    function updateModeButtons(){
+      modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+    }
+    modeButtons.forEach(function(b){
+      b.addEventListener('click', function(){
+        var m = b.getAttribute('data-mode');
+        if(m === FIELD_MODE) return;
+        FIELD_MODE = m;
+        updateModeButtons();
+        startRound();
+      });
+    });
+    updateModeButtons();
+
+    window.formulaLabTopics = window.formulaLabTopics || [];
+    window.formulaLabTopics.push(startRound);
+    startRound();
   }
 </script>
 <script>
@@ -4171,6 +4619,364 @@
   window.formulaLabTopics.push(startRound);
 
   startRound();
+})();
+</script>
+<script>
+// ---------------------------------------------------------------
+// Level 3 capacitor topics (added 2026-09-25). Scope checked against the
+// 2021-2025 NZQA 91526 assessment schedules: Q = CV, C = ε0εrA/d, E = ½QV,
+// τ = RC and series/parallel capacitance all earn Achieved there.
+// Shared data first, then one buildFormulaTopic() call per topic.
+// ---------------------------------------------------------------
+var CAP_E0 = 8.85e-12;
+var CAP_SHEET_OPTIONS = ['Q = CV', 'C = ε₀εᵣA ÷ d', 'E = ½QV', 'τ = RC', 'CT = C1 + C2 + C3', '1/CT = 1/C1 + 1/C2 + 1/C3', 'V = IR', 'Q = It'];
+var CAP_C_POOL = [10e-6, 22e-6, 47e-6, 100e-6, 150e-6, 220e-6, 470e-6, 1000e-6, 2200e-6];
+var CAP_V_POOL = [1.5, 3, 4.5, 6, 9, 12, 24, 50];
+var CAP_UNIT_ALIASES = {
+  C: ['f', 'farad', 'farads'],
+  Q: ['c', 'coulomb', 'coulombs'],
+  V: ['v', 'volt', 'volts'],
+  E: ['j', 'joule', 'joules'],
+  R: ['ω', 'ohm', 'ohms'],
+  tau: ['s', 'sec', 'secs', 'second', 'seconds'],
+  A: ['m2', 'm^2', 'm²', 'square metres', 'square meters', 'square metre'],
+  d: ['m', 'metre', 'metres', 'meter', 'meters'],
+  er: ['', 'none', 'no unit', 'no units', 'nounit', '-']
+};
+// Capacitances that came from the pool read as µF in the question text,
+// the way NZQA writes them; anything tiny stays in standard form.
+function capMicro(v){
+  if(v >= 1e-7 && v < 1){ return sig3(v*1e6) + ' µF'; }
+  return null;
+}
+function capPerms(factors){
+  if(factors.length <= 1) return [factors.join('')];
+  var out = [];
+  factors.forEach(function(f, i){
+    var rest = factors.slice(0, i).concat(factors.slice(i+1));
+    capPerms(rest).forEach(function(r){ out.push(f + r); });
+  });
+  return out;
+}
+function capColor(light, dark){ return { light: light, dark: dark }; }
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'qcv', dataTopic: 'qcv',
+    keys: ['C','V','Q'], targets: ['Q','C','V'],
+    CLR: { C: capColor('#6B2BB0','#B27FE8'), V: capColor('#B0562B','#E8A67F'), Q: capColor('#2B6CB0','#7FB2E8') },
+    LABEL: { C:'C', V:'V', Q:'Q' },
+    NAME: { C:'capacitance', V:'voltage', Q:'charge' },
+    UNIT: { C:'F', V:'V', Q:'C' },
+    NAME_ALIASES: { C: ['capacitance'], V: ['voltage', 'potential difference', 'pd'], Q: ['charge', 'charge stored'] },
+    SYMBOL_ALIASES: { C: ['c'], V: ['v'], Q: ['q'] },
+    UNIT_ALIASES: CAP_UNIT_ALIASES,
+    scenarioFmt: function(k, v){ return k === 'C' ? capMicro(v) : null; },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: ['q=cv', 'q=vc'],
+    formulaOk: { Q: ['q=cv', 'q=vc'], C: ['c=q/v'], V: ['v=q/c'] },
+    formulaCorrectDisplay: { Q: 'Q = CV', C: 'C = Q ÷ V', V: 'V = Q ÷ C' },
+    formulaChoices: {
+      Q: ['Q = CV', 'Q = C ÷ V', 'Q = V ÷ C'],
+      C: ['C = Q ÷ V', 'C = QV', 'C = V ÷ Q'],
+      V: ['V = Q ÷ C', 'V = QC', 'V = C ÷ Q']
+    },
+    scenarios: {
+      Q: [
+        "A {C} capacitor is fully charged by connecting it to a {V} battery. Calculate the charge stored on the capacitor.",
+        "The capacitor in a camera flash has a capacitance of {C} and is charged to {V}. Calculate the charge on its plates.",
+        "A {C} capacitor in a radio circuit has {V} across it. Find the charge stored.",
+        "A wizard charges a {C} rune-capacitor from a {V} crystal battery. Calculate the charge stored in the rune.",
+        "A golem's heart-capacitor of {C} holds {V} of arcane potential. Find the charge it stores.",
+        "An enchanted lantern stores its glow in a {C} capacitor charged to {V}. Calculate the charge on its plates."
+      ],
+      C: [
+        "A capacitor stores {Q} of charge when there is {V} across it. Calculate its capacitance.",
+        "When a capacitor in a timer circuit is charged to {V}, it holds {Q} of charge. Find its capacitance.",
+        "A capacitor in a sensor holds {Q} at {V}. Calculate the capacitance of the capacitor.",
+        "A crystal capacitor holds {Q} of mana-charge when charged to {V}. Calculate its capacitance.",
+        "A rune-jar stores {Q} of charge when a wizard applies {V} across it. Find the capacitance of the jar.",
+        "An alchemist's capacitor holds {Q} at {V}. Calculate its capacitance."
+      ],
+      V: [
+        "A {C} capacitor holds {Q} of charge. Calculate the voltage across it.",
+        "The {C} capacitor in a defibrillator stores {Q} of charge. Find the voltage across its plates.",
+        "A {C} capacitor in a bike light holds {Q}. Calculate the voltage across the capacitor.",
+        "A {C} rune-capacitor holds {Q} of arcane charge. Calculate the voltage across the rune.",
+        "A golem's {C} heart-capacitor stores {Q} of charge. Find the voltage across it.",
+        "A {C} capacitor inside a wizard's staff holds {Q}. Calculate the voltage across its plates."
+      ]
+    },
+    generate: function(){
+      var C = pick(CAP_C_POOL), V = pick(CAP_V_POOL);
+      return { C: C, V: V, Q: C*V };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var num = capPerms(['e0','er','a']);
+  var eps = capPerms(['e0','er']);
+  var cd = capPerms(['c','d']);
+  var okC = [], okD = [], okA = [];
+  num.forEach(function(p){ okC.push('c='+p+'/d', 'c=('+p+')/d'); okD.push('d='+p+'/c', 'd=('+p+')/c'); });
+  cd.forEach(function(p){ eps.forEach(function(e){ okA.push('a='+p+'/('+e+')', 'a=('+p+')/('+e+')'); }); okA.push('a='+p+'/e0/er', 'a='+p+'/er/e0'); });
+  var E0_TEXT = ' (ε₀ = 8.85 × 10⁻¹² F m⁻¹)';
+  buildFormulaTopic({
+    idSuffix: 'plate', dataTopic: 'plate',
+    keys: ['er','A','d','C'], targets: ['C','d','A'],
+    CLR: { er: capColor('#8A5A1B','#D1A05F'), A: capColor('#1B8A6B','#5FD1AC'), d: capColor('#B0562B','#E8A67F'), C: capColor('#6B2BB0','#B27FE8') },
+    LABEL: { er:'εᵣ', A:'A', d:'d', C:'C' },
+    NAME: { er:'dielectric constant', A:'plate area', d:'plate separation', C:'capacitance' },
+    UNIT: { er:'', A:'m²', d:'m', C:'F' },
+    NAME_ALIASES: {
+      er: ['dielectric constant', 'relative permittivity', 'permittivity', 'dielectric'],
+      A: ['area', 'plate area', 'area of plates', 'area of the plates'],
+      d: ['separation', 'plate separation', 'distance', 'distance between plates', 'gap'],
+      C: ['capacitance']
+    },
+    SYMBOL_ALIASES: { er: ['εr', 'er', 'epsilonr', 'k'], A: ['a'], d: ['d'], C: ['c'] },
+    UNIT_ALIASES: CAP_UNIT_ALIASES,
+    scenarioFmt: function(k, v){
+      if(k === 'd') return sig3(v*1000) + ' mm';
+      if(k === 'er') return String(v);
+      return null;
+    },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: okC,
+    formulaOk: { C: okC, d: okD, A: okA },
+    formulaCorrectDisplay: { C: 'C = ε₀εᵣA ÷ d', d: 'd = ε₀εᵣA ÷ C', A: 'A = Cd ÷ (ε₀εᵣ)' },
+    formulaChoices: {
+      C: ['C = ε₀εᵣA ÷ d', 'C = ε₀εᵣd ÷ A', 'C = A ÷ (ε₀εᵣd)'],
+      d: ['d = ε₀εᵣA ÷ C', 'd = C ÷ (ε₀εᵣA)', 'd = ε₀εᵣAC'],
+      A: ['A = Cd ÷ (ε₀εᵣ)', 'A = ε₀εᵣd ÷ C', 'A = C ÷ (ε₀εᵣd)']
+    },
+    scenarios: {
+      C: [
+        "A parallel-plate capacitor has plates of area {A} separated by {d} of material with a dielectric constant of {er}. Calculate its capacitance." + E0_TEXT,
+        "Two metal sheets of area {A} are held {d} apart, with a plastic film of dielectric constant {er} between them. Find the capacitance." + E0_TEXT,
+        "A touch-screen sensor acts as a capacitor with plates of area {A}, {d} apart, filled with glass of dielectric constant {er}. Calculate the capacitance." + E0_TEXT,
+        "Two enchanted silver plates of area {A} are held {d} apart by a dragon-scale sheet with a dielectric constant of {er}. Calculate the capacitance." + E0_TEXT,
+        "A rune-shield is built as a capacitor: plates of area {A}, {d} apart, filled with crystal of dielectric constant {er}. Find its capacitance." + E0_TEXT,
+        "A wizard stacks two mithril plates of area {A}, {d} apart, with parchment of dielectric constant {er} between them. Calculate the capacitance." + E0_TEXT
+      ],
+      d: [
+        "A capacitor has a capacitance of {C}. Its plates have an area of {A} and are separated by material with a dielectric constant of {er}. Calculate the separation of the plates." + E0_TEXT,
+        "A sensor capacitor of {C} has plates of area {A} with a film of dielectric constant {er} between them. Find the distance between the plates." + E0_TEXT,
+        "An enchanted capacitor of {C} has silver plates of area {A} with dragon-scale of dielectric constant {er} between them. Calculate the plate separation." + E0_TEXT,
+        "A rune-shield capacitor of {C} has plates of area {A} and a crystal filling of dielectric constant {er}. Find how far apart the plates are." + E0_TEXT
+      ],
+      A: [
+        "A capacitor of {C} has its plates {d} apart, with material of dielectric constant {er} between them. Calculate the area of each plate." + E0_TEXT,
+        "An engineer needs a {C} capacitor with plates {d} apart and a dielectric constant of {er}. Find the plate area required." + E0_TEXT,
+        "A wizard wants a {C} capacitor with plates {d} apart and troll-hide of dielectric constant {er} between them. Calculate the plate area needed." + E0_TEXT,
+        "A golem-maker builds a {C} capacitor with plates {d} apart, filled with crystal of dielectric constant {er}. Find the area of each plate." + E0_TEXT
+      ]
+    },
+    generate: function(){
+      var er = pick([1, 2.1, 2.2, 3, 4, 5]);
+      var A = pick([0.01, 0.02, 0.04, 0.05, 0.08, 0.16]);
+      var d = pick([0.1, 0.2, 0.5, 1, 2]) * 1e-3;
+      return { er: er, A: A, d: d, C: CAP_E0*er*A/d };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'ecap', dataTopic: 'ecap',
+    keys: ['Q','V','E'], targets: ['E','Q','V'],
+    CLR: { Q: capColor('#2B6CB0','#7FB2E8'), V: capColor('#B0562B','#E8A67F'), E: capColor('#1B8A6B','#5FD1AC') },
+    LABEL: { Q:'Q', V:'V', E:'E' },
+    NAME: { Q:'charge', V:'voltage', E:'energy stored' },
+    UNIT: { Q:'C', V:'V', E:'J' },
+    NAME_ALIASES: { Q: ['charge', 'charge stored'], V: ['voltage', 'potential difference', 'pd'], E: ['energy', 'energy stored', 'stored energy', 'potential energy'] },
+    SYMBOL_ALIASES: { Q: ['q'], V: ['v'], E: ['e', 'ep', 'w'] },
+    UNIT_ALIASES: CAP_UNIT_ALIASES,
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: ['e=1/2qv', 'e=1/2vq', 'e=qv/2', 'e=vq/2', 'e=0.5qv', 'e=0.5vq'],
+    formulaOk: {
+      E: ['e=1/2qv', 'e=1/2vq', 'e=qv/2', 'e=vq/2', 'e=0.5qv', 'e=0.5vq'],
+      Q: ['q=2e/v', 'q=e/(1/2v)', 'q=e/0.5v', 'q=e/(0.5v)'],
+      V: ['v=2e/q', 'v=e/(1/2q)', 'v=e/0.5q', 'v=e/(0.5q)']
+    },
+    formulaCorrectDisplay: { E: 'E = ½QV', Q: 'Q = 2E ÷ V', V: 'V = 2E ÷ Q' },
+    formulaChoices: {
+      E: ['E = ½QV', 'E = 2QV', 'E = ½Q ÷ V'],
+      Q: ['Q = 2E ÷ V', 'Q = E ÷ (2V)', 'Q = 2EV'],
+      V: ['V = 2E ÷ Q', 'V = E ÷ (2Q)', 'V = 2EQ']
+    },
+    scenarios: {
+      E: [
+        "A capacitor holds {Q} of charge when the voltage across it is {V}. Calculate the energy stored in the capacitor.",
+        "The capacitor in a camera flash stores {Q} of charge at {V}. Find the energy stored, ready for the flash.",
+        "A defibrillator capacitor holds {Q} at {V}. Calculate the energy it stores.",
+        "A rune-capacitor holds {Q} of arcane charge at {V}. Calculate the energy stored in the rune.",
+        "A lightning-jar holds {Q} of charge at {V}. Find the energy waiting to be released.",
+        "A golem's heart-capacitor stores {Q} at {V}. Calculate the energy it holds."
+      ],
+      Q: [
+        "A capacitor charged to {V} stores {E} of energy. Calculate the charge on its plates.",
+        "A camera flash capacitor stores {E} of energy at {V}. Find the charge stored.",
+        "A lightning-jar charged to {V} holds {E} of energy. Calculate the charge inside.",
+        "A wizard's staff-capacitor stores {E} at {V}. Find the charge it holds."
+      ],
+      V: [
+        "A capacitor holding {Q} of charge stores {E} of energy. Calculate the voltage across it.",
+        "A defibrillator capacitor stores {E} of energy with {Q} of charge. Find the voltage across its plates.",
+        "A rune-capacitor holding {Q} of charge stores {E} of energy. Calculate the voltage across the rune.",
+        "A golem's heart-capacitor holds {Q} and stores {E}. Find the voltage across it."
+      ]
+    },
+    generate: function(){
+      var C = pick(CAP_C_POOL), V = pick(CAP_V_POOL), Q = C*V;
+      return { Q: Q, V: V, E: 0.5*Q*V };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'rc', dataTopic: 'rc',
+    keys: ['R','C','tau'], targets: ['tau','R','C'],
+    CLR: { R: capColor('#1B8A6B','#5FD1AC'), C: capColor('#6B2BB0','#B27FE8'), tau: capColor('#8A2B6C','#D67FB2') },
+    LABEL: { R:'R', C:'C', tau:'τ' },
+    NAME: { R:'resistance', C:'capacitance', tau:'time constant' },
+    UNIT: { R:'Ω', C:'F', tau:'s' },
+    NAME_ALIASES: { R: ['resistance'], C: ['capacitance'], tau: ['time constant', 'tau'] },
+    SYMBOL_ALIASES: { R: ['r'], C: ['c'], tau: ['τ', 'tau'] },
+    UNIT_ALIASES: CAP_UNIT_ALIASES,
+    scenarioFmt: function(k, v){
+      if(k === 'C') return capMicro(v);
+      if(k === 'R' && v >= 1000) return sig3(v/1000) + ' kΩ';
+      return null;
+    },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: ['tau=rc', 'tau=cr'],
+    formulaOk: { tau: ['tau=rc', 'tau=cr'], R: ['r=tau/c'], C: ['c=tau/r'] },
+    formulaCorrectDisplay: { tau: 'τ = RC', R: 'R = τ ÷ C', C: 'C = τ ÷ R' },
+    formulaChoices: {
+      tau: ['τ = RC', 'τ = R ÷ C', 'τ = C ÷ R'],
+      R: ['R = τ ÷ C', 'R = τC', 'R = C ÷ τ'],
+      C: ['C = τ ÷ R', 'C = τR', 'C = R ÷ τ']
+    },
+    scenarios: {
+      tau: [
+        "A {C} capacitor is charged through a {R} resistor. Calculate the time constant of the circuit.",
+        "The delay circuit in a car's interior light uses a {C} capacitor and a {R} resistor. Find the time constant.",
+        "A {C} capacitor discharges through a {R} resistor in a camera. Calculate the time constant.",
+        "A {C} rune-capacitor charges through a {R} enchanted resistor. Calculate the time constant of the spell circuit.",
+        "A castle's gate-timer uses a {C} capacitor with a {R} troll-hair resistor. Find the time constant.",
+        "A lantern fades as its {C} capacitor discharges through a {R} filament. Calculate the time constant."
+      ],
+      R: [
+        "A {C} capacitor charges with a time constant of {tau}. Calculate the resistance in the circuit.",
+        "A timer circuit needs a time constant of {tau} using a {C} capacitor. Find the resistance required.",
+        "A {C} rune-capacitor must charge with a time constant of {tau}. Calculate the resistance needed.",
+        "A castle gate-timer with a {C} capacitor has a time constant of {tau}. Find the resistance."
+      ],
+      C: [
+        "A capacitor charges through a {R} resistor with a time constant of {tau}. Calculate the capacitance.",
+        "A flashing bike light has a time constant of {tau} and a {R} resistor. Find the capacitance.",
+        "A lantern capacitor discharges through a {R} filament with a time constant of {tau}. Calculate the capacitance.",
+        "A rune circuit with a {R} resistor has a time constant of {tau}. Find the capacitance of the rune."
+      ]
+    },
+    generate: function(){
+      var R = pick([100, 220, 470, 1000, 1500, 2200, 4700, 10000, 22000]);
+      var C = pick(CAP_C_POOL);
+      return { R: R, C: C, tau: R*C };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'cser', dataTopic: 'cser',
+    keys: ['C1','C2','CT'], targets: ['CT'],
+    CLR: { C1: capColor('#2B6CB0','#7FB2E8'), C2: capColor('#B0562B','#E8A67F'), CT: capColor('#6B2BB0','#B27FE8') },
+    LABEL: { C1:'C₁', C2:'C₂', CT:'CT' },
+    NAME: { C1:'capacitance 1', C2:'capacitance 2', CT:'total capacitance' },
+    UNIT: { C1:'F', C2:'F', CT:'F' },
+    NAME_ALIASES: { C1: ['capacitance', 'capacitance 1', 'capacitance1'], C2: ['capacitance', 'capacitance 2', 'capacitance2'], CT: ['total capacitance', 'capacitance total', 'combined capacitance', 'equivalent capacitance'] },
+    SYMBOL_ALIASES: { C1: ['c1'], C2: ['c2'], CT: ['ct', 'ctotal'] },
+    UNIT_ALIASES: { C1: CAP_UNIT_ALIASES.C, C2: CAP_UNIT_ALIASES.C, CT: CAP_UNIT_ALIASES.C },
+    scenarioFmt: function(k, v){ return capMicro(v); },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: ['1/ct=1/c1+1/c2+1/c3', '1/ct=1/c1+1/c2'],
+    formulaOk: { CT: ['ct=1/(1/c1+1/c2)', 'ct=(1/c1+1/c2)^-1', 'ct=c1c2/(c1+c2)', 'ct=(c1c2)/(c1+c2)', 'ct=1/(1/c2+1/c1)'] },
+    formulaCorrectDisplay: { CT: 'CT = 1 ÷ (1/C1 + 1/C2)' },
+    formulaChoices: { CT: ['CT = 1 ÷ (1/C1 + 1/C2)', 'CT = 1/C1 + 1/C2', 'CT = C1 + C2'] },
+    scenarios: {
+      CT: [
+        "A {C1} capacitor and a {C2} capacitor are connected in series. Calculate the total capacitance.",
+        "Two capacitors, {C1} and {C2}, are joined in series in a filter circuit. Find their combined capacitance.",
+        "A technician connects a {C1} capacitor in series with a {C2} capacitor. Calculate the total capacitance.",
+        "A wizard chains a {C1} rune-capacitor in series with a {C2} rune-capacitor. Calculate the total capacitance.",
+        "Two crystal capacitors, {C1} and {C2}, are linked in series inside a golem. Find the combined capacitance.",
+        "An alchemist wires a {C1} capacitor in series with a {C2} capacitor on a spell bench. Calculate the total capacitance."
+      ]
+    },
+    generate: function(){
+      var C1 = pick(CAP_C_POOL), C2 = pick(CAP_C_POOL);
+      return { C1: C1, C2: C2, CT: 1/(1/C1 + 1/C2) };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var sums = capPerms(['a','b','c']).map(function(p){
+    return 'ct=' + p.split('').map(function(ch){ return { a:'c1', b:'c2', c:'c3' }[ch]; }).join('+');
+  });
+  buildFormulaTopic({
+    idSuffix: 'cpar', dataTopic: 'cpar',
+    keys: ['C1','C2','C3','CT'], targets: ['CT'],
+    CLR: { C1: capColor('#2B6CB0','#7FB2E8'), C2: capColor('#B0562B','#E8A67F'), C3: capColor('#1B8A6B','#5FD1AC'), CT: capColor('#6B2BB0','#B27FE8') },
+    LABEL: { C1:'C₁', C2:'C₂', C3:'C₃', CT:'CT' },
+    NAME: { C1:'capacitance 1', C2:'capacitance 2', C3:'capacitance 3', CT:'total capacitance' },
+    UNIT: { C1:'F', C2:'F', C3:'F', CT:'F' },
+    NAME_ALIASES: { C1: ['capacitance', 'capacitance 1', 'capacitance1'], C2: ['capacitance', 'capacitance 2', 'capacitance2'], C3: ['capacitance', 'capacitance 3', 'capacitance3'], CT: ['total capacitance', 'capacitance total', 'combined capacitance', 'equivalent capacitance'] },
+    SYMBOL_ALIASES: { C1: ['c1'], C2: ['c2'], C3: ['c3'], CT: ['ct', 'ctotal'] },
+    UNIT_ALIASES: { C1: CAP_UNIT_ALIASES.C, C2: CAP_UNIT_ALIASES.C, C3: CAP_UNIT_ALIASES.C, CT: CAP_UNIT_ALIASES.C },
+    scenarioFmt: function(k, v){ return capMicro(v); },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: sums,
+    formulaOk: { CT: sums },
+    formulaCorrectDisplay: { CT: 'CT = C1 + C2 + C3' },
+    formulaChoices: { CT: ['CT = C1 + C2 + C3', '1/CT = 1/C1 + 1/C2 + 1/C3', 'CT = C1 × C2 × C3'] },
+    scenarios: {
+      CT: [
+        "Capacitors of {C1}, {C2} and {C3} are connected in parallel. Calculate the total capacitance.",
+        "An audio amplifier has {C1}, {C2} and {C3} capacitors wired in parallel. Find the combined capacitance.",
+        "A technician connects {C1}, {C2} and {C3} capacitors side by side in parallel. Calculate the total capacitance.",
+        "A wizard links three rune-capacitors of {C1}, {C2} and {C3} in parallel. Calculate the total capacitance.",
+        "A golem's power bank has crystal capacitors of {C1}, {C2} and {C3} in parallel. Find the combined capacitance.",
+        "An enchanted lantern holds {C1}, {C2} and {C3} capacitors side by side in parallel. Calculate the total capacitance."
+      ]
+    },
+    generate: function(){
+      var C1 = pick(CAP_C_POOL), C2 = pick(CAP_C_POOL), C3 = pick(CAP_C_POOL);
+      return { C1: C1, C2: C2, C3: C3, CT: C1 + C2 + C3 };
+    }
+  });
 })();
 </script>
 </body>
