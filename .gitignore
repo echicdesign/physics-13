@@ -6,6 +6,10 @@
 !amech/formula-lab.html
 !awave/wave-lab.html
 !awave/formula-lab.html
+!aelec/elec-lab.html
+!aelec/formula-lab.html
+!aelec/Images/*.jpg
+!aelec/Images/*.JPG
 !.nojekyll
 !.gitignore
 !README.md
