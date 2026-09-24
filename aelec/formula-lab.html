@@ -36,7 +36,16 @@
   .title-row{ margin-bottom:12px; display:flex; align-items:baseline; flex-wrap:wrap; gap:10px; }
   h1{ font-family:'Fraunces', Georgia, serif; font-weight:700; font-size:clamp(1.4rem,2.6vw,1.9rem); line-height:1.2; margin:0; display:inline; text-wrap:balance; }
   .eyebrow-inline{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--ink-muted); }
-  .nav-link{ margin-left:auto; text-decoration:none; align-self:center; }
+  .nav-link{ text-decoration:none; align-self:center; }
+  .header-actions{ margin-left:auto; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .topic-select{
+    font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem;
+    padding:8px 34px 8px 14px; border-radius:9px; border:1.5px solid var(--border);
+    background:var(--surface) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%235B6870"><path d="M5.5 7.5l4.5 5 4.5-5z"/></svg>') no-repeat right 10px center;
+    background-size:16px; color:var(--ink); cursor:pointer; appearance:none; -webkit-appearance:none;
+    max-width:100%;
+  }
+  .topic-select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
 
   button.ghost-btn, a.ghost-btn{
     font-family:'IBM Plex Mono', monospace; font-size:0.78rem;
@@ -169,29 +178,40 @@
 <div class="wrap">
   <div class="title-row">
     <h1>Electricity Formula Lab</h1><span class="eyebrow-inline">AS91526 &middot; Electrical Systems &middot; rearrange, substitute, solve</span>
-    <a class="ghost-btn nav-link" href="../">&#127968; All tools</a>
-  </div>
-
-  <div class="toprow">
-    <button class="ghost-btn danger-btn" id="newStudentBtn" type="button">New student &mdash; clear everything</button>
-  </div>
-  <div class="tab-bar" role="tablist">
-    <button class="tab-btn active" data-topic="ohm" type="button">Ohm's Law</button>
-    <button class="tab-btn" data-topic="pvi" type="button">Power (V & I)</button>
-    <button class="tab-btn" data-topic="pir" type="button">Power (I & R)</button>
-    <button class="tab-btn" data-topic="pvr" type="button">Power (V & R)</button>
-    <button class="tab-btn" data-topic="nrg" type="button">Energy</button>
-    <button class="tab-btn" data-topic="chg" type="button">Charge</button>
-    <button class="tab-btn" data-topic="sr" type="button">Series Resistance</button>
-    <button class="tab-btn" data-topic="pr" type="button">Parallel Resistance</button>
-    <button class="tab-btn" data-topic="sv" type="button">Series Voltage</button>
-    <button class="tab-btn" data-topic="pc" type="button">Parallel Current</button>
-    <button class="tab-btn" data-topic="qcv" type="button">Capacitor Charge</button>
-    <button class="tab-btn" data-topic="plate" type="button">Plate Capacitance</button>
-    <button class="tab-btn" data-topic="ecap" type="button">Capacitor Energy</button>
-    <button class="tab-btn" data-topic="rc" type="button">RC Time Constant</button>
-    <button class="tab-btn" data-topic="cser" type="button">Series Capacitors</button>
-    <button class="tab-btn" data-topic="cpar" type="button">Parallel Capacitors</button>
+    <div class="header-actions">
+      <select id="topicSelect" class="topic-select" aria-label="Topic">
+        <optgroup label="Circuit basics (Level 1-2 review)">
+          <option value="ohm">Ohm's Law</option>
+          <option value="pvi">Power (V & I)</option>
+          <option value="pir">Power (I & R)</option>
+          <option value="pvr">Power (V & R)</option>
+          <option value="nrg">Energy</option>
+          <option value="chg">Charge</option>
+          <option value="sr">Series Resistance</option>
+          <option value="pr">Parallel Resistance</option>
+          <option value="sv">Series Voltage</option>
+          <option value="pc">Parallel Current</option>
+        </optgroup>
+        <optgroup label="Capacitors">
+          <option value="qcv">Capacitor Charge</option>
+          <option value="plate">Plate Capacitance</option>
+          <option value="ecap">Capacitor Energy</option>
+          <option value="rc">RC Time Constant</option>
+          <option value="cser">Series Capacitors</option>
+          <option value="cpar">Parallel Capacitors</option>
+        </optgroup>
+        <optgroup label="Inductors and induction">
+          <option value="selfemf">Self-Induced EMF</option>
+          <option value="flux">Magnetic Flux</option>
+          <option value="faraday">Faraday EMF (one loop)</option>
+          <option value="lr">LR Time Constant</option>
+          <option value="lenergy">Inductor Energy</option>
+          <option value="xfmr">Transformer</option>
+        </optgroup>
+      </select>
+      <button class="ghost-btn danger-btn" id="newStudentBtn" type="button">New student &mdash; clear everything</button>
+      <a class="ghost-btn nav-link" href="../">&#127968; All tools</a>
+    </div>
   </div>
   <section class="topic-panel" data-topic="ohm">
     <div class="toprow">
@@ -400,6 +420,84 @@
     </div>
     <div class="problem-card" id="problemCard-cpar"></div>
   </section>
+
+  <section class="topic-panel" data-topic="selfemf" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-selfemf"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-selfemf" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-selfemf"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="flux" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-flux"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-flux" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-flux"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="faraday" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-faraday"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-faraday" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-faraday"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="lr" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-lr"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-lr" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-lr"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="lenergy" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-lenergy"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-lenergy" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-lenergy"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="xfmr" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-xfmr"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-xfmr" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-xfmr"></div>
+  </section>
 </div>
 
 <div class="modal-overlay" id="roundDoneModal" hidden>
@@ -448,12 +546,13 @@
     return parseFloat(t.replace(/[^0-9.\-eE+]/g,''));
   }
   function normalizeGuess(s){
-    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατε]/gi,'');
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατεφϕ]/gi,'');
   }
 
-  // Greek letters: the capacitor topics need ε (ε₀, εᵣ) and τ.
+  // Greek letters: the capacitor and inductor topics need ε, τ, Δ and φ.
   var GREEK_LETTERS = [
     { ch:'ε', name:'epsilon' },
+    { ch:'φ', name:'phi' },
     { ch:'Δ', name:'delta' },
     { ch:'θ', name:'theta' },
     { ch:'ω', name:'omega' },
@@ -655,6 +754,7 @@
       .replace(/½/g,'1/2')
       .replace(/²/g,'^2')
       .replace(/ε/g,'e')
+      .replace(/[φϕ]/g,'phi')
       .replace(/δ/g,'delta')
       .replace(/θ/g,'theta')
       .replace(/π/g,'pi')
@@ -794,7 +894,7 @@
       }
 
       var origFormulaHtml, formulaFieldHtml;
-      var hint = 'Use × or * for multiply, ÷ or / for divide, ½ or 1/2 for a half. The Greek button has ε and τ.';
+      var hint = 'Use × or * for multiply, ÷ or / for divide, ½ or 1/2 for a half. The Greek button has ε, τ, Δ and φ.';
 
       if(FIELD_MODE === 'learner'){
         var sheetOptHtml = '<option value="">— choose —</option>' + shuffle(cfg.formulaSheetOptions).map(function(o){
@@ -1002,15 +1102,11 @@
 <script>
 (function(){
   "use strict";
-  var tabButtons = document.querySelectorAll('.tab-btn');
-  tabButtons.forEach(function(btn){
-    btn.addEventListener('click', function(){
-      if(btn.disabled) return;
-      var id = btn.getAttribute('data-topic');
-      tabButtons.forEach(function(b){ b.classList.toggle('active', b === btn); });
-      document.querySelectorAll('.topic-panel').forEach(function(p){
-        p.hidden = (p.getAttribute('data-topic') !== id);
-      });
+  var topicSelect = document.getElementById('topicSelect');
+  topicSelect.addEventListener('change', function(){
+    var id = topicSelect.value;
+    document.querySelectorAll('.topic-panel').forEach(function(p){
+      p.hidden = (p.getAttribute('data-topic') !== id);
     });
   });
 
@@ -4975,6 +5071,414 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     generate: function(){
       var C1 = pick(CAP_C_POOL), C2 = pick(CAP_C_POOL), C3 = pick(CAP_C_POOL);
       return { C1: C1, C2: C2, C3: C3, CT: C1 + C2 + C3 };
+    }
+  });
+})();
+</script>
+<script>
+// ---------------------------------------------------------------
+// Level 3 electromagnetic induction / inductor topics (added 2026-09-25).
+// Scope from the 2021-2025 NZQA 91526 assessment schedules: ε = −LΔI/Δt,
+// φ = BA, single-loop ε = −Δφ/Δt, τ = L/R, E = ½LI² and the transformer
+// ratio all earn Achieved. The minus signs only show direction (Lenz's
+// law), so sizes are calculated and a formula with or without the minus
+// sign is accepted.
+// ---------------------------------------------------------------
+var IND_SHEET_OPTIONS = ['ε = −L ΔI ÷ Δt', 'φ = BA', 'ε = −Δφ ÷ Δt', 'τ = L ÷ R', 'E = ½LI²', 'Np ÷ Ns = Vp ÷ Vs', 'τ = RC', 'Q = CV'];
+var IND_L_POOL = [0.05, 0.1, 0.25, 0.4, 0.6, 0.8, 1.2, 1.6, 2.4];
+var IND_DT_POOL = [0.01, 0.02, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4];
+var IND_UNIT_ALIASES = {
+  eps: ['v', 'volt', 'volts'],
+  L: ['h', 'henry', 'henries', 'henrys'],
+  dI: ['a', 'amp', 'amps', 'ampere', 'amperes'],
+  I: ['a', 'amp', 'amps', 'ampere', 'amperes'],
+  dt: ['s', 'sec', 'secs', 'second', 'seconds'],
+  tau: ['s', 'sec', 'secs', 'second', 'seconds'],
+  R: ['ω', 'ohm', 'ohms'],
+  E: ['j', 'joule', 'joules'],
+  B: ['t', 'tesla', 'teslas', 'wbm2', 'wb/m2', 'wbm-2'],
+  A: ['m2', 'm^2', 'm²', 'square metres', 'square meters', 'square metre'],
+  phi: ['wb', 'weber', 'webers', 'tm2'],
+  dphi: ['wb', 'weber', 'webers', 'tm2'],
+  Np: ['', 'turns', 'turn', 'none', 'no unit', 'no units'],
+  Ns: ['', 'turns', 'turn', 'none', 'no unit', 'no units'],
+  Vp: ['v', 'volt', 'volts'],
+  Vs: ['v', 'volt', 'volts']
+};
+// Every accepted typed form of "lhs = num / den": factor orders, optional
+// brackets, and (for EMF formulae) an optional minus sign.
+function indForms(lhs, num, den, allowMinus){
+  var out = [];
+  var signs = allowMinus ? ['', '-'] : [''];
+  capPerms(num).forEach(function(n){
+    var ns = num.length > 1 ? [n, '('+n+')'] : [n];
+    ns.forEach(function(nn){
+      signs.forEach(function(sg){
+        if(!den.length){ out.push(lhs+'='+sg+nn); return; }
+        capPerms(den).forEach(function(d){
+          out.push(lhs+'='+sg+nn+'/'+(den.length > 1 ? '('+d+')' : d));
+        });
+      });
+    });
+  });
+  return out;
+}
+// Small areas read as cm² in the question, with the SI value alongside, the
+// way NZQA writes them (e.g. "1.60 cm² (1.60 × 10⁻⁴ m²)").
+function indArea(v){
+  if(v < 0.01) return sig3(v*1e4) + ' cm² (' + sig3(v) + ' m²)';
+  return null;
+}
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'selfemf', dataTopic: 'selfemf',
+    keys: ['L','dI','dt','eps'], targets: ['eps','L','dt'],
+    CLR: { L: capColor('#8A2B6C','#D67FB2'), dI: capColor('#2B6CB0','#7FB2E8'), dt: capColor('#8A5A1B','#D1A05F'), eps: capColor('#B0562B','#E8A67F') },
+    LABEL: { L:'L', dI:'ΔI', dt:'Δt', eps:'ε' },
+    NAME: { L:'inductance', dI:'change in current', dt:'time taken', eps:'induced EMF' },
+    UNIT: { L:'H', dI:'A', dt:'s', eps:'V' },
+    NAME_ALIASES: {
+      L: ['inductance', 'self inductance', 'self-inductance'],
+      dI: ['change in current', 'current change', 'delta i'],
+      dt: ['time', 'time taken', 'change in time', 'time interval'],
+      eps: ['emf', 'induced emf', 'back emf', 'voltage', 'induced voltage']
+    },
+    SYMBOL_ALIASES: { L: ['l'], dI: ['δi', 'deltai', 'di'], dt: ['δt', 'deltat', 'dt', 't'], eps: ['ε', 'e', 'emf', 'v'] },
+    UNIT_ALIASES: IND_UNIT_ALIASES,
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: indForms('e', ['l','deltai'], ['deltat'], true),
+    formulaOk: {
+      eps: indForms('e', ['l','deltai'], ['deltat'], true),
+      L: indForms('l', ['e','deltat'], ['deltai'], true),
+      dt: indForms('deltat', ['l','deltai'], ['e'], true)
+    },
+    formulaCorrectDisplay: { eps: 'ε = LΔI ÷ Δt', L: 'L = εΔt ÷ ΔI', dt: 'Δt = LΔI ÷ ε' },
+    formulaChoices: {
+      eps: ['ε = LΔI ÷ Δt', 'ε = LΔt ÷ ΔI', 'ε = ΔI ÷ (LΔt)'],
+      L: ['L = εΔt ÷ ΔI', 'L = εΔI ÷ Δt', 'L = ΔI ÷ (εΔt)'],
+      dt: ['Δt = LΔI ÷ ε', 'Δt = εL ÷ ΔI', 'Δt = ε ÷ (LΔI)']
+    },
+    scenarios: {
+      eps: [
+        "The current in a {L} inductor falls steadily from {dI} to zero in {dt}. Calculate the size of the EMF induced across the inductor.",
+        "When a car's ignition coil ({L}) is switched, the current in it changes by {dI} in {dt}. Calculate the size of the average induced EMF.",
+        "The current through a {L} coil in a motor changes by {dI} in {dt}. Find the size of the average back EMF.",
+        "The mana-current through a {L} rune-coil drops by {dI} in {dt}. Calculate the size of the EMF induced in the coil.",
+        "A wizard's staff contains a {L} coil. When a spell is cast, its current changes by {dI} in {dt}. Find the size of the average induced EMF.",
+        "The current in a golem's {L} core-coil changes by {dI} in {dt}. Calculate the size of the back EMF."
+      ],
+      L: [
+        "An average EMF of {eps} is induced in a coil when the current in it changes by {dI} in {dt}. Calculate the self-inductance of the coil.",
+        "A back EMF of {eps} appears across a coil when its current falls by {dI} in {dt}. Find the inductance of the coil.",
+        "An average EMF of {eps} is induced in a rune-coil when its mana-current changes by {dI} in {dt}. Calculate the inductance of the rune-coil.",
+        "When the current in a golem's core-coil changes by {dI} in {dt}, a back EMF of {eps} appears. Find the inductance of the coil."
+      ],
+      dt: [
+        "The current in a {L} inductor changes by {dI}, inducing an average EMF of {eps}. Calculate how long the change took.",
+        "A {L} coil has an average back EMF of {eps} while its current rises by {dI}. Find the time taken for the change.",
+        "A {L} rune-coil produces an average EMF of {eps} while its current changes by {dI}. Calculate how long the change took.",
+        "A wizard's {L} staff-coil has an average back EMF of {eps} as its current changes by {dI}. Find the time taken."
+      ]
+    },
+    generate: function(){
+      var L = pick(IND_L_POOL), dI = pick([0.5, 1, 2, 3, 4, 5]), dt = pick(IND_DT_POOL);
+      return { L: L, dI: dI, dt: dt, eps: L*dI/dt };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'flux', dataTopic: 'flux',
+    keys: ['B','A','phi'], targets: ['phi','B','A'],
+    CLR: { B: capColor('#2B6CB0','#7FB2E8'), A: capColor('#1B8A6B','#5FD1AC'), phi: capColor('#6B2BB0','#B27FE8') },
+    LABEL: { B:'B', A:'A', phi:'φ' },
+    NAME: { B:'magnetic flux density', A:'area', phi:'magnetic flux' },
+    UNIT: { B:'T', A:'m²', phi:'Wb' },
+    NAME_ALIASES: {
+      B: ['magnetic flux density', 'flux density', 'magnetic field', 'magnetic field strength', 'field strength'],
+      A: ['area', 'coil area', 'loop area'],
+      phi: ['magnetic flux', 'flux']
+    },
+    SYMBOL_ALIASES: { B: ['b'], A: ['a'], phi: ['φ', 'ϕ', 'phi'] },
+    UNIT_ALIASES: IND_UNIT_ALIASES,
+    scenarioFmt: function(k, v){ return k === 'A' ? indArea(v) : null; },
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: indForms('phi', ['b','a'], [], false),
+    formulaOk: { phi: indForms('phi', ['b','a'], [], false), B: indForms('b', ['phi'], ['a'], false), A: indForms('a', ['phi'], ['b'], false) },
+    formulaCorrectDisplay: { phi: 'φ = BA', B: 'B = φ ÷ A', A: 'A = φ ÷ B' },
+    formulaChoices: {
+      phi: ['φ = BA', 'φ = B ÷ A', 'φ = A ÷ B'],
+      B: ['B = φ ÷ A', 'B = φA', 'B = A ÷ φ'],
+      A: ['A = φ ÷ B', 'A = φB', 'A = B ÷ φ']
+    },
+    scenarios: {
+      phi: [
+        "A flat coil of area {A} is placed in a magnetic field of flux density {B}, with its plane perpendicular to the field lines. Calculate the magnetic flux through the coil.",
+        "A loop of wire with an area of {A} sits at right angles to a {B} magnetic field. Find the magnetic flux through the loop.",
+        "The coil of a bike-wheel sensor has an area of {A} and faces a magnet producing {B} straight through it. Calculate the flux through the coil.",
+        "A rune-circle of area {A} lies flat across a {B} enchanted magnetic field. Calculate the magnetic flux through the circle.",
+        "A wizard holds a copper ring of area {A} at right angles to a dragon-lodestone field of {B}. Find the flux through the ring.",
+        "A golem's sensing coil, of area {A}, faces a {B} magnetic field head-on. Calculate the magnetic flux through it."
+      ],
+      B: [
+        "A magnetic flux of {phi} passes through a coil of area {A} placed perpendicular to a magnetic field. Calculate the magnetic flux density.",
+        "A loop of area {A} at right angles to a magnetic field has a flux of {phi} through it. Find the strength of the field.",
+        "A flux of {phi} passes through a rune-circle of area {A} lying across an enchanted field. Calculate the flux density of the field.",
+        "A wizard measures {phi} of flux through a ring of area {A} held across a lodestone field. Find the magnetic flux density."
+      ],
+      A: [
+        "A coil perpendicular to a {B} magnetic field has a flux of {phi} through it. Calculate the area of the coil.",
+        "A {B} magnetic field produces a flux of {phi} through a loop at right angles to it. Find the area of the loop.",
+        "An enchanted field of {B} produces {phi} of flux through a rune-circle. Calculate the area of the circle.",
+        "A golem's sensing coil in a {B} field has {phi} of flux through it. Find the area of the coil."
+      ]
+    },
+    generate: function(){
+      var B = pick([0.02, 0.05, 0.12, 0.25, 0.6, 1.2, 1.8]), A = pick([1.6e-4, 2.5e-4, 3e-4, 5e-4, 0.01, 0.02, 0.05]);
+      return { B: B, A: A, phi: B*A };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'faraday', dataTopic: 'faraday',
+    keys: ['dphi','dt','eps'], targets: ['eps','dphi','dt'],
+    CLR: { dphi: capColor('#6B2BB0','#B27FE8'), dt: capColor('#8A5A1B','#D1A05F'), eps: capColor('#B0562B','#E8A67F') },
+    LABEL: { dphi:'Δφ', dt:'Δt', eps:'ε' },
+    NAME: { dphi:'change in flux', dt:'time taken', eps:'induced EMF' },
+    UNIT: { dphi:'Wb', dt:'s', eps:'V' },
+    NAME_ALIASES: {
+      dphi: ['change in flux', 'change in magnetic flux', 'flux change'],
+      dt: ['time', 'time taken', 'change in time', 'time interval'],
+      eps: ['emf', 'induced emf', 'voltage', 'induced voltage']
+    },
+    SYMBOL_ALIASES: { dphi: ['δφ', 'δϕ', 'deltaφ', 'deltaphi', 'dphi'], dt: ['δt', 'deltat', 'dt', 't'], eps: ['ε', 'e', 'emf', 'v'] },
+    UNIT_ALIASES: IND_UNIT_ALIASES,
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: indForms('e', ['deltaphi'], ['deltat'], true),
+    formulaOk: {
+      eps: indForms('e', ['deltaphi'], ['deltat'], true),
+      dphi: indForms('deltaphi', ['e','deltat'], [], true),
+      dt: indForms('deltat', ['deltaphi'], ['e'], true)
+    },
+    formulaCorrectDisplay: { eps: 'ε = Δφ ÷ Δt', dphi: 'Δφ = εΔt', dt: 'Δt = Δφ ÷ ε' },
+    formulaChoices: {
+      eps: ['ε = Δφ ÷ Δt', 'ε = ΔφΔt', 'ε = Δt ÷ Δφ'],
+      dphi: ['Δφ = εΔt', 'Δφ = ε ÷ Δt', 'Δφ = Δt ÷ ε'],
+      dt: ['Δt = Δφ ÷ ε', 'Δt = εΔφ', 'Δt = ε ÷ Δφ']
+    },
+    scenarios: {
+      eps: [
+        "A single loop of wire is pulled out of a magnetic field. The flux through the loop falls by {dphi} in {dt}. Calculate the average EMF induced in the loop.",
+        "A magnet is pushed into a single wire loop, increasing the flux through it by {dphi} in {dt}. Find the average EMF induced.",
+        "The flux through a single-turn coil in a generator changes by {dphi} in {dt}. Calculate the average induced EMF.",
+        "A wizard yanks a single silver ring out of an enchanted field, changing the flux through it by {dphi} in {dt}. Calculate the average EMF induced.",
+        "A lodestone is dropped through a single copper ring, changing the flux through it by {dphi} in {dt}. Find the average induced EMF.",
+        "A single loop on a golem's arm swings through a magic field, and the flux through it changes by {dphi} in {dt}. Calculate the average EMF."
+      ],
+      dphi: [
+        "An average EMF of {eps} is induced in a single loop over {dt}. Calculate the change in magnetic flux through the loop.",
+        "A single wire loop has an average EMF of {eps} induced in it for {dt} as a magnet moves past. Find the change in flux.",
+        "A silver ring has an average EMF of {eps} induced in it for {dt} as a wizard sweeps a lodestone past. Calculate the change in flux.",
+        "A single loop on a golem's arm has {eps} induced in it for {dt}. Find the change in magnetic flux."
+      ],
+      dt: [
+        "The flux through a single loop changes by {dphi}, inducing an average EMF of {eps}. Calculate how long the change took.",
+        "A single-turn coil has an average EMF of {eps} induced as its flux changes by {dphi}. Find the time taken.",
+        "The flux through an enchanted ring changes by {dphi}, inducing an average EMF of {eps}. Calculate how long the change took.",
+        "A lodestone changes the flux through a copper ring by {dphi}, inducing {eps} on average. Find the time taken."
+      ]
+    },
+    generate: function(){
+      var dphi = pick([1.8e-4, 3.6e-4, 7.2e-4, 2.4e-3, 7.2e-3, 0.012, 0.05]), dt = pick(IND_DT_POOL);
+      return { dphi: dphi, dt: dt, eps: dphi/dt };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'lr', dataTopic: 'lr',
+    keys: ['L','R','tau'], targets: ['tau','L','R'],
+    CLR: { L: capColor('#8A2B6C','#D67FB2'), R: capColor('#1B8A6B','#5FD1AC'), tau: capColor('#8A5A1B','#D1A05F') },
+    LABEL: { L:'L', R:'R', tau:'τ' },
+    NAME: { L:'inductance', R:'resistance', tau:'time constant' },
+    UNIT: { L:'H', R:'Ω', tau:'s' },
+    NAME_ALIASES: { L: ['inductance', 'self inductance', 'self-inductance'], R: ['resistance'], tau: ['time constant', 'tau'] },
+    SYMBOL_ALIASES: { L: ['l'], R: ['r'], tau: ['τ', 'tau'] },
+    UNIT_ALIASES: IND_UNIT_ALIASES,
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: indForms('tau', ['l'], ['r'], false),
+    formulaOk: { tau: indForms('tau', ['l'], ['r'], false), L: indForms('l', ['tau','r'], [], false), R: indForms('r', ['l'], ['tau'], false) },
+    formulaCorrectDisplay: { tau: 'τ = L ÷ R', L: 'L = τR', R: 'R = L ÷ τ' },
+    formulaChoices: {
+      tau: ['τ = L ÷ R', 'τ = LR', 'τ = R ÷ L'],
+      L: ['L = τR', 'L = τ ÷ R', 'L = R ÷ τ'],
+      R: ['R = L ÷ τ', 'R = Lτ', 'R = τ ÷ L']
+    },
+    scenarios: {
+      tau: [
+        "A {L} inductor is connected in series with a {R} lamp and a battery. Calculate the time constant of the circuit.",
+        "A coil with an inductance of {L} is wired in series with a {R} resistor. Find the time constant of the circuit.",
+        "A relay coil of {L} is connected to a {R} resistor. Calculate the time constant for the current to build up.",
+        "A {L} rune-coil is joined in series with a {R} glowing crystal. Calculate the time constant of the circuit.",
+        "A castle drawbridge magnet has a {L} coil in series with {R} of enchanted wire. Find the time constant.",
+        "A golem's {L} core-coil is wired to a {R} lantern. Calculate the time constant for its glow to build up."
+      ],
+      L: [
+        "An inductor in series with a {R} resistor gives a time constant of {tau}. Calculate the inductance.",
+        "A coil and a {R} lamp have a time constant of {tau}. Find the inductance of the coil.",
+        "A rune-coil in series with a {R} crystal has a time constant of {tau}. Calculate the inductance of the rune-coil.",
+        "A golem's core-coil with a {R} lantern has a time constant of {tau}. Find the inductance of the coil."
+      ],
+      R: [
+        "A {L} inductor is in series with a resistor, giving a time constant of {tau}. Calculate the resistance.",
+        "A {L} coil and a lamp have a time constant of {tau}. Find the resistance of the lamp.",
+        "A {L} rune-coil and a glowing crystal have a time constant of {tau}. Calculate the resistance of the crystal.",
+        "A {L} drawbridge coil has a time constant of {tau}. Find the resistance in the circuit."
+      ]
+    },
+    generate: function(){
+      var L = pick(IND_L_POOL), R = pick([2, 2.5, 4, 5, 8, 10, 20, 50]);
+      return { L: L, R: R, tau: L/R };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var okE = ['e=1/2li^2', 'e=1/2i^2l', 'e=li^2/2', 'e=i^2l/2', 'e=0.5li^2', 'e=0.5i^2l'];
+  buildFormulaTopic({
+    idSuffix: 'lenergy', dataTopic: 'lenergy',
+    keys: ['L','I','E'], targets: ['E','L','I'],
+    CLR: { L: capColor('#8A2B6C','#D67FB2'), I: capColor('#2B6CB0','#7FB2E8'), E: capColor('#1B8A6B','#5FD1AC') },
+    LABEL: { L:'L', I:'I', E:'E' },
+    NAME: { L:'inductance', I:'current', E:'energy stored' },
+    UNIT: { L:'H', I:'A', E:'J' },
+    NAME_ALIASES: { L: ['inductance', 'self inductance', 'self-inductance'], I: ['current', 'steady current'], E: ['energy', 'energy stored', 'stored energy'] },
+    SYMBOL_ALIASES: { L: ['l'], I: ['i'], E: ['e', 'ep', 'w'] },
+    UNIT_ALIASES: IND_UNIT_ALIASES,
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: okE,
+    formulaOk: {
+      E: okE,
+      L: ['l=2e/i^2', 'l=(2e)/i^2', 'l=e/(1/2i^2)', 'l=e/(0.5i^2)'],
+      I: ['i=sqrt(2e/l)', 'i=sqrt((2e)/l)', 'i=(2e/l)^0.5', 'i=(2e/l)^(1/2)']
+    },
+    formulaCorrectDisplay: { E: 'E = ½LI²', L: 'L = 2E ÷ I²', I: 'I = √(2E ÷ L)' },
+    formulaChoices: {
+      E: ['E = ½LI²', 'E = ½L²I', 'E = 2LI²'],
+      L: ['L = 2E ÷ I²', 'L = E ÷ (2I²)', 'L = 2EI²'],
+      I: ['I = √(2E ÷ L)', 'I = 2E ÷ L', 'I = √(E ÷ 2L)']
+    },
+    scenarios: {
+      E: [
+        "A steady current of {I} flows through a {L} inductor. Calculate the energy stored in the inductor.",
+        "The {L} coil in a car's ignition system carries a steady {I}. Find the energy stored in its magnetic field.",
+        "A {L} inductor in a power supply carries {I}. Calculate the energy stored.",
+        "A steady {I} of mana-current flows through a {L} rune-coil. Calculate the energy stored in its magnetic field.",
+        "A golem's {L} core-coil carries a steady {I}. Find the energy stored in the coil.",
+        "A wizard's {L} staff-coil holds a steady {I}. Calculate the energy stored, ready for a spell."
+      ],
+      L: [
+        "An inductor carrying a steady {I} stores {E} of energy. Calculate its inductance.",
+        "A coil stores {E} in its magnetic field when a current of {I} flows. Find the inductance of the coil.",
+        "A rune-coil carrying {I} stores {E} of energy. Calculate its inductance.",
+        "A golem's core-coil stores {E} when {I} flows through it. Find the inductance."
+      ],
+      I: [
+        "A {L} inductor stores {E} of energy. Calculate the current flowing through it.",
+        "The magnetic field of a {L} coil stores {E}. Find the steady current in the coil.",
+        "A {L} rune-coil stores {E} of energy. Calculate the current flowing through it.",
+        "A wizard's {L} staff-coil stores {E}. Find the steady current in the coil."
+      ]
+    },
+    generate: function(){
+      var L = pick(IND_L_POOL), I = pick([0.5, 1, 1.2, 1.5, 2, 3, 4, 5]);
+      return { L: L, I: I, E: 0.5*L*I*I };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'xfmr', dataTopic: 'xfmr',
+    keys: ['Vp','Np','Ns','Vs'], targets: ['Vs','Ns','Vp'],
+    CLR: { Vp: capColor('#B0562B','#E8A67F'), Np: capColor('#2B6CB0','#7FB2E8'), Ns: capColor('#1B8A6B','#5FD1AC'), Vs: capColor('#6B2BB0','#B27FE8') },
+    LABEL: { Vp:'Vp', Np:'Np', Ns:'Ns', Vs:'Vs' },
+    NAME: { Vp:'primary voltage', Np:'primary turns', Ns:'secondary turns', Vs:'secondary voltage' },
+    UNIT: { Vp:'V', Np:'', Ns:'', Vs:'V' },
+    NAME_ALIASES: {
+      Vp: ['primary voltage', 'input voltage', 'voltage primary'],
+      Np: ['primary turns', 'turns on primary', 'number of primary turns', 'number of turns primary'],
+      Ns: ['secondary turns', 'turns on secondary', 'number of secondary turns', 'number of turns secondary'],
+      Vs: ['secondary voltage', 'output voltage', 'voltage secondary']
+    },
+    SYMBOL_ALIASES: { Vp: ['vp'], Np: ['np'], Ns: ['ns'], Vs: ['vs'] },
+    UNIT_ALIASES: IND_UNIT_ALIASES,
+    scenarioFmt: function(k, v){
+      if(k === 'Np' || k === 'Ns') return String(Math.round(v)) + ' turns';
+      if(k === 'Vp' || k === 'Vs') return (v >= 1000 && v % 1000 === 0) ? String(v/1000) + ' kV' : sig3(v) + ' V';
+      return null;
+    },
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: ['np/ns=vp/vs', 'vp/vs=np/ns', 'ns/np=vs/vp', 'vs/vp=ns/np'],
+    formulaOk: {
+      Vs: indForms('vs', ['vp','ns'], ['np'], false),
+      Ns: indForms('ns', ['np','vs'], ['vp'], false),
+      Vp: indForms('vp', ['vs','np'], ['ns'], false)
+    },
+    formulaCorrectDisplay: { Vs: 'Vs = VpNs ÷ Np', Ns: 'Ns = NpVs ÷ Vp', Vp: 'Vp = VsNp ÷ Ns' },
+    formulaChoices: {
+      Vs: ['Vs = VpNs ÷ Np', 'Vs = VpNp ÷ Ns', 'Vs = NpNs ÷ Vp'],
+      Ns: ['Ns = NpVs ÷ Vp', 'Ns = NpVp ÷ Vs', 'Ns = VpVs ÷ Np'],
+      Vp: ['Vp = VsNp ÷ Ns', 'Vp = VsNs ÷ Np', 'Vp = NpNs ÷ Vs']
+    },
+    scenarios: {
+      Vs: [
+        "A transformer has {Np} on its primary coil and {Ns} on its secondary coil. The primary is connected to a {Vp} AC supply. Calculate the voltage across the secondary coil.",
+        "A phone charger contains a transformer with {Np} on the primary and {Ns} on the secondary. The mains supply is {Vp}. Find the output voltage.",
+        "A substation transformer has {Np} on its primary and {Ns} on its secondary, with {Vp} across the primary. Calculate the secondary voltage.",
+        "A wizard winds a transformer with {Np} on the primary and {Ns} on the secondary, and feeds {Vp} into the primary. Calculate the secondary voltage.",
+        "A golem's power crystal supplies {Vp} to a transformer with {Np} on the primary and {Ns} on the secondary. Find the output voltage.",
+        "A castle lantern transformer has {Np} on the primary and {Ns} on the secondary, with {Vp} applied. Calculate the voltage across the secondary."
+      ],
+      Ns: [
+        "A transformer steps {Vp} down to {Vs}. The primary coil has {Np}. Calculate the number of turns on the secondary coil.",
+        "A transformer with {Np} on its primary coil changes {Vp} into {Vs}. Find the number of secondary turns.",
+        "A wizard's transformer turns {Vp} into {Vs} using {Np} on the primary. Calculate the number of secondary turns.",
+        "A golem's transformer changes {Vp} to {Vs} with {Np} on the primary. Find the number of turns on the secondary."
+      ],
+      Vp: [
+        "A transformer has {Np} on its primary and {Ns} on its secondary. The secondary voltage is {Vs}. Calculate the primary voltage.",
+        "The secondary coil of a transformer ({Ns}) gives {Vs}. The primary has {Np}. Find the supply voltage on the primary.",
+        "A wizard's transformer has {Np} on the primary and {Ns} on the secondary, and gives {Vs} out. Calculate the voltage fed into the primary.",
+        "A castle transformer with {Np} on the primary and {Ns} on the secondary delivers {Vs}. Find the primary voltage."
+      ]
+    },
+    generate: function(){
+      var pair = pick([[230, 1150, 60], [240, 4800, 240], [230, 2300, 120], [240, 1200, 60], [12, 50, 1000], [11000, 5500, 110], [230, 460, 24], [120, 600, 1500]]);
+      return { Vp: pair[0], Np: pair[1], Ns: pair[2], Vs: pair[0]*pair[2]/pair[1] };
     }
   });
 })();
