@@ -127,6 +127,7 @@
   .calc-trigger:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
   .calc-popup{ position:absolute; bottom:100%; right:0; margin-bottom:8px; z-index:30; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:12px; box-shadow:0 12px 32px rgba(0,0,0,0.28); width:230px; }
   .calc-popup[hidden]{ display:none; }
+  .calc-expr{ min-height:1.1em; font-family:'IBM Plex Mono', monospace; font-size:0.78rem; text-align:right; color:var(--ink-muted); margin-bottom:4px; overflow-wrap:anywhere; }
   .calc-display{ width:100%; box-sizing:border-box; font-family:'IBM Plex Mono', monospace; font-size:1.3rem; text-align:right; padding:10px 12px; margin-bottom:8px; border:1.5px solid var(--input-line); border-radius:8px; background:var(--surface-2); color:var(--ink); }
   .calc-grid{ display:grid; grid-template-columns:repeat(4, 1fr); gap:6px; }
   .calc-btn{ font-family:'IBM Plex Mono', monospace; font-size:1rem; padding:10px 0; border:1px solid var(--border); border-radius:7px; background:var(--surface-2); color:var(--ink); cursor:pointer; }
@@ -135,7 +136,6 @@
   .calc-btn.calc-op{ color:var(--accent); font-weight:600; }
   .calc-btn.calc-clear{ color:var(--bad); }
   .calc-btn.calc-eq{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
-  .calc-btn.calc-zero{ grid-column:span 2; }
   .calc-use-row{ margin-top:8px; }
   .calc-use-btn{ width:100%; font-family:'IBM Plex Mono', monospace; font-size:0.82rem; font-weight:600; padding:9px 0; border:none; border-radius:8px; background:var(--accent); color:var(--on-accent); cursor:pointer; }
   .calc-use-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
@@ -390,11 +390,17 @@
     for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
     return a;
   }
+  var SUPERSCRIPT_DIGITS = { '⁰':'0', '¹':'1', '²':'2', '³':'3', '⁴':'4', '⁵':'5', '⁶':'6', '⁷':'7', '⁸':'8', '⁹':'9', '⁻':'-' };
   function normalizeNumber(s){
     // keeps e/E and + so real scientific notation (5.97e24, 6.67E-11)
-    // parses correctly -- mechanics' Fg problems genuinely need this,
-    // unlike anything in the wave-systems Formula Lab.
-    return parseFloat((s||'').toString().trim().replace(/[^0-9.\-eE+]/g,''));
+    // parses correctly -- mechanics' Fg problems genuinely need this --
+    // and also turns "5.97×10^24", "5.97 x 10²⁴" or "6.67*10^(-11)" into e-notation.
+    var t = (s||'').toString().trim().replace(/\s+/g,'').replace(/[−–]/g,'-');
+    t = t.replace(/10([⁻]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g, function(m, sup){
+      return '10^' + sup.split('').map(function(c){ return SUPERSCRIPT_DIGITS[c]; }).join('');
+    });
+    t = t.replace(/[×xX*]10\^\(?([+\-]?\d+)\)?/, 'e$1');
+    return parseFloat(t.replace(/[^0-9.\-eE+]/g,''));
   }
   function normalizeGuess(s){
     return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9δθωατ]/gi,'');
@@ -466,11 +472,14 @@
     });
   }
 
-  // Simple four-function calculator, toggled beside the answer field.
+  // Simple calculator with a power (xʸ) key, toggled beside the answer field.
+  // Keys build an expression that is evaluated with normal order of
+  // operations on =, so 6.67 × 10 xʸ −11 means 6.67×10⁻¹¹.
   function buildCalculatorHtml(){
     return '<div class="calc-wrap">' +
       '<button type="button" class="calc-trigger" aria-label="Open calculator">🖩</button>' +
       '<div class="calc-popup" hidden>' +
+        '<div class="calc-expr" aria-live="polite"></div>' +
         '<input class="calc-display" type="text" readonly value="0" aria-label="Calculator display">' +
         '<div class="calc-grid">' +
           '<button type="button" class="calc-btn calc-clear" data-calc-key="C">C</button>' +
@@ -489,8 +498,9 @@
           '<button type="button" class="calc-btn" data-calc-key="2">2</button>' +
           '<button type="button" class="calc-btn" data-calc-key="3">3</button>' +
           '<button type="button" class="calc-btn calc-op" data-calc-key="+">+</button>' +
-          '<button type="button" class="calc-btn calc-zero" data-calc-key="0">0</button>' +
+          '<button type="button" class="calc-btn" data-calc-key="0">0</button>' +
           '<button type="button" class="calc-btn" data-calc-key=".">.</button>' +
+          '<button type="button" class="calc-btn calc-op" data-calc-key="^" aria-label="to the power of">xʸ</button>' +
           '<button type="button" class="calc-btn calc-eq" data-calc-key="=">=</button>' +
         '</div>' +
         '<div class="calc-use-row">' +
@@ -511,18 +521,39 @@
     var display = wrap.querySelector('.calc-display');
     var useBtn = wrap.querySelector('.calc-use-btn');
 
-    var current = '0', pending = null, pendingOp = null, awaitingNew = false;
+    var exprEl = wrap.querySelector('.calc-expr');
+    // tokens: numbers and operators entered so far, not yet including `current`
+    var current = '0', tokens = [], awaitingNew = false;
+    var OP_SHOW = { '+':'+', '−':'−', '×':'×', '÷':'÷', '^':'^' };
 
-    function render(){ display.value = current; }
-    function compute(a, op, b){
-      if(op === '+') return a + b;
-      if(op === '−') return a - b;
-      if(op === '×') return a * b;
-      if(op === '÷') return b === 0 ? NaN : a / b;
-      return b;
+    function showNum(n){ return String(n).charAt(0) === '-' && tokens.length ? '(' + n + ')' : String(n); }
+    function render(){
+      display.value = current;
+      exprEl.textContent = tokens.map(function(t){ return typeof t === 'number' ? showNum(t) : ' ' + OP_SHOW[t] + ' '; }).join('');
+    }
+    function evaluate(list){
+      // powers first (right to left), then × ÷, then + −, each left to right
+      var t = list.slice(), i;
+      for(i = t.length - 2; i > 0; i -= 2){
+        if(t[i] === '^'){ t.splice(i - 1, 3, Math.pow(t[i - 1], t[i + 1])); }
+      }
+      for(i = 1; i < t.length; ){
+        if(t[i] === '×' || t[i] === '÷'){
+          var v = t[i] === '×' ? t[i - 1] * t[i + 1] : (t[i + 1] === 0 ? NaN : t[i - 1] / t[i + 1]);
+          t.splice(i - 1, 3, v);
+        } else { i += 2; }
+      }
+      var total = t[0];
+      for(i = 1; i < t.length; i += 2){ total = t[i] === '+' ? total + t[i + 1] : total - t[i + 1]; }
+      return total;
+    }
+    function tidy(n){
+      if(!isFinite(n)) return 'Error';
+      return String(parseFloat(n.toPrecision(12)));
     }
     function pressDigit(d){
       if(current === 'Error' || awaitingNew || current === '0'){ current = d; awaitingNew = false; }
+      else if(current === '-0'){ current = '-' + d; }
       else { current += d; }
       render();
     }
@@ -531,34 +562,35 @@
       if(current.indexOf('.') === -1){ current += '.'; render(); }
     }
     function pressOp(op){
-      var num = parseFloat(current);
-      if(pendingOp !== null && !awaitingNew){
-        num = compute(pending, pendingOp, num);
-        current = isNaN(num) ? 'Error' : String(num);
-        render();
+      if(current === 'Error') return;
+      if(awaitingNew && tokens.length && typeof tokens[tokens.length - 1] !== 'number'){
+        tokens[tokens.length - 1] = op;   // changed their mind about the operator
+      } else {
+        tokens.push(parseFloat(current), op);
       }
-      pending = parseFloat(current);
-      pendingOp = op;
       awaitingNew = true;
+      render();
     }
     function pressEquals(){
-      if(pendingOp === null) return;
-      var num = parseFloat(current);
-      var result = compute(pending, pendingOp, num);
-      current = isNaN(result) ? 'Error' : String(result);
-      pendingOp = null; pending = null; awaitingNew = true;
+      if(!tokens.length || current === 'Error') return;
+      if(awaitingNew){ tokens.pop(); } else { tokens.push(parseFloat(current)); }
+      current = tidy(evaluate(tokens));
+      tokens = []; awaitingNew = true;
       render();
     }
     function pressClear(){
-      current = '0'; pending = null; pendingOp = null; awaitingNew = false; render();
+      current = '0'; tokens = []; awaitingNew = false; render();
     }
     function pressBackspace(){
       if(current === 'Error' || awaitingNew) return;
       current = current.length > 1 ? current.slice(0,-1) : '0';
+      if(current === '-') current = '0';
       render();
     }
     function pressSign(){
-      if(current === '0' || current === 'Error') return;
+      if(current === 'Error') return;
+      if(awaitingNew){ current = '-0'; awaitingNew = false; render(); return; }
+      if(current === '0'){ current = '-0'; render(); return; }
       current = current.charAt(0) === '-' ? current.slice(1) : ('-' + current);
       render();
     }
@@ -578,7 +610,7 @@
         else if(key === '⌫'){ pressBackspace(); }
         else if(key === '±'){ pressSign(); }
         else if(key === '='){ pressEquals(); }
-        else if(key === '+' || key === '−' || key === '×' || key === '÷'){ pressOp(key); }
+        else if(key === '+' || key === '−' || key === '×' || key === '÷' || key === '^'){ pressOp(key); }
         else if(key === '.'){ pressDot(); }
         else { pressDigit(key); }
       });
