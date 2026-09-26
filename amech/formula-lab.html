@@ -611,7 +611,7 @@
       .replace(/τ/g,'tau')
       .replace(/√/g,'sqrt')
       .replace(/−/g,'-')
-      .replace(/[×✕✗*]/g,'')
+      .replace(/[×✕✗*·⋅\u200b]/g,'')
       .replace(/[₀-₉]/g, function(ch){ return '0123456789'.charAt(ch.charCodeAt(0)-8320); })
       .replace(/\bx\b/g,'')
       .replace(/÷/g,'/')
