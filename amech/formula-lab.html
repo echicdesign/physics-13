@@ -135,6 +135,7 @@
   .calc-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
   .calc-btn.calc-op{ color:var(--accent); font-weight:600; }
   .calc-btn.calc-clear{ color:var(--bad); }
+  .calc-btn.calc-wide{ grid-column:span 2; }
   .calc-btn.calc-eq{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); }
   .calc-use-row{ margin-top:8px; }
   .calc-use-btn{ width:100%; font-family:'IBM Plex Mono', monospace; font-size:0.82rem; font-weight:600; padding:9px 0; border:none; border-radius:8px; background:var(--accent); color:var(--on-accent); cursor:pointer; }
@@ -472,36 +473,27 @@
     });
   }
 
-  // Simple calculator with a power (xʸ) key, toggled beside the answer field.
+  // Calculator with brackets, x² and xʸ, toggled beside the answer field.
   // Keys build an expression that is evaluated with normal order of
-  // operations on =, so 6.67 × 10 xʸ −11 means 6.67×10⁻¹¹.
+  // operations on =, so 6.67 × 10 xʸ 11 ± means 6.67×10⁻¹¹ and
+  // ÷ ( 7 × 10 xʸ 6 ) x² divides by the whole of r².
   function buildCalculatorHtml(){
+    function key(k, label, cls, aria){
+      return '<button type="button" class="calc-btn' + (cls ? ' ' + cls : '') + '" data-calc-key="' + k + '"' +
+        (aria ? ' aria-label="' + aria + '"' : '') + '>' + (label || k) + '</button>';
+    }
     return '<div class="calc-wrap">' +
       '<button type="button" class="calc-trigger" aria-label="Open calculator">🖩</button>' +
       '<div class="calc-popup" hidden>' +
         '<div class="calc-expr" aria-live="polite"></div>' +
         '<input class="calc-display" type="text" readonly value="0" aria-label="Calculator display">' +
         '<div class="calc-grid">' +
-          '<button type="button" class="calc-btn calc-clear" data-calc-key="C">C</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="±">±</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="⌫">⌫</button>' +
-          '<button type="button" class="calc-btn calc-op" data-calc-key="÷">÷</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="7">7</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="8">8</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="9">9</button>' +
-          '<button type="button" class="calc-btn calc-op" data-calc-key="×">×</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="4">4</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="5">5</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="6">6</button>' +
-          '<button type="button" class="calc-btn calc-op" data-calc-key="−">−</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="1">1</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="2">2</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="3">3</button>' +
-          '<button type="button" class="calc-btn calc-op" data-calc-key="+">+</button>' +
-          '<button type="button" class="calc-btn" data-calc-key="0">0</button>' +
-          '<button type="button" class="calc-btn" data-calc-key=".">.</button>' +
-          '<button type="button" class="calc-btn calc-op" data-calc-key="^" aria-label="to the power of">xʸ</button>' +
-          '<button type="button" class="calc-btn calc-eq" data-calc-key="=">=</button>' +
+          key('C', '', 'calc-clear') + key('⌫') + key('±') + key('÷', '', 'calc-op') +
+          key('(', '', 'calc-op') + key(')', '', 'calc-op') + key('²', 'x²', 'calc-op', 'squared') + key('×', '', 'calc-op') +
+          key('7') + key('8') + key('9') + key('−', '', 'calc-op') +
+          key('4') + key('5') + key('6') + key('+', '', 'calc-op') +
+          key('1') + key('2') + key('3') + key('^', 'xʸ', 'calc-op', 'to the power of') +
+          key('0') + key('.') + key('=', '', 'calc-eq calc-wide') +
         '</div>' +
         '<div class="calc-use-row">' +
           '<button type="button" class="calc-use-btn" type="button">Use this answer ↓</button>' +
@@ -519,80 +511,155 @@
     var trigger = wrap.querySelector('.calc-trigger');
     var popup = wrap.querySelector('.calc-popup');
     var display = wrap.querySelector('.calc-display');
+    var exprEl = wrap.querySelector('.calc-expr');
     var useBtn = wrap.querySelector('.calc-use-btn');
 
-    var exprEl = wrap.querySelector('.calc-expr');
-    // tokens: numbers and operators entered so far, not yet including `current`
-    var current = '0', tokens = [], awaitingNew = false;
-    var OP_SHOW = { '+':'+', '−':'−', '×':'×', '÷':'÷', '^':'^' };
+    // tokens: numbers, + − × ÷ ^, ( ) and ² entered so far; entry: the number
+    // being typed; shown: what the display holds; done: just pressed =
+    var tokens = [], entry = '', shown = '0', done = false, lastExpr = '';
+    var BINARY = { '+':1, '−':1, '×':1, '÷':1, '^':1 };
 
-    function showNum(n){ return String(n).charAt(0) === '-' && tokens.length ? '(' + n + ')' : String(n); }
-    function render(){
-      display.value = current;
-      exprEl.textContent = tokens.map(function(t){ return typeof t === 'number' ? showNum(t) : ' ' + OP_SHOW[t] + ' '; }).join('');
+    function last(){ return tokens[tokens.length - 1]; }
+    function endsOperand(t){ return typeof t === 'number' || t === ')' || t === '²'; }
+    function openCount(){
+      var n = 0;
+      tokens.forEach(function(t){ if(t === '(') n++; else if(t === ')') n--; });
+      return n;
+    }
+    function commitEntry(){
+      if(entry !== ''){ tokens.push(parseFloat(entry)); entry = ''; }
+    }
+    function showNum(text, first){ return (!first && text.charAt(0) === '-') ? '(' + text + ')' : text; }
+    function fmt(list){
+      return list.map(function(t, i){
+        if(typeof t === 'number') return showNum(String(t), i === 0);
+        return BINARY[t] ? ' ' + t + ' ' : t;
+      }).join('');
     }
     function evaluate(list){
-      // powers first (right to left), then × ÷, then + −, each left to right
-      var t = list.slice(), i;
-      for(i = t.length - 2; i > 0; i -= 2){
-        if(t[i] === '^'){ t.splice(i - 1, 3, Math.pow(t[i - 1], t[i + 1])); }
+      // + − lowest, then × ÷, then ^ (right to left), then ², brackets first
+      var i = 0;
+      function expr(){
+        var v = term();
+        while(list[i] === '+' || list[i] === '−'){ var op = list[i++], r = term(); v = op === '+' ? v + r : v - r; }
+        return v;
       }
-      for(i = 1; i < t.length; ){
-        if(t[i] === '×' || t[i] === '÷'){
-          var v = t[i] === '×' ? t[i - 1] * t[i + 1] : (t[i + 1] === 0 ? NaN : t[i - 1] / t[i + 1]);
-          t.splice(i - 1, 3, v);
-        } else { i += 2; }
+      function term(){
+        var v = power();
+        while(list[i] === '×' || list[i] === '÷'){ var op = list[i++], r = power(); v = op === '×' ? v * r : (r === 0 ? NaN : v / r); }
+        return v;
       }
-      var total = t[0];
-      for(i = 1; i < t.length; i += 2){ total = t[i] === '+' ? total + t[i + 1] : total - t[i + 1]; }
-      return total;
+      function power(){
+        var b = postfix();
+        if(list[i] === '^'){ i++; return Math.pow(b, power()); }
+        return b;
+      }
+      function postfix(){
+        var v = primary();
+        while(list[i] === '²'){ i++; v = v * v; }
+        return v;
+      }
+      function primary(){
+        var t = list[i++];
+        if(typeof t === 'number') return t;
+        if(t === '('){ var v = expr(); if(list[i] === ')') i++; return v; }
+        return NaN;
+      }
+      var v = expr();
+      return i === list.length ? v : NaN;
+    }
+    function lastOperandValue(){
+      // value of the number or bracket group just finished, for the display
+      var j = tokens.length - 1;
+      while(tokens[j] === '²') j--;
+      if(tokens[j] === ')'){
+        var depth = 0;
+        for(; j >= 0; j--){ if(tokens[j] === ')') depth++; else if(tokens[j] === '(' && --depth === 0) break; }
+      }
+      return evaluate(tokens.slice(j));
     }
     function tidy(n){
       if(!isFinite(n)) return 'Error';
       return String(parseFloat(n.toPrecision(12)));
     }
+    function render(){
+      display.value = shown;
+      exprEl.textContent = done ? lastExpr : fmt(tokens) + (entry !== '' ? showNum(entry, !tokens.length) : '');
+    }
+    function startFresh(){ if(done){ tokens = []; entry = ''; done = false; } }
+    function continueFromResult(){
+      if(done){ tokens = shown === 'Error' ? [] : [parseFloat(shown)]; entry = ''; done = false; }
+    }
     function pressDigit(d){
-      if(current === 'Error' || awaitingNew || current === '0'){ current = d; awaitingNew = false; }
-      else if(current === '-0'){ current = '-' + d; }
-      else { current += d; }
-      render();
+      startFresh();
+      if(entry === '' && endsOperand(last())) tokens.push('×');
+      if(entry === '' || entry === '0') entry = d;
+      else if(entry === '-0') entry = '-' + d;
+      else entry += d;
+      shown = entry;
     }
     function pressDot(){
-      if(current === 'Error' || awaitingNew){ current = '0.'; awaitingNew = false; render(); return; }
-      if(current.indexOf('.') === -1){ current += '.'; render(); }
+      startFresh();
+      if(entry === '' && endsOperand(last())) tokens.push('×');
+      if(entry === '') entry = '0.';
+      else if(entry.indexOf('.') === -1) entry += '.';
+      shown = entry;
     }
     function pressOp(op){
-      if(current === 'Error') return;
-      if(awaitingNew && tokens.length && typeof tokens[tokens.length - 1] !== 'number'){
-        tokens[tokens.length - 1] = op;   // changed their mind about the operator
-      } else {
-        tokens.push(parseFloat(current), op);
-      }
-      awaitingNew = true;
-      render();
+      continueFromResult();
+      commitEntry();
+      if(!tokens.length){ tokens.push(parseFloat(shown) || 0); }
+      else if(BINARY[last()]){ tokens[tokens.length - 1] = op; return; }   // changed their mind
+      else if(last() === '('){ return; }
+      tokens.push(op);
+    }
+    function pressOpen(){
+      startFresh();
+      commitEntry();
+      if(endsOperand(last())) tokens.push('×');
+      tokens.push('(');
+    }
+    function pressClose(){
+      commitEntry();
+      if(openCount() > 0 && endsOperand(last())){ tokens.push(')'); shown = tidy(lastOperandValue()); }
+    }
+    function pressSquare(){
+      continueFromResult();
+      commitEntry();
+      if(!tokens.length) tokens.push(parseFloat(shown) || 0);
+      if(endsOperand(last())){ tokens.push('²'); shown = tidy(lastOperandValue()); }
     }
     function pressEquals(){
-      if(!tokens.length || current === 'Error') return;
-      if(awaitingNew){ tokens.pop(); } else { tokens.push(parseFloat(current)); }
-      current = tidy(evaluate(tokens));
-      tokens = []; awaitingNew = true;
-      render();
+      if(done) return;
+      commitEntry();
+      while(tokens.length && (BINARY[last()] || last() === '(')) tokens.pop();
+      for(var n = openCount(); n > 0; n--) tokens.push(')');
+      if(!tokens.length) return;
+      shown = tidy(evaluate(tokens));
+      lastExpr = fmt(tokens) + ' =';
+      tokens = []; done = true;
     }
-    function pressClear(){
-      current = '0'; tokens = []; awaitingNew = false; render();
-    }
+    function pressClear(){ tokens = []; entry = ''; shown = '0'; done = false; lastExpr = ''; }
     function pressBackspace(){
-      if(current === 'Error' || awaitingNew) return;
-      current = current.length > 1 ? current.slice(0,-1) : '0';
-      if(current === '-') current = '0';
-      render();
+      if(done) return;
+      if(entry !== ''){
+        entry = entry.slice(0, -1);
+        if(entry === '-') entry = '';
+        shown = entry || '0';
+      } else if(tokens.length){ tokens.pop(); }
     }
     function pressSign(){
-      if(current === 'Error') return;
-      if(awaitingNew){ current = '-0'; awaitingNew = false; render(); return; }
-      if(current === '0'){ current = '-0'; render(); return; }
-      current = current.charAt(0) === '-' ? current.slice(1) : ('-' + current);
-      render();
+      if(done){
+        if(shown === 'Error') return;
+        entry = shown.charAt(0) === '-' ? shown.slice(1) : '-' + shown;
+        tokens = []; done = false;
+      } else if(entry === ''){
+        if(endsOperand(last())) return;
+        entry = '-0';
+      } else {
+        entry = entry.charAt(0) === '-' ? entry.slice(1) : '-' + entry;
+      }
+      shown = entry;
     }
 
     trigger.addEventListener('click', function(e){
@@ -610,15 +677,19 @@
         else if(key === '⌫'){ pressBackspace(); }
         else if(key === '±'){ pressSign(); }
         else if(key === '='){ pressEquals(); }
-        else if(key === '+' || key === '−' || key === '×' || key === '÷' || key === '^'){ pressOp(key); }
+        else if(BINARY[key]){ pressOp(key); }
+        else if(key === '('){ pressOpen(); }
+        else if(key === ')'){ pressClose(); }
+        else if(key === '²'){ pressSquare(); }
         else if(key === '.'){ pressDot(); }
         else { pressDigit(key); }
+        render();
       });
     });
     useBtn.addEventListener('click', function(){
       var answerInput = scope.querySelector('.answer-value-input');
-      if(answerInput && current !== 'Error'){
-        answerInput.value = current;
+      if(answerInput && shown !== 'Error'){
+        answerInput.value = shown;
         answerInput.classList.remove('ok','bad');
       }
       popup.hidden = true;
