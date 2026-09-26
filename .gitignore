@@ -10,6 +10,8 @@
 !aelec/formula-lab.html
 !aelec/Images/*.jpg
 !aelec/Images/*.JPG
+!acomplex/complex-lab.html
+!acomplex/formula-lab.html
 !.nojekyll
 !.gitignore
 !README.md
