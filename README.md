@@ -1,4 +1,4 @@
-# Physics Study Tools
+# L3 NCEA Achieved level Physics and Maths Study Tools
 
 Interactive physics study labs for students: Wave Lab, Mechanics Lab, Electricity Lab and a Formula Lab for each.
 Open the site's front page and pick a lab. Everything runs in your browser; no login and nothing is stored.
