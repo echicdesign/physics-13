@@ -4,6 +4,8 @@
 !index.html
 !amech/mech-lab.html
 !amech/formula-lab.html
+!amech/*.jpg
+!amech/*.JPG
 !awave/wave-lab.html
 !awave/formula-lab.html
 !aelec/elec-lab.html
