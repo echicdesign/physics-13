@@ -191,9 +191,6 @@
     </div>
 
     <div class="layout">
-      <div class="stage">
-        <canvas id="waveCanvas-lin" role="img" aria-label="Two masses on a beam with the centre of mass marked between them"></canvas>
-      </div>
       <div class="grid" id="cardsGrid-lin"></div>
     </div>
   </section>
@@ -943,74 +940,6 @@
     });
   });
   updateModeButtons();
-
-  // ---------- canvas ----------
-  var canvas = document.getElementById('waveCanvas-lin');
-  var cctx = canvas.getContext('2d');
-  var cw = 0, ch = 140;
-  var pal = {};
-  function readPalette(){
-    var cs = getComputedStyle(document.documentElement);
-    pal.ink = cs.getPropertyValue('--ink').trim();
-    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
-    pal.border = cs.getPropertyValue('--border').trim();
-    pal.m1 = isDarkMode() ? qByKey.m1.colorDark : qByKey.m1.colorLight;
-    pal.m2 = isDarkMode() ? qByKey.m2.colorDark : qByKey.m2.colorLight;
-    pal.xCOM = isDarkMode() ? qByKey.xCOM.colorDark : qByKey.xCOM.colorLight;
-  }
-  readPalette();
-  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
-
-  function sizeCanvas(){
-    var rect = canvas.getBoundingClientRect();
-    var dpr = window.devicePixelRatio || 1;
-    cw = rect.width;
-    canvas.width = cw*dpr; canvas.height = ch*dpr;
-    cctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  sizeCanvas();
-  window.addEventListener('resize', sizeCanvas);
-
-  function render(){
-    cctx.clearRect(0,0,cw,ch);
-    var margin = 40;
-    var span = Math.max(cw - margin*2, 100);
-    var maxPos = 10;
-    var midY = 80;
-
-    cctx.strokeStyle = pal.border;
-    cctx.beginPath(); cctx.moveTo(margin, midY); cctx.lineTo(cw-margin, midY); cctx.stroke();
-
-    var x1px = margin + (waveState.x1/maxPos)*span;
-    var x2px = margin + (waveState.x2/maxPos)*span;
-    var xcom = (waveState.m1*waveState.x1 + waveState.m2*waveState.x2) / (waveState.m1 + waveState.m2);
-    var xcomPx = margin + (xcom/maxPos)*span;
-
-    var r1 = 8 + waveState.m1*2;
-    var r2 = 8 + waveState.m2*2;
-
-    cctx.fillStyle = unlocked.m1 ? pal.m1 : pal.ink;
-    cctx.beginPath(); cctx.arc(x1px, midY, r1, 0, 2*Math.PI); cctx.fill();
-    cctx.font = "11px 'Trocchi', serif"; cctx.textAlign = 'center'; cctx.fillStyle = pal.inkMuted;
-    cctx.fillText('m1', x1px, midY + r1 + 16);
-
-    cctx.fillStyle = unlocked.m2 ? pal.m2 : pal.ink;
-    cctx.beginPath(); cctx.arc(x2px, midY, r2, 0, 2*Math.PI); cctx.fill();
-    cctx.fillStyle = pal.inkMuted;
-    cctx.fillText('m2', x2px, midY + r2 + 16);
-
-    cctx.strokeStyle = unlocked.xCOM ? pal.xCOM : pal.inkMuted;
-    cctx.lineWidth = 2;
-    cctx.beginPath(); cctx.moveTo(xcomPx, midY-30); cctx.lineTo(xcomPx, midY+30); cctx.stroke();
-    cctx.lineWidth = 1;
-    if(unlocked.xCOM){
-      cctx.fillStyle = pal.xCOM;
-      cctx.fillText('xCOM', xcomPx, midY-36);
-    }
-
-    requestAnimationFrame(render);
-  }
-  requestAnimationFrame(render);
 
   renderGrid();
   updateProgress();
