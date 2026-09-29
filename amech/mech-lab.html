@@ -225,9 +225,6 @@
     </div>
 
     <div class="layout">
-      <div class="stage">
-        <canvas id="waveCanvas-cir" role="img" aria-label="A mass orbiting a central point, held in by a centripetal force"></canvas>
-      </div>
       <div class="grid" id="cardsGrid-cir"></div>
     </div>
   </section>
@@ -260,9 +257,6 @@
     </div>
 
     <div class="layout">
-      <div class="stage">
-        <canvas id="waveCanvas-ang" role="img" aria-label="A wheel spinning around a central axle"></canvas>
-      </div>
       <div class="grid" id="cardsGrid-ang"></div>
     </div>
   </section>
@@ -1446,65 +1440,6 @@
   });
   updateModeButtons();
 
-  // ---------- canvas ----------
-  var canvas = document.getElementById('waveCanvas-cir');
-  var cctx = canvas.getContext('2d');
-  var cw = 0, ch = 140;
-  var t = 0, lastTime = null;
-  var pal = {};
-  function readPalette(){
-    var cs = getComputedStyle(document.documentElement);
-    pal.ink = cs.getPropertyValue('--ink').trim();
-    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
-    pal.border = cs.getPropertyValue('--border').trim();
-    pal.m = isDarkMode() ? qByKey.m.colorDark : qByKey.m.colorLight;
-    pal.Fc = isDarkMode() ? qByKey.Fc.colorDark : qByKey.Fc.colorLight;
-  }
-  readPalette();
-  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
-
-  function sizeCanvas(){
-    var rect = canvas.getBoundingClientRect();
-    var dpr = window.devicePixelRatio || 1;
-    cw = rect.width;
-    canvas.width = cw*dpr; canvas.height = ch*dpr;
-    cctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  sizeCanvas();
-  window.addEventListener('resize', sizeCanvas);
-
-  function render(now){
-    if(lastTime===null) lastTime = now;
-    var dt = Math.min((now-lastTime)/1000, 0.05);
-    lastTime = now;
-    if(playing) t += dt;
-
-    cctx.clearRect(0,0,cw,ch);
-    var midX = cw/2, midY = 70;
-    var pxRadius = Math.min(40 + waveState.r*3, 60);
-
-    cctx.strokeStyle = pal.border;
-    cctx.beginPath(); cctx.arc(midX, midY, pxRadius, 0, 2*Math.PI); cctx.stroke();
-
-    cctx.fillStyle = pal.inkMuted;
-    cctx.beginPath(); cctx.arc(midX, midY, 4, 0, 2*Math.PI); cctx.fill();
-
-    var angularSpeed = waveState.v / Math.max(waveState.r, 1);
-    var angle = t * angularSpeed;
-    var objX = midX + pxRadius*Math.cos(angle);
-    var objY = midY + pxRadius*Math.sin(angle);
-
-    cctx.strokeStyle = unlocked.Fc ? pal.Fc : pal.inkMuted;
-    cctx.beginPath(); cctx.moveTo(midX, midY); cctx.lineTo(objX, objY); cctx.stroke();
-
-    var objR = 6 + waveState.m*0.6;
-    cctx.fillStyle = unlocked.m ? pal.m : pal.ink;
-    cctx.beginPath(); cctx.arc(objX, objY, objR, 0, 2*Math.PI); cctx.fill();
-
-    requestAnimationFrame(render);
-  }
-  requestAnimationFrame(render);
-
   renderGrid();
   updateProgress();
 })();
@@ -2009,61 +1944,6 @@
     });
   });
   updateModeButtons();
-
-  // ---------- canvas ----------
-  var canvas = document.getElementById('waveCanvas-ang');
-  var cctx = canvas.getContext('2d');
-  var cw = 0, ch = 140;
-  var t = 0, lastTime = null;
-  var pal = {};
-  function readPalette(){
-    var cs = getComputedStyle(document.documentElement);
-    pal.ink = cs.getPropertyValue('--ink').trim();
-    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
-    pal.border = cs.getPropertyValue('--border').trim();
-    pal.omega = isDarkMode() ? qByKey.omega.colorDark : qByKey.omega.colorLight;
-  }
-  readPalette();
-  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
-
-  function sizeCanvas(){
-    var rect = canvas.getBoundingClientRect();
-    var dpr = window.devicePixelRatio || 1;
-    cw = rect.width;
-    canvas.width = cw*dpr; canvas.height = ch*dpr;
-    cctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  sizeCanvas();
-  window.addEventListener('resize', sizeCanvas);
-
-  function render(now){
-    if(lastTime===null) lastTime = now;
-    var dt = Math.min((now-lastTime)/1000, 0.05);
-    lastTime = now;
-    if(playing) t += dt;
-
-    cctx.clearRect(0,0,cw,ch);
-    var midX = cw/2, midY = 70;
-    var pxRadius = 45;
-
-    var omega = waveState.dtheta / waveState.dt;
-    var angle = t * omega;
-
-    cctx.strokeStyle = pal.border;
-    cctx.beginPath(); cctx.arc(midX, midY, pxRadius, 0, 2*Math.PI); cctx.stroke();
-    cctx.fillStyle = pal.inkMuted;
-    cctx.beginPath(); cctx.arc(midX, midY, 4, 0, 2*Math.PI); cctx.fill();
-
-    var spokeX = midX + pxRadius*Math.cos(angle);
-    var spokeY = midY + pxRadius*Math.sin(angle);
-    cctx.strokeStyle = unlocked.omega ? pal.omega : pal.ink;
-    cctx.lineWidth = 3;
-    cctx.beginPath(); cctx.moveTo(midX, midY); cctx.lineTo(spokeX, spokeY); cctx.stroke();
-    cctx.lineWidth = 1;
-
-    requestAnimationFrame(render);
-  }
-  requestAnimationFrame(render);
 
   renderGrid();
   updateProgress();
