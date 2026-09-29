@@ -4,12 +4,34 @@
 <meta name="robots" content="noindex">
 <title>L3 NCEA Achieved level Physics and Maths Study Tools</title>
 <style>
-body { font-family: sans-serif; max-width: 32em; margin: 4em auto; padding: 0 1em; }
+body { font-family: sans-serif; max-width: 60em; margin: 4em auto; padding: 0 1em; }
 h2 { margin-top: 1.5em; }
 a { display: block; font-size: 1.3em; margin: 1em 0; }
+
+.layout { display: flex; flex-direction: column; gap: 1.5em; align-items: stretch; }
+.main { flex: 3; min-width: 0; order: 0; }
+.howto { flex: 2; background: #f2f6fa; border: 1px solid #cfd8e3; border-radius: 8px;
+         padding: 0.2em 1.2em 1em; font-size: 0.92em; line-height: 1.5; order: -1; }
+.howto h2 { margin-top: 1em; }
+.howto summary { font-size: 1.1em; font-weight: bold; padding: 0.8em 0; cursor: pointer; }
+.howto ol, .howto ul { padding-left: 1.3em; }
+.howto p { margin: 0.7em 0; }
+
+@media (min-width: 701px) {
+  .layout { flex-direction: row; gap: 3em; align-items: flex-start; }
+  .main { order: 1; }
+  .howto { order: 2; }
+  .howto summary { pointer-events: none; list-style: none; }
+  .howto summary::-webkit-details-marker { display: none; }
+  .howto summary::marker { display: none; }
+}
+
+.disclaimer { margin-top: 3em; padding-top: 1em; border-top: 1px solid #ddd; font-size: 0.9em; color: #555; }
 </style></head>
 <body>
 <h1>L3 NCEA Achieved level Physics and Maths Study Tools</h1>
+<div class="layout">
+<div class="main">
 <h2>Waves</h2>
 <a href="awave/wave-lab.html">Understanding Waves</a>
 <a href="awave/formula-lab.html">Waves Formula</a>
@@ -22,4 +44,39 @@ a { display: block; font-size: 1.3em; margin: 1em 0; }
 <h2>Maths: Complex Numbers</h2>
 <a href="acomplex/complex-lab.html">Understanding Complex Numbers</a>
 <a href="acomplex/formula-lab.html">Complex Numbers Formula</a>
+</div>
+<details class="howto" id="howto">
+<summary>How to use this tool</summary>
+<p><strong>Understanding</strong> helps you identify the variables, and know their letters and units.<br>
+<strong>Formula</strong> - once you understand the variables, this walks you through using them in equations.</p>
+
+<h2>1. Start with Understanding</h2>
+<p>Pick a topic above (e.g. "Understanding Mechanics"), then select the sub-topic (e.g. Harmonics) from the drop-down.</p>
+<p>There are three levels:</p>
+<ul>
+<li>Learner</li>
+<li>Confident</li>
+<li>Expert</li>
+</ul>
+<p>Figure out where you are at, and work through the drills until you can confidently identify the items. You can skip ahead or back at any time.</p>
+<p>Some areas (like Angular Mechanics) have explainer diagrams on each card to help you remember ideas. Others have a general "show picture" button.</p>
+
+<h2>2. Then try Formula</h2>
+<p>Once you've worked through Understanding, click <strong>All Tools</strong> to come back to this page and choose the <strong>Formula</strong> option for your topic.</p>
+<p>Select the area, e.g. Hooke's Law, from the drop-down, and work through the levels (Learner, Confident, Expert) as before.</p>
+
+<h2>Bugs</h2>
+<p>This is a work in progress - there will be the odd bug. Mechanics and Waves have had the most attention so far. You can just skip over it, or try pasting the question into Google to find out what is going on (brackets matter!). Happy to hear about possible fixes.</p>
+</details>
+</div>
+<p class="disclaimer">This is a study aid built for my own child. I'm NOT a physics teacher. Use with caution.</p>
+<script>
+(function () {
+  var howto = document.getElementById('howto');
+  var mq = window.matchMedia('(min-width: 701px)');
+  function sync() { howto.open = mq.matches; }
+  sync();
+  mq.addEventListener('change', sync);
+})();
+</script>
 </body></html>
