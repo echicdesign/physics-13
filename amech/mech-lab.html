@@ -160,7 +160,7 @@
     <option value="linear">Linear Mechanics</option>
     <option value="circular">Circular Motion</option>
     <option value="angular">Angular Mechanics</option>
-    <option value="shm">SHM</option>
+    <option value="shm">Harmonic Motion</option>
     <option value="memorise">Memorise (not on formula sheet)</option>
   </select>
 
@@ -2177,6 +2177,7 @@
       ],
       definition:"Mass is the mass of the object attached to a spring. It is measured in kilograms.",
       kind:'slider', min:0.2, max:5, step:0.1, def:1,
+      img:'shm_spring_period.jpg',
       colorLight:'#2B6E8A', colorDark:'#6FC0D6', fill:'#2B6E8A' },
     { key:'k', order:2, name:'Spring constant', symbol:'k', unit:'N/m',
       nameAliases:['spring constant','stiffness'], symbolAliases:['k'], unitAliases:['n/m','newton per metre','newtons per metre','n per m'],
@@ -2189,6 +2190,7 @@
       ],
       definition:"Spring constant is how stiff a spring is. It is measured in newtons per metre.",
       kind:'slider', min:5, max:100, step:1, def:20,
+      img:'shm_hookes_law.jpg',
       colorLight:'#8A6E2B', colorDark:'#D6C06F', fill:'#8A6E2B' },
     { key:'T', order:3, name:'Period', symbol:'T', unit:'s',
       nameAliases:['period','period of oscillation'], symbolAliases:['t'], unitAliases:['s','sec','second','seconds'],
@@ -2196,12 +2198,13 @@
         "The time taken for one complete oscillation — out, back, and returning to the same point moving the same way.",
         "A mass on a spring completes one full bounce every 0.89 s. What quantity is 0.89 s?",
         "This quantity is calculated using T = 2π√(m/k) — the mass and spring constant together.",
-        "The reciprocal of this quantity is the frequency of oscillation.",
+        "A pendulum has this same quantity too, but calculated from its length and gravity instead — T = 2π√(l/g).",
         "A stiffer spring or a lighter mass makes this quantity smaller — faster oscillations."
       ],
       definition:"Period is the time taken for one complete oscillation. It is measured in seconds.",
       note:"T isn't independent — it's calculated from m and k. Adjust those above to see it change.",
       kind:'derived', deriveFn:function(state){ return 2*Math.PI*Math.sqrt(state.m/state.k); },
+      img:'shm_spring_period.jpg',
       colorLight:'#6E2B8A', colorDark:'#C06FD6', fill:'#6E2B8A' },
     { key:'y', order:4, name:'Displacement', symbol:'y', unit:'m',
       nameAliases:['displacement','displacement from equilibrium'], symbolAliases:['y'], unitAliases:['m','metre','metres','meter','meters'],
@@ -2214,6 +2217,7 @@
       ],
       definition:"Displacement is how far the oscillating mass sits from its equilibrium position. It is measured in metres.",
       kind:'slider', min:-0.3, max:0.3, step:0.01, def:0.15,
+      img:'shm_hookes_law.jpg',
       colorLight:'#2B8A6E', colorDark:'#6FD6C0', fill:'#2B8A6E' },
     { key:'F', order:5, name:'Restoring force', symbol:'F', unit:'N',
       nameAliases:['restoring force','spring force'], symbolAliases:['f'], unitAliases:['n','newton','newtons'],
@@ -2227,6 +2231,7 @@
       definition:"Restoring force is the force pulling an oscillating mass back toward equilibrium. It is measured in newtons.",
       note:"F isn't independent — it's calculated from k and y. Adjust those above to see it change.",
       kind:'derived', deriveFn:function(state){ return -state.k * state.y; },
+      img:'shm_hookes_law.jpg',
       colorLight:'#8A2B6E', colorDark:'#D66FC0', fill:'#8A2B6E' },
     { key:'Ep', order:6, name:'Elastic potential energy', symbol:'Ep', unit:'J',
       nameAliases:['elastic potential energy','spring potential energy','elastic pe'], symbolAliases:['ep'], unitAliases:['j','joule','joules'],
@@ -2240,6 +2245,7 @@
       definition:"Elastic potential energy is the potential energy stored in a stretched or compressed spring. It is measured in joules.",
       note:"Ep isn't independent — it's calculated from k and y. Adjust those above to see it change.",
       kind:'derived', deriveFn:function(state){ return 0.5 * state.k * state.y * state.y; },
+      img:'shm_elastic_pe.jpg',
       colorLight:'#6E8A2B', colorDark:'#C0D66F', fill:'#6E8A2B' }
   ];
 
