@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Differentiation Formula</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Trocchi&display=swap">
+<style>
+  :root{
+    --bg:#F5F7F8; --surface:#FFFFFF; --surface-2:#EDF1F2;
+    --ink:#1B2730; --ink-muted:#5B6870; --border:#D6DEE1;
+    --accent:#2B6CB0; --on-accent:#F3F8FC;
+    --input-line:#B6C1C5; --focus-ring: rgba(43,108,176,0.22);
+    --bad:#B3432E; --good:#1E7A46;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#10171B; --surface:#17222A; --surface-2:#1E2B31;
+      --ink:#E7EEF0; --ink-muted:#9FB0B6; --border:#2B3C43;
+      --accent:#7FB2E8; --on-accent:#0E1E2C;
+      --input-line:#3A4B52; --focus-ring: rgba(127,178,232,0.28);
+      --bad:#E5806A; --good:#5FCB8C;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#10171B; --surface:#17222A; --surface-2:#1E2B31;
+    --ink:#E7EEF0; --ink-muted:#9FB0B6; --border:#2B3C43;
+    --accent:#7FB2E8; --on-accent:#0E1E2C;
+    --input-line:#3A4B52; --focus-ring: rgba(127,178,232,0.28);
+    --bad:#E5806A; --good:#5FCB8C;
+  }
+  *{ box-sizing:border-box; }
+  body{ background:var(--bg); color:var(--ink); font-family:'Public Sans', -apple-system, 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums; }
+  .wrap{ max-width:1100px; margin:0 auto; padding:12px 22px 60px; }
+
+  .title-row{ margin-bottom:10px; display:flex; align-items:baseline; flex-wrap:wrap; gap:8px 10px; }
+  h1{ font-family:'Fraunces', Georgia, serif; font-weight:700; font-size:clamp(1.15rem,2vw,1.5rem); line-height:1.2; margin:0; display:inline; text-wrap:balance; }
+  .eyebrow-inline{ font-family:'IBM Plex Mono', monospace; font-size:0.72rem; letter-spacing:0.04em; color:var(--ink-muted); }
+  .header-actions{ margin-left:auto; display:flex; gap:8px; flex-wrap:wrap; }
+  .nav-link{ text-decoration:none; align-self:center; }
+
+  button.ghost-btn, a.ghost-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem;
+    color:var(--ink-muted); background:var(--surface); border:1px solid var(--border);
+    border-radius:7px; padding:7px 12px; cursor:pointer; display:inline-block;
+  }
+  button.ghost-btn:hover, a.ghost-btn:hover{ color:var(--ink); border-color:var(--input-line); }
+  button.ghost-btn:focus-visible, a.ghost-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  button.danger-btn{
+    font-family:'IBM Plex Mono', monospace; font-size:0.78rem;
+    color:var(--bad); background:var(--surface); border:1px solid var(--bad);
+    border-radius:7px; padding:7px 12px; cursor:pointer;
+  }
+  button.danger-btn:hover{ background:var(--bad); color:#fff; }
+  button.danger-btn:focus-visible{ outline:2px solid var(--bad); outline-offset:2px; }
+
+  .control-row{ display:flex; align-items:center; gap:10px 14px; flex-wrap:wrap; margin-bottom:20px; }
+  .toprow{ display:flex; align-items:center; gap:14px; flex-wrap:wrap; }
+
+  .topic-select{
+    font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem;
+    padding:8px 34px 8px 14px; border-radius:9px; border:1.5px solid var(--border);
+    background:var(--surface) url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="%235B6870"><path d="M5.5 7.5l4.5 5 4.5-5z"/></svg>') no-repeat right 10px center;
+    background-size:16px; color:var(--ink); cursor:pointer; appearance:none; -webkit-appearance:none;
+    max-width:100%;
+  }
+  .topic-select:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .topic-panel{ display:contents; }
+  .topic-panel[hidden]{ display:none; }
+
+  .badge{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:5px 12px; color:var(--ink-muted); }
+  .mode-toggle{ display:inline-flex; border:1px solid var(--border); border-radius:999px; overflow:hidden; }
+  .mode-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.75rem; padding:6px 13px; background:var(--surface); color:var(--ink-muted); border:none; cursor:pointer; }
+  .mode-btn.active{ background:var(--accent); color:var(--on-accent); }
+  .mode-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  .problem-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 26px; flex-basis:100%; width:100%; }
+  .problem-text{ font-family:'Fraunces', serif; font-size:1.25rem; line-height:1.5; margin:0 0 18px; text-wrap:balance; }
+  .problem-text sup{ font-size:0.68em; }
+
+  .field-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:16px; }
+  .field-row label{ font-family:'IBM Plex Mono', monospace; font-size:0.74rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-muted); }
+  .field-row input, .field-row select{ font-family:'Trocchi', serif; font-size:1.05rem; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:12px 14px; }
+  .field-row input:focus, .field-row select:focus{ outline:none; border-color:var(--accent); box-shadow:0 0 0 3px var(--focus-ring); }
+  .field-row input.ok, .field-row select.ok{ border-color:var(--good); }
+  .field-row input.bad, .field-row select.bad{ border-color:var(--bad); }
+  .field-hint{ font-size:0.8rem; color:var(--ink-muted); font-style:italic; margin:2px 0 14px; }
+
+  .actions-row{ display:flex; align-items:center; gap:12px; margin-top:6px; flex-wrap:wrap; }
+  .check-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.9rem; font-weight:600; color:var(--on-accent); background:var(--accent); border:none; border-radius:9px; padding:11px 22px; cursor:pointer; }
+  .check-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+  .feedback{ font-size:0.9rem; color:var(--ink-muted); }
+
+  .modal-overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:center; justify-content:center; padding:20px; z-index:50; }
+  .modal-overlay[hidden]{ display:none; }
+  .modal-box{ background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:30px 32px; max-width:420px; text-align:center; box-shadow:0 16px 50px rgba(0,0,0,0.3); animation: celebrate-pop 0.55s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes celebrate-pop{ 0%{ transform:scale(0.3) rotate(-20deg); opacity:0; } 60%{ transform:scale(1.08) rotate(8deg); opacity:1; } 80%{ transform:scale(0.96) rotate(-3deg); } 100%{ transform:scale(1) rotate(0deg); } }
+  .modal-title{ font-family:'Fraunces', serif; font-weight:700; font-size:1.4rem; margin:0 0 12px; }
+  .modal-summary{ color:var(--ink-muted); line-height:1.55; margin:0 0 22px; }
+  .modal-box-compact{ padding:22px 34px; }
+  .modal-box-compact .modal-title{ margin:0; color:var(--good); }
+  .next-btn{ font-family:'IBM Plex Mono', monospace; font-size:0.9rem; font-weight:600; color:var(--on-accent); background:var(--accent); border:none; border-radius:9px; padding:11px 26px; cursor:pointer; }
+  .next-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; }
+
+  @media (prefers-reduced-motion: reduce){ *{ transition:none !important; } .modal-box{ animation:none !important; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="title-row">
+    <h1>Differentiation Formula</h1><span class="eyebrow-inline">91578 &middot; Differentiation</span>
+    <div class="header-actions">
+      <button class="ghost-btn danger-btn" id="newStudentBtn" type="button">New student &mdash; clear everything</button>
+      <a class="ghost-btn nav-link" href="../">&#127968; All tools</a>
+    </div>
+  </div>
+
+  <div class="control-row">
+  <select id="topicSelect" class="topic-select">
+    <option value="chain">Chain Rule</option>
+    <option value="product">Product Rule</option>
+  </select>
+
+  <section class="topic-panel" data-topic="chain">
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-chain"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: spot the outer/inner function. Confident: differentiate with a straightforward inner function. Expert: differentiate with a harder or nested inner function.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-chain" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-chain"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="product" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-product"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: spot u and v. Confident: full product rule with simple one-term factors. Expert: multi-term or mixed factors.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-product" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-product"></div>
+  </section>
+  </div>
+</div>
+
+<div class="modal-overlay" id="roundDoneModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <h2 class="modal-title" id="roundDoneTitle">Round complete!</h2>
+    <p class="modal-summary" id="roundDoneSummary"></p>
+    <button class="next-btn" id="roundDoneBtn" type="button">Next round</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="correctModal" hidden>
+  <div class="modal-box modal-box-compact" role="status" aria-live="polite">
+    <h2 class="modal-title">Correct!</h2>
+  </div>
+</div>
+
+<script>
+  // Shared helpers, used by both topics below.
+  "use strict";
+  window.formulaLabTopics = window.formulaLabTopics || [];
+
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  // ---- Expression parser / evaluator for differentiation answers ----
+  // Supports: numbers, x, e, pi, + - * / ^ (right-assoc), unary minus,
+  // parentheses, implicit multiplication (4cos(4x) -> 4*cos(4x)), and
+  // functions sin cos tan sec ln sqrt -- always written with parentheses
+  // around their argument (sin(4x), not sin4x). "func^n(" is accepted as
+  // (func(...))^n, e.g. sec^2(4x), matching the sec²x exam convention.
+  var FUNC_NAMES = ['sin','cos','tan','sec','ln','sqrt'];
+
+  function tokenizeExpr(str){
+    var s = (str||'').toString().replace(/\s+/g,'');
+    s = s.replace(/×/g,'*').replace(/·/g,'*').replace(/÷/g,'/').replace(/−/g,'-').replace(/π/gi,'pi');
+    var toks = [];
+    var i = 0;
+    while(i < s.length){
+      var c = s[i];
+      if((c >= '0' && c <= '9') || c === '.'){
+        var j = i;
+        while(j < s.length && ((s[j] >= '0' && s[j] <= '9') || s[j] === '.')) j++;
+        var numStr = s.slice(i,j);
+        if(numStr === '.') return null;
+        toks.push({t:'num', v: parseFloat(numStr)});
+        i = j;
+        continue;
+      }
+      if(/[a-zA-Z]/.test(c)){
+        var matched = null;
+        for(var k=0;k<FUNC_NAMES.length;k++){
+          var fn = FUNC_NAMES[k];
+          if(s.slice(i,i+fn.length).toLowerCase() === fn){ matched = fn; break; }
+        }
+        if(matched){ toks.push({t:'func', v:matched}); i += matched.length; continue; }
+        if(s.slice(i,i+2).toLowerCase() === 'pi'){ toks.push({t:'const', v:'pi'}); i += 2; continue; }
+        if(c.toLowerCase() === 'e'){ toks.push({t:'const', v:'e'}); i += 1; continue; }
+        if(c.toLowerCase() === 'x'){ toks.push({t:'var'}); i += 1; continue; }
+        return null;
+      }
+      if(c==='+'||c==='-'||c==='*'||c==='/'||c==='^'||c==='('||c===')'){
+        toks.push({t:c}); i++; continue;
+      }
+      return null;
+    }
+    return toks;
+  }
+
+  function insertImplicitMultiply(toks){
+    var VALUE_END = {num:1, 'var':1, 'const':1};
+    var out = [];
+    for(var i=0;i<toks.length;i++){
+      out.push(toks[i]);
+      if(i+1 < toks.length){
+        var cur = toks[i], nxt = toks[i+1];
+        var curEndsValue = (VALUE_END[cur.t] === 1) || cur.t === ')';
+        var nxtStartsValue = (VALUE_END[nxt.t] === 1) || nxt.t === '(' || nxt.t === 'func';
+        if(curEndsValue && nxtStartsValue) out.push({t:'*'});
+      }
+    }
+    return out;
+  }
+
+  function parseTokens(toks){
+    var pos = 0;
+    function peek(){ return toks[pos]; }
+    function next(){ return toks[pos++]; }
+    function expect(t){ var tok = next(); if(!tok || tok.t !== t) throw new Error('parse'); return tok; }
+
+    function parseExpr(){ return parseAddSub(); }
+    function parseAddSub(){
+      var node = parseMulDiv();
+      while(peek() && (peek().t === '+' || peek().t === '-')){
+        var op = next().t;
+        node = { t:'bin', op:op, l:node, r:parseMulDiv() };
+      }
+      return node;
+    }
+    function parseMulDiv(){
+      var node = parseUnary();
+      while(peek() && (peek().t === '*' || peek().t === '/')){
+        var op = next().t;
+        node = { t:'bin', op:op, l:node, r:parseUnary() };
+      }
+      return node;
+    }
+    function parseUnary(){
+      if(peek() && peek().t === '-'){ next(); return { t:'neg', v:parseUnary() }; }
+      if(peek() && peek().t === '+'){ next(); return parseUnary(); }
+      return parsePow();
+    }
+    function parsePow(){
+      var base = parsePrimary();
+      if(peek() && peek().t === '^'){
+        next();
+        return { t:'pow', base:base, exp:parseUnary() };
+      }
+      return base;
+    }
+    function parsePrimary(){
+      var tok = peek();
+      if(!tok) throw new Error('parse');
+      if(tok.t === 'num'){ next(); return { t:'num', v:tok.v }; }
+      if(tok.t === 'var'){ next(); return { t:'var' }; }
+      if(tok.t === 'const'){ next(); return { t:'const', v:tok.v }; }
+      if(tok.t === '('){
+        next();
+        var inner = parseExpr();
+        expect(')');
+        return inner;
+      }
+      if(tok.t === 'func'){
+        next();
+        var powExp = null;
+        if(peek() && peek().t === '^'){ next(); powExp = parseUnary(); }
+        if(peek() && peek().t === '*'){ next(); } // skip a spurious implicit-multiply inserted between "func^n" and its own "("
+        expect('(');
+        var arg = parseExpr();
+        expect(')');
+        var callNode = { t:'call', name:tok.v, arg:arg };
+        return powExp ? { t:'pow', base:callNode, exp:powExp } : callNode;
+      }
+      throw new Error('parse');
+    }
+
+    var result = parseExpr();
+    if(pos !== toks.length) throw new Error('parse');
+    return result;
+  }
+
+  function evalNode(node, x){
+    switch(node.t){
+      case 'num': return node.v;
+      case 'var': return x;
+      case 'const': return node.v === 'pi' ? Math.PI : Math.E;
+      case 'neg': return -evalNode(node.v, x);
+      case 'bin': {
+        var l = evalNode(node.l, x), r = evalNode(node.r, x);
+        if(node.op === '+') return l + r;
+        if(node.op === '-') return l - r;
+        if(node.op === '*') return l * r;
+        return l / r;
+      }
+      case 'pow': return Math.pow(evalNode(node.base, x), evalNode(node.exp, x));
+      case 'call': {
+        var a = evalNode(node.arg, x);
+        if(node.name === 'sin') return Math.sin(a);
+        if(node.name === 'cos') return Math.cos(a);
+        if(node.name === 'tan') return Math.tan(a);
+        if(node.name === 'sec') return 1/Math.cos(a);
+        if(node.name === 'ln') return Math.log(a);
+        if(node.name === 'sqrt') return Math.sqrt(a);
+        return NaN;
+      }
+    }
+    return NaN;
+  }
+
+  function parseMathExpr(str){
+    var toks = tokenizeExpr(str);
+    if(!toks || !toks.length) return null;
+    toks = insertImplicitMultiply(toks);
+    try{ return parseTokens(toks); } catch(e){ return null; }
+  }
+
+  function expressionsMatch(studentStr, correctFn){
+    var ast = parseMathExpr(studentStr);
+    if(!ast) return false;
+    var studentFn = function(x){
+      try{ var v = evalNode(ast, x); return (typeof v === 'number' && isFinite(v)) ? v : NaN; }
+      catch(e){ return NaN; }
+    };
+    // Try increasingly wide sampling windows -- a narrow window around 0 is
+    // enough for most problems and keeps exponentials from overflowing, but
+    // some random ln/sqrt coefficients only have a valid domain further out.
+    var SCALES = [2.2, 6, 15, 40];
+    var matches = 0, validTried = 0;
+    for(var s=0; s<SCALES.length && validTried<5; s++){
+      var scale = SCALES[s];
+      for(var attempt=0; attempt<40 && validTried<5; attempt++){
+        var xv = (Math.random() * 2 * scale) - scale;
+        var b;
+        try{ b = correctFn(xv); } catch(e){ continue; }
+        if(typeof b !== 'number' || !isFinite(b)) continue;
+        validTried++;
+        var a = studentFn(xv);
+        var tol = Math.max(1e-3, 0.01 * Math.abs(b));
+        if(typeof a === 'number' && isFinite(a) && Math.abs(a - b) <= tol){ matches++; }
+        else { return false; }
+      }
+    }
+    return validTried >= 3 && matches === validTried;
+  }
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var A_POOL = [-7,-6,-5,-4,-3,-2,2,3,4,5,6,7];
+  var B_POOL = [-7,-6,-5,-4,-3,-2,-1,0,1,2,3,4,5,6,7];
+  var CHAIN_LINEAR_KINDS = ['exp','sin','cos','tan','ln','pow','sqrt'];
+  var OUTER_LABEL = { exp:'e^( ) — exponential', sin:'sin( )', cos:'cos( )', tan:'tan( )', ln:'ln( )', pow:'( )ⁿ — power', sqrt:'√( ) — square root' };
+
+  function fmtLin(a,b){
+    var absA = Math.abs(a);
+    var s = (absA===1) ? (a<0?'&minus;x':'x') : ((a<0?'&minus;':'')+absA+'x');
+    if(b>0) s += '+'+b; else if(b<0) s += '&minus;'+Math.abs(b);
+    return s;
+  }
+
+  function genChainLinear(kind){
+    var a = pick(A_POOL), b = pick(B_POOL);
+    var lin = fmtLin(a,b);
+    var n = (kind==='pow') ? pick([3,4,5]) : null;
+    var display, derivFn, fn;
+    var innerFn = function(x){ return a*x+b; };
+    if(kind==='exp'){ display='e<sup>'+lin+'</sup>'; derivFn=function(x){ return a*Math.exp(a*x+b); }; fn=function(x){ return Math.exp(a*x+b); }; }
+    else if(kind==='sin'){ display='sin('+lin+')'; derivFn=function(x){ return a*Math.cos(a*x+b); }; fn=function(x){ return Math.sin(a*x+b); }; }
+    else if(kind==='cos'){ display='cos('+lin+')'; derivFn=function(x){ return -a*Math.sin(a*x+b); }; fn=function(x){ return Math.cos(a*x+b); }; }
+    else if(kind==='tan'){ display='tan('+lin+')'; derivFn=function(x){ return a/Math.pow(Math.cos(a*x+b),2); }; fn=function(x){ return Math.tan(a*x+b); }; }
+    else if(kind==='ln'){ display='ln('+lin+')'; derivFn=function(x){ return a/(a*x+b); }; fn=function(x){ return Math.log(a*x+b); }; }
+    else if(kind==='pow'){ display='('+lin+')<sup>'+n+'</sup>'; derivFn=function(x){ return n*a*Math.pow(a*x+b,n-1); }; fn=function(x){ return Math.pow(a*x+b,n); }; }
+    else { display='&radic;('+lin+')'; derivFn=function(x){ return a/(2*Math.sqrt(a*x+b)); }; fn=function(x){ return Math.sqrt(a*x+b); }; }
+    return { outerType:kind, display:display, innerFn:innerFn, derivFn:derivFn, fn:fn };
+  }
+
+  var CHAIN_EXPERT_GENERATORS = [
+    function(){ var k=pick([2,3,4,5,6]); return { display:'e<sup>'+k+'x&sup2;</sup>', derivFn:function(x){ return 2*k*x*Math.exp(k*x*x); }, fn:function(x){ return Math.exp(k*x*x); } }; },
+    function(){ var k=pick([2,3,4,5]); return { display:'sin('+k+'x&sup3;)', derivFn:function(x){ return 3*k*x*x*Math.cos(k*x*x*x); }, fn:function(x){ return Math.sin(k*x*x*x); } }; },
+    function(){ var c=pick([2,3,4,5,6,7]), n=pick([3,4]); return { display:'(x&sup2;+'+c+')<sup>'+n+'</sup>', derivFn:function(x){ return n*Math.pow(x*x+c,n-1)*2*x; }, fn:function(x){ return Math.pow(x*x+c,n); } }; },
+    function(){ var c=pick([2,3,4,5,6,7]); return { display:'ln(x&sup2;+'+c+')', derivFn:function(x){ return 2*x/(x*x+c); }, fn:function(x){ return Math.log(x*x+c); } }; },
+    function(){ var k=pick([2,3,4,5]), c=pick([2,3,4,5,6]); return { display:'&radic;('+k+'x&sup2;+'+c+')', derivFn:function(x){ return k*x/Math.sqrt(k*x*x+c); }, fn:function(x){ return Math.sqrt(k*x*x+c); } }; },
+    function(){ var k=pick([2,3,4,5,6]); return { display:'e<sup>sin('+k+'x)</sup>', derivFn:function(x){ return k*Math.cos(k*x)*Math.exp(Math.sin(k*x)); }, fn:function(x){ return Math.exp(Math.sin(k*x)); } }; },
+    function(){ var k=pick([2,3,4,5]); return { display:'ln(cos('+k+'x))', derivFn:function(x){ return -k*Math.tan(k*x); }, fn:function(x){ return Math.log(Math.cos(k*x)); } }; },
+    function(){ var a=pick([2,3,4,5]), b=pick([-4,-3,-2,-1,0,1,2,3,4]); var lin=fmtLin(a,b); return { display:'sin(('+lin+')<sup>2</sup>)', derivFn:function(x){ var u=a*x+b; return 2*a*u*Math.cos(u*u); }, fn:function(x){ var u=a*x+b; return Math.sin(u*u); } }; },
+    function(){ var k=pick([2,3,4,5,6]); return { display:'e<sup>cos('+k+'x)</sup>', derivFn:function(x){ return -k*Math.sin(k*x)*Math.exp(Math.cos(k*x)); }, fn:function(x){ return Math.exp(Math.cos(k*x)); } }; },
+    function(){ var k=pick([1,2,3]), n=pick([2,3]); var kstr=(k===1)?'':k; return { display:'(e<sup>'+kstr+'x</sup>+1)<sup>'+n+'</sup>', derivFn:function(x){ return n*k*Math.exp(k*x)*Math.pow(Math.exp(k*x)+1,n-1); }, fn:function(x){ return Math.pow(Math.exp(k*x)+1,n); } }; }
+  ];
+
+  // Exposed purely so a headless self-test can exercise these pure generator
+  // functions directly (random coefficients, no DOM/timers involved).
+  window.__chainGen = { genChainLinear: genChainLinear, CHAIN_LINEAR_KINDS: CHAIN_LINEAR_KINDS, CHAIN_EXPERT_GENERATORS: CHAIN_EXPERT_GENERATORS };
+
+  var FIELD_MODE = 'learner';
+  var score = 0, asked = 0, ROUND_SIZE = 6, current = null;
+
+  function newProblem(){
+    current = (FIELD_MODE === 'expert') ? pick(CHAIN_EXPERT_GENERATORS)() : genChainLinear(pick(CHAIN_LINEAR_KINDS));
+    renderProblem();
+  }
+
+  function renderProblem(){
+    var card = document.getElementById('problemCard-chain');
+    var html = '<p class="problem-text">' + ((FIELD_MODE === 'learner') ? ('y = ' + current.display) : ('Differentiate y = ' + current.display)) + '</p>';
+
+    if(FIELD_MODE === 'learner'){
+      html += '<div class="field-row"><label>Outer function type</label>' +
+        '<select id="outerSelect-chain">' +
+        '<option value="" selected disabled>Choose&hellip;</option>' +
+        CHAIN_LINEAR_KINDS.map(function(k){ return '<option value="'+k+'">'+OUTER_LABEL[k]+'</option>'; }).join('') +
+        '</select></div>' +
+        '<div class="field-row"><label>Inner function (the bit inside the brackets)</label>' +
+        '<input type="text" id="innerInput-chain" autocomplete="off" spellcheck="false" placeholder="e.g. 3x+1"></div>';
+    } else {
+      html += '<div class="field-row"><label>dy/dx =</label>' +
+        '<input type="text" id="derivInput-chain" autocomplete="off" spellcheck="false" placeholder="type your answer"></div>' +
+        '<p class="field-hint">Always put brackets around a function’s input, e.g. sin(4x) not sin4x. Use ^ for powers, e.g. x^2 or (3x+1)^4. sec^2(2x) and (sec(2x))^2 both work.</p>';
+    }
+
+    html += '<div class="actions-row"><button class="check-btn" id="checkBtn-chain" type="button">Check</button>' +
+      '<span class="feedback" id="feedback-chain" aria-live="polite"></span></div>';
+
+    card.innerHTML = html;
+    document.getElementById('checkBtn-chain').addEventListener('click', checkAnswer);
+    card.querySelectorAll('input').forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+    });
+    var focusEl = card.querySelector('select, input');
+    if(focusEl) focusEl.focus();
+  }
+
+  function checkAnswer(){
+    var card = document.getElementById('problemCard-chain');
+    var feedback = document.getElementById('feedback-chain');
+    var checkBtn = document.getElementById('checkBtn-chain');
+    var allOk = true, message = '';
+
+    if(FIELD_MODE === 'learner'){
+      var outerEl = document.getElementById('outerSelect-chain');
+      var innerEl = document.getElementById('innerInput-chain');
+      var outerOk = outerEl.value === current.outerType;
+      outerEl.classList.remove('ok','bad'); outerEl.classList.add(outerOk?'ok':'bad');
+      if(!outerOk){ allOk=false; message = message || 'That’s not quite the outer function type — look at the LAST operation you’d do.'; }
+      var innerOk = expressionsMatch(innerEl.value, current.innerFn);
+      innerEl.classList.remove('ok','bad'); innerEl.classList.add(innerOk?'ok':'bad');
+      if(!innerOk){ allOk=false; message = message || 'The inner function isn’t quite right yet.'; }
+    } else {
+      var derivEl = document.getElementById('derivInput-chain');
+      var derivOk = expressionsMatch(derivEl.value, current.derivFn);
+      derivEl.classList.remove('ok','bad'); derivEl.classList.add(derivOk?'ok':'bad');
+      if(!derivOk){ allOk=false; message = message || 'Not quite — check your chain rule steps and try again.'; }
+    }
+
+    asked++;
+    if(allOk){
+      score++; updateScore(); checkBtn.disabled = true;
+      var correctModal = document.getElementById('correctModal');
+      correctModal.hidden = false;
+      setTimeout(function(){
+        correctModal.hidden = true;
+        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+      }, 1000);
+    } else {
+      feedback.textContent = message;
+      asked--;
+    }
+  }
+
+  function updateScore(){
+    document.getElementById('scoreBadge-chain').innerHTML = '<b>'+score+'</b> / '+ROUND_SIZE+' correct this round';
+  }
+
+  function showRoundDone(){
+    var modal = document.getElementById('roundDoneModal');
+    var title = document.getElementById('roundDoneTitle');
+    var summary = document.getElementById('roundDoneSummary');
+    var btn = document.getElementById('roundDoneBtn');
+    if(score === ROUND_SIZE){ title.textContent = "Perfect round!"; summary.textContent = "All " + ROUND_SIZE + " correct — Chain Rule is solid in this mode."; }
+    else { title.textContent = "Round complete"; summary.textContent = score + " out of " + ROUND_SIZE + " correct. Have another go to lock it in."; }
+    btn.onclick = function(){ modal.hidden = true; startRound(); };
+    modal.hidden = false; btn.focus();
+  }
+
+  function startRound(){ score = 0; asked = 0; updateScore(); newProblem(); }
+
+  document.getElementById('newRoundBtn-chain').addEventListener('click', startRound);
+
+  var panel = document.querySelector('.topic-panel[data-topic="chain"]');
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){ modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode')===FIELD_MODE); }); }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if(m===FIELD_MODE) return;
+      FIELD_MODE = m; updateModeButtons(); startRound();
+    });
+  });
+  updateModeButtons();
+
+  window.formulaLabTopics = window.formulaLabTopics || [];
+  window.formulaLabTopics.push(startRound);
+
+  startRound();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var PR_KIND_POOL = ['pow','exp','sin','cos','ln','tan'];
+
+  function genFactor(kind){
+    if(kind==='pow'){ var n=pick([1,2,3,4]); var str=(n===1)?'x':'x<sup>'+n+'</sup>'; return { str:str, fn:function(x){ return Math.pow(x,n); }, dfn:function(x){ return n*Math.pow(x,n-1); } }; }
+    if(kind==='exp'){ var k=pick([1,2,3,4]); var str=(k===1)?'e<sup>x</sup>':'e<sup>'+k+'x</sup>'; return { str:str, fn:function(x){ return Math.exp(k*x); }, dfn:function(x){ return k*Math.exp(k*x); } }; }
+    if(kind==='sin'){ var k2=pick([1,2,3,4]); var str2=(k2===1)?'sinx':'sin('+k2+'x)'; return { str:str2, fn:function(x){ return Math.sin(k2*x); }, dfn:function(x){ return k2*Math.cos(k2*x); } }; }
+    if(kind==='cos'){ var k3=pick([1,2,3,4]); var str3=(k3===1)?'cosx':'cos('+k3+'x)'; return { str:str3, fn:function(x){ return Math.cos(k3*x); }, dfn:function(x){ return -k3*Math.sin(k3*x); } }; }
+    if(kind==='ln'){ return { str:'lnx', fn:function(x){ return Math.log(x); }, dfn:function(x){ return 1/x; } }; }
+    var k4=pick([1,2,3]); var str4=(k4===1)?'tanx':'tan('+k4+'x)'; return { str:str4, fn:function(x){ return Math.tan(k4*x); }, dfn:function(x){ return k4/Math.pow(Math.cos(k4*x),2); } };
+  }
+  function pickTwoDistinctKinds(){
+    var a = pick(PR_KIND_POOL), b = pick(PR_KIND_POOL), tries=0;
+    while(b===a && tries<10){ b=pick(PR_KIND_POOL); tries++; }
+    return [a,b];
+  }
+  function genProductSimple(){
+    var kinds = pickTwoDistinctKinds();
+    var f1=genFactor(kinds[0]), f2=genFactor(kinds[1]);
+    return { display:f1.str+f2.str, f1:f1, f2:f2, derivFn:function(x){ return f1.dfn(x)*f2.fn(x)+f1.fn(x)*f2.dfn(x); }, fn:function(x){ return f1.fn(x)*f2.fn(x); } };
+  }
+  function genProductExpert(){
+    var variant = pick(['poly2poly2','poly2trans','twoKind']);
+    if(variant==='poly2poly2'){
+      var a=pick([-6,-5,-4,-3,-2,-1,1,2,3,4,5,6]);
+      var b=pick([-8,-7,-6,-5,-4,-3,-2,-1,1,2,3,4,5,6,7,8]);
+      var signA = a>=0 ? ('+'+a) : ('&minus;'+Math.abs(a));
+      var signB = b>=0 ? ('+'+b) : ('&minus;'+Math.abs(b));
+      return { display:'(x'+signA+')(x&sup2;'+signB+')', derivFn:function(x){ return 1*(x*x+b) + (x+a)*(2*x); }, fn:function(x){ return (x+a)*(x*x+b); } };
+    }
+    if(variant==='poly2trans'){
+      var c=pick([-6,-5,-4,-3,-2,-1,1,2,3,4,5,6]);
+      var signC = c>=0 ? ('+'+c) : ('&minus;'+Math.abs(c));
+      var kind=pick(['exp','sin','cos','ln','tan']);
+      var g=genFactor(kind);
+      return { display:'(x&sup2;'+signC+')'+g.str, derivFn:function(x){ return 2*x*g.fn(x) + (x*x+c)*g.dfn(x); }, fn:function(x){ return (x*x+c)*g.fn(x); } };
+    }
+    return genProductSimple();
+  }
+
+  // Exposed purely so a headless self-test can exercise these pure generator
+  // functions directly (random coefficients, no DOM/timers involved).
+  window.__productGen = { genFactor: genFactor, pickTwoDistinctKinds: pickTwoDistinctKinds, genProductSimple: genProductSimple, genProductExpert: genProductExpert };
+
+  var FIELD_MODE = 'learner';
+  var score=0, asked=0, ROUND_SIZE=6, current=null;
+
+  function newProblem(){
+    current = (FIELD_MODE === 'expert') ? genProductExpert() : genProductSimple();
+    renderProblem();
+  }
+
+  function renderProblem(){
+    var card = document.getElementById('problemCard-product');
+    var html = '<p class="problem-text">' + ((FIELD_MODE==='learner') ? ('y = '+current.display) : ('Differentiate y = '+current.display)) + '</p>';
+
+    if(FIELD_MODE==='learner'){
+      html += '<div class="field-row"><label>u =</label><input type="text" id="uInput-product" autocomplete="off" spellcheck="false" placeholder="first factor"></div>' +
+        '<div class="field-row"><label>v =</label><input type="text" id="vInput-product" autocomplete="off" spellcheck="false" placeholder="second factor"></div>' +
+        '<p class="field-hint">Order doesn’t matter &mdash; either factor can go in u or v.</p>';
+    } else {
+      html += '<div class="field-row"><label>dy/dx =</label><input type="text" id="derivInput-product" autocomplete="off" spellcheck="false" placeholder="type your answer"></div>' +
+        '<p class="field-hint">Always put brackets around a function’s input, e.g. sin(4x) not sin4x. Use ^ for powers.</p>';
+    }
+
+    html += '<div class="actions-row"><button class="check-btn" id="checkBtn-product" type="button">Check</button>' +
+      '<span class="feedback" id="feedback-product" aria-live="polite"></span></div>';
+
+    card.innerHTML = html;
+    document.getElementById('checkBtn-product').addEventListener('click', checkAnswer);
+    card.querySelectorAll('input').forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+    });
+    var focusEl = card.querySelector('input');
+    if(focusEl) focusEl.focus();
+  }
+
+  function checkAnswer(){
+    var card = document.getElementById('problemCard-product');
+    var feedback = document.getElementById('feedback-product');
+    var checkBtn = document.getElementById('checkBtn-product');
+    var allOk = true, message = '';
+
+    if(FIELD_MODE==='learner'){
+      var uEl = document.getElementById('uInput-product');
+      var vEl = document.getElementById('vInput-product');
+      var uMatchesF1 = expressionsMatch(uEl.value, current.f1.fn);
+      var uMatchesF2 = expressionsMatch(uEl.value, current.f2.fn);
+      var vMatchesF1 = expressionsMatch(vEl.value, current.f1.fn);
+      var vMatchesF2 = expressionsMatch(vEl.value, current.f2.fn);
+      var pairOk = (uMatchesF1 && vMatchesF2) || (uMatchesF2 && vMatchesF1);
+      uEl.classList.remove('ok','bad'); vEl.classList.remove('ok','bad');
+      uEl.classList.add(pairOk?'ok':'bad'); vEl.classList.add(pairOk?'ok':'bad');
+      if(!pairOk){ allOk=false; message='Check u and v against the two factors in y.'; }
+    } else {
+      var derivEl = document.getElementById('derivInput-product');
+      var derivOk = expressionsMatch(derivEl.value, current.derivFn);
+      derivEl.classList.remove('ok','bad'); derivEl.classList.add(derivOk?'ok':'bad');
+      if(!derivOk){ allOk=false; message='Not quite — check u’v + uv’ and try again.'; }
+    }
+
+    asked++;
+    if(allOk){
+      score++; updateScore(); checkBtn.disabled = true;
+      var correctModal = document.getElementById('correctModal');
+      correctModal.hidden = false;
+      setTimeout(function(){
+        correctModal.hidden = true;
+        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+      }, 1000);
+    } else {
+      feedback.textContent = message;
+      asked--;
+    }
+  }
+
+  function updateScore(){ document.getElementById('scoreBadge-product').innerHTML = '<b>'+score+'</b> / '+ROUND_SIZE+' correct this round'; }
+
+  function showRoundDone(){
+    var modal = document.getElementById('roundDoneModal');
+    var title = document.getElementById('roundDoneTitle');
+    var summary = document.getElementById('roundDoneSummary');
+    var btn = document.getElementById('roundDoneBtn');
+    if(score===ROUND_SIZE){ title.textContent="Perfect round!"; summary.textContent="All "+ROUND_SIZE+" correct — Product Rule is solid in this mode."; }
+    else { title.textContent="Round complete"; summary.textContent=score+" out of "+ROUND_SIZE+" correct. Have another go to lock it in."; }
+    btn.onclick = function(){ modal.hidden=true; startRound(); };
+    modal.hidden=false; btn.focus();
+  }
+
+  function startRound(){ score=0; asked=0; updateScore(); newProblem(); }
+
+  document.getElementById('newRoundBtn-product').addEventListener('click', startRound);
+
+  var panel = document.querySelector('.topic-panel[data-topic="product"]');
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){ modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode')===FIELD_MODE); }); }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m=b.getAttribute('data-mode');
+      if(m===FIELD_MODE) return;
+      FIELD_MODE=m; updateModeButtons(); startRound();
+    });
+  });
+  updateModeButtons();
+
+  window.formulaLabTopics = window.formulaLabTopics || [];
+  window.formulaLabTopics.push(startRound);
+
+  startRound();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var topicSelect = document.getElementById('topicSelect');
+  topicSelect.addEventListener('change', function(){
+    var id = topicSelect.value;
+    document.querySelectorAll('.topic-panel').forEach(function(p){
+      p.hidden = (p.getAttribute('data-topic') !== id);
+    });
+  });
+
+  document.getElementById('newStudentBtn').addEventListener('click', function(){
+    (window.formulaLabTopics || []).forEach(function(fn){ fn(); });
+  });
+
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      var modal = document.getElementById('roundDoneModal');
+      if(!modal.hidden){ document.getElementById('roundDoneBtn').click(); }
+    }
+  });
+})();
+</script>
+</body>
+</html>
