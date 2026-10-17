@@ -4,10 +4,12 @@
 !index.html
 !amech/mech-lab.html
 !amech/formula-lab.html
+!amech/daily-recap.html
 !amech/*.jpg
 !amech/*.JPG
 !awave/wave-lab.html
 !awave/formula-lab.html
+!awave/daily-recap.html
 !aelec/elec-lab.html
 !aelec/formula-lab.html
 !aelec/Images/*.jpg
