@@ -207,8 +207,11 @@
           <option value="plate">Plate Capacitance</option>
           <option value="ecap">Capacitor Energy</option>
           <option value="rc">RC Time Constant</option>
+          <option value="qtau">Charge at One Time Constant</option>
           <option value="cser">Series Capacitors</option>
           <option value="cpar">Parallel Capacitors</option>
+          <option value="xc">Capacitive Reactance</option>
+          <option value="zrc">RC Impedance</option>
         </optgroup>
         <optgroup label="Inductors and induction">
           <option value="selfemf">Self-Induced EMF</option>
@@ -217,6 +220,8 @@
           <option value="lr">LR Time Constant</option>
           <option value="lenergy">Inductor Energy</option>
           <option value="xfmr">Transformer</option>
+          <option value="xl">Inductive Reactance</option>
+          <option value="f0">Resonant Frequency</option>
         </optgroup>
       </select>
       <button class="ghost-btn danger-btn" id="newStudentBtn" type="button">New student &mdash; clear everything</button>
@@ -415,6 +420,19 @@
     <div class="problem-card" id="problemCard-rc"></div>
   </section>
 
+  <section class="topic-panel" data-topic="qtau" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-qtau"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-qtau" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-qtau"></div>
+  </section>
+
   <section class="topic-panel" data-topic="cser" hidden>
     <div class="toprow">
       <span class="badge" id="scoreBadge-cser"><b>0</b> / 6 correct this round</span>
@@ -439,6 +457,32 @@
       <button class="ghost-btn" id="newRoundBtn-cpar" type="button">New round</button>
     </div>
     <div class="problem-card" id="problemCard-cpar"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="xc" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-xc"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-xc" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-xc"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="zrc" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-zrc"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-zrc" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-zrc"></div>
   </section>
 
   <section class="topic-panel" data-topic="selfemf" hidden>
@@ -517,6 +561,32 @@
       <button class="ghost-btn" id="newRoundBtn-xfmr" type="button">New round</button>
     </div>
     <div class="problem-card" id="problemCard-xfmr"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="xl" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-xl"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-xl" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-xl"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="f0" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-f0"><b>0</b> / 6 correct this round</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick the rearranged formula from a list. Confident: write the rearranged formula yourself. Expert: no formula shown -- just solve it.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="newRoundBtn-f0" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-f0"></div>
   </section>
 </div>
 
@@ -4814,8 +4884,12 @@
 // Shared data first, then one buildFormulaTopic() call per topic.
 // ---------------------------------------------------------------
 var CAP_E0 = 8.85e-12;
-var CAP_SHEET_OPTIONS = ['Q = CV', 'C = ε₀εᵣA ÷ d', 'E = ½QV', 'τ = RC', 'CT = C1 + C2 + C3', '1/CT = 1/C1 + 1/C2 + 1/C3', 'V = IR', 'Q = It'];
-var CAP_C_POOL = [10e-6, 22e-6, 47e-6, 100e-6, 150e-6, 220e-6, 470e-6, 1000e-6, 2200e-6];
+var CAP_SHEET_OPTIONS = ['Q = CV', 'C = ε₀εᵣA ÷ d', 'E = ½QV', 'τ = RC', 'CT = C1 + C2 + C3', '1/CT = 1/C1 + 1/C2 + 1/C3', 'Xc = 1 ÷ (2πfC)', 'Z = √(R² + Xc²)', 'V = IR', 'Q = It'];
+// Mostly uF-scale, but a couple of nF values are mixed in deliberately --
+// capMicro() shows those as "185 nF (1.85 x 10-7 F)", same dual format as
+// the real exam, so the uF/nF/pF conversion trap gets genuine practice
+// across every topic that draws from this pool, not just reactance.
+var CAP_C_POOL = [10e-6, 22e-6, 47e-6, 100e-6, 150e-6, 220e-6, 470e-6, 1000e-6, 2200e-6, 100e-9, 470e-9, 185e-9];
 var CAP_V_POOL = [1.5, 3, 4.5, 6, 9, 12, 24, 50];
 var CAP_UNIT_ALIASES = {
   C: ['f', 'farad', 'farads'],
@@ -4826,12 +4900,19 @@ var CAP_UNIT_ALIASES = {
   tau: ['s', 'sec', 'secs', 'second', 'seconds'],
   A: ['m2', 'm^2', 'm²', 'square metres', 'square meters', 'square metre'],
   d: ['m', 'metre', 'metres', 'meter', 'meters'],
-  er: ['', 'none', 'no unit', 'no units', 'nounit', '-']
+  er: ['', 'none', 'no unit', 'no units', 'nounit', '-'],
+  f: ['hz', 'hertz'],
+  Xc: ['ω', 'ohm', 'ohms'],
+  Z: ['ω', 'ohm', 'ohms']
 };
 // Capacitances that came from the pool read as µF in the question text,
 // the way NZQA writes them; anything tiny stays in standard form.
 function capMicro(v){
-  if(v >= 1e-7 && v < 1){ return sig3(v*1e6) + ' µF'; }
+  if(v >= 1e-6 && v < 1){ return sig3(v*1e6) + ' µF'; }
+  // Sub-1uF values get both forms together, the way NZQA itself writes
+  // them (eg "185 nF (1.85 x 10-7 F)") -- a deliberate trap for the
+  // uF/nF/pF conversion slip, since the F value is given right alongside.
+  if(v >= 1e-13 && v < 1e-6){ return sig3(v*1e9) + ' nF (' + sig3(v) + ' F)'; }
   return null;
 }
 function capPerms(factors){
@@ -5061,6 +5142,77 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
 </script>
 
 <script>
+// ---------------------------------------------------------------
+// Charge at one time constant (added 2026-10-17). Deliberately targets
+// the 63%/37% trap: Qmax = CV is only the FINAL charge, not the charge
+// after one time constant -- confirmed Achieved evidence (2023 exam
+// schedule: "Q at tau1 = 1.75e-7 C" against Qmax = 2.78e-7 C, i.e. the
+// 63% multiplier, not 1-1/e). The Learner-mode decoy "Qt = CV" (no 0.63)
+// is the exact trap, offered deliberately as a wrong choice.
+// ---------------------------------------------------------------
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'qtau', dataTopic: 'qtau',
+    keys: ['C','V','Qtau'], targets: ['Qtau','C','V'],
+    CLR: { C: capColor('#6B2BB0','#B27FE8'), V: capColor('#2B6CB0','#7FB2E8'), Qtau: capColor('#5A2BB0','#A07FE8') },
+    LABEL: { C:'C', V:'V', Qtau:'Qτ' },
+    NAME: { C:'capacitance', V:'voltage', Qtau:'charge at one time constant' },
+    UNIT: { C:'F', V:'V', Qtau:'C' },
+    NAME_ALIASES: {
+      C: ['capacitance'],
+      V: ['voltage', 'potential difference', 'pd'],
+      Qtau: ['charge at one time constant', 'charge at 1 time constant', 'charge after one time constant', 'charge at tau']
+    },
+    SYMBOL_ALIASES: { C: ['c'], V: ['v'], Qtau: ['qtau', 'qτ', 'q(tau)', 'qattau'] },
+    UNIT_ALIASES: { C: CAP_UNIT_ALIASES.C, V: CAP_UNIT_ALIASES.V, Qtau: CAP_UNIT_ALIASES.Q },
+    scenarioFmt: function(k, v){
+      if(k === 'C') return capMicro(v);
+      return null;
+    },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    // The original-formula step checks against Q = CV -- the real formula on
+    // the NZQA sheet -- since the 0.63 multiplier itself isn't a sheet
+    // formula, it's a memorised fact (charge reaches 63% of max after one
+    // time constant) that gets folded into the REARRANGED formula instead.
+    formulaOriginalOk: ['q=cv', 'q=vc'],
+    formulaOk: {
+      Qtau: ['qtau=0.63cv', 'qtau=0.63vc'],
+      C: ['c=qtau/(0.63v)'],
+      V: ['v=qtau/(0.63c)']
+    },
+    formulaCorrectDisplay: { Qtau: 'Qτ = 0.63 × CV', C: 'C = Qτ ÷ (0.63V)', V: 'V = Qτ ÷ (0.63C)' },
+    formulaChoices: {
+      Qtau: ['Qτ = 0.63 × CV', 'Qτ = CV', 'Qτ = CV ÷ 0.63'],
+      C: ['C = Qτ ÷ (0.63V)', 'C = 0.63 × QτV', 'C = Qτ ÷ V'],
+      V: ['V = Qτ ÷ (0.63C)', 'V = 0.63 × QτC', 'V = Qτ ÷ C']
+    },
+    scenarios: {
+      Qtau: [
+        "A {C} capacitor is charged from flat through a resistor by a {V} battery. Calculate the charge on the capacitor after exactly one time constant has passed.",
+        "A {C} capacitor charges towards a {V} supply. Calculate how much charge has accumulated on its plates after one time constant (63% of the way to full charge).",
+        "A camera's {C} capacitor charges towards {V}. Find the charge stored after one time constant of charging.",
+      ],
+      C: [
+        "A capacitor charges towards {V}. After one time constant, it holds {Qtau} of charge. Calculate its capacitance.",
+      ],
+      V: [
+        "A {C} capacitor holds {Qtau} of charge after one time constant of charging. Calculate the supply voltage.",
+      ]
+    },
+    generate: function(){
+      var C = pick(CAP_C_POOL);
+      var V = pick(CAP_V_POOL);
+      return { C: C, V: V, Qtau: 0.63*C*V };
+    }
+  });
+})();
+</script>
+
+<script>
 (function(){
   "use strict";
   buildFormulaTopic({
@@ -5084,6 +5236,11 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
         "A {C1} capacitor and a {C2} capacitor are connected in series. Calculate the total capacitance.",
         "Two capacitors, {C1} and {C2}, are joined in series in a filter circuit. Find their combined capacitance.",
         "A technician connects a {C1} capacitor in series with a {C2} capacitor. Calculate the total capacitance.",
+        // Deliberately avoids the word "series" -- tests whether the student
+        // can recognise the wiring from a physical description, the trap
+        // being to reach for CT = C1 + C2 just because two values are given.
+        "A {C1} capacitor and a {C2} capacitor are wired end to end along a single path, so the same charge builds up on every plate. Calculate the total capacitance.",
+        "A {C1} capacitor is connected directly to a {C2} capacitor, with no other path for the current to take between them. Find the total capacitance of the pair.",
       ]
     },
     generate: function(){
@@ -5121,6 +5278,11 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
         "Capacitors of {C1}, {C2} and {C3} are connected in parallel. Calculate the total capacitance.",
         "An audio amplifier has {C1}, {C2} and {C3} capacitors wired in parallel. Find the combined capacitance.",
         "A technician connects {C1}, {C2} and {C3} capacitors side by side in parallel. Calculate the total capacitance.",
+        // Deliberately avoids the word "parallel" -- the trap is reaching
+        // for the reciprocal-sum rule just because three values are given,
+        // when the description actually describes separate branches.
+        "Capacitors of {C1}, {C2} and {C3} are each connected directly across the same two supply terminals. Calculate the total capacitance.",
+        "Three capacitors, {C1}, {C2} and {C3}, are wired as separate branches between the same two points in a circuit. Find the total capacitance.",
       ]
     },
     generate: function(){
@@ -5130,6 +5292,127 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
   });
 })();
 </script>
+
+<script>
+// ---------------------------------------------------------------
+// Capacitive reactance / RC impedance (added 2026-10-17). Scope checked
+// against the real 2021-2025 91526 exams: Xc = 1/(2πfC) and, for an RC
+// series circuit, Z = √(R² + Xc²) are both Achieved (2023 exam Q3(a) is a
+// "show that Xc = ..., hence determine Z" question, marked Achieved for
+// correct Xc and correct Z). Finding current from Z is Merit, not built here.
+// ---------------------------------------------------------------
+var CAP_F_POOL = [50, 60, 100, 200, 400, 500, 800, 1000, 2000, 5000, 8000, 10000, 20000];
+var CAP_AC_C_POOL = [0.001e-6, 0.0047e-6, 0.01e-6, 0.047e-6, 0.1e-6, 0.47e-6, 1e-6, 1.2e-6, 2.2e-6, 4.7e-6, 10e-6];
+</script>
+
+<script>
+(function(){
+  "use strict";
+  function recipForms(lhs, den){
+    return capPerms(den).map(function(d){ return lhs+'=1/('+d+')'; });
+  }
+  var xcForms = recipForms('xc', ['2','pi','f','c']);
+  var fForms = recipForms('f', ['2','pi','c','xc']);
+  var cForms = recipForms('c', ['2','pi','f','xc']);
+  buildFormulaTopic({
+    idSuffix: 'xc', dataTopic: 'xc',
+    keys: ['f','C','Xc'], targets: ['Xc','f','C'],
+    CLR: { f: capColor('#2B6CB0','#7FB2E8'), C: capColor('#6B2BB0','#B27FE8'), Xc: capColor('#B0562B','#E8A67F') },
+    LABEL: { f:'f', C:'C', Xc:'Xc' },
+    NAME: { f:'frequency', C:'capacitance', Xc:'capacitive reactance' },
+    UNIT: { f:'Hz', C:'F', Xc:'Ω' },
+    NAME_ALIASES: { f: ['frequency'], C: ['capacitance'], Xc: ['capacitive reactance', 'reactance'] },
+    SYMBOL_ALIASES: { f: ['f'], C: ['c'], Xc: ['xc'] },
+    UNIT_ALIASES: { f: CAP_UNIT_ALIASES.f, C: CAP_UNIT_ALIASES.C, Xc: CAP_UNIT_ALIASES.Xc },
+    scenarioFmt: function(k, v){
+      if(k === 'C') return capMicro(v);
+      if(k === 'f' && v >= 1000) return sig3(v/1000) + ' kHz';
+      if(k === 'Xc' && v >= 1000) return sig3(v/1000) + ' kΩ';
+      return null;
+    },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: xcForms,
+    formulaOk: { Xc: xcForms, f: fForms, C: cForms },
+    formulaCorrectDisplay: { Xc: 'Xc = 1 ÷ (2πfC)', f: 'f = 1 ÷ (2πCXc)', C: 'C = 1 ÷ (2πfXc)' },
+    formulaChoices: {
+      Xc: ['Xc = 1 ÷ (2πfC)', 'Xc = 2πfC', 'Xc = fC ÷ 2π'],
+      f: ['f = 1 ÷ (2πCXc)', 'f = 2πCXc', 'f = Xc ÷ (2πC)'],
+      C: ['C = 1 ÷ (2πfXc)', 'C = 2πfXc', 'C = Xc ÷ (2πf)']
+    },
+    scenarios: {
+      Xc: [
+        "A {C} capacitor is connected to a signal generator operating at {f}. Calculate the capacitive reactance of the capacitor.",
+        "A {C} capacitor is used in a filter circuit at a frequency of {f}. Find the capacitive reactance.",
+      ],
+      f: [
+        "A {C} capacitor has a capacitive reactance of {Xc} at a certain frequency. Calculate that frequency.",
+        "In an AC circuit, a {C} capacitor has a reactance of {Xc}. Find the frequency of the supply.",
+      ],
+      C: [
+        "A capacitor has a capacitive reactance of {Xc} at a frequency of {f}. Calculate its capacitance.",
+        "An unknown capacitor has a reactance of {Xc} when driven at {f}. Find its capacitance.",
+      ]
+    },
+    generate: function(){
+      var f = pick(CAP_F_POOL);
+      var C = pick(CAP_AC_C_POOL);
+      return { f: f, C: C, Xc: 1/(2*Math.PI*f*C) };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'zrc', dataTopic: 'zrc',
+    keys: ['R','Xc','Z'], targets: ['Z','R','Xc'],
+    CLR: { R: capColor('#1B8A6B','#5FD1AC'), Xc: capColor('#B0562B','#E8A67F'), Z: capColor('#8A2B6C','#D67FB2') },
+    LABEL: { R:'R', Xc:'Xc', Z:'Z' },
+    NAME: { R:'resistance', Xc:'capacitive reactance', Z:'impedance' },
+    UNIT: { R:'Ω', Xc:'Ω', Z:'Ω' },
+    NAME_ALIASES: { R: ['resistance'], Xc: ['capacitive reactance', 'reactance'], Z: ['impedance'] },
+    SYMBOL_ALIASES: { R: ['r'], Xc: ['xc'], Z: ['z'] },
+    UNIT_ALIASES: { R: CAP_UNIT_ALIASES.R, Xc: CAP_UNIT_ALIASES.Xc, Z: CAP_UNIT_ALIASES.Z },
+    scenarioFmt: function(k, v){
+      if(v >= 1000) return sig3(v/1000) + ' kΩ';
+      return null;
+    },
+    formulaSheetOptions: CAP_SHEET_OPTIONS,
+    formulaOriginalOk: ['z=sqrt(r^2+xc^2)', 'z=sqrt(xc^2+r^2)'],
+    formulaOk: {
+      Z: ['z=sqrt(r^2+xc^2)', 'z=sqrt(xc^2+r^2)'],
+      R: ['r=sqrt(z^2-xc^2)'],
+      Xc: ['xc=sqrt(z^2-r^2)']
+    },
+    formulaCorrectDisplay: { Z: 'Z = √(R² + Xc²)', R: 'R = √(Z² − Xc²)', Xc: 'Xc = √(Z² − R²)' },
+    formulaChoices: {
+      Z: ['Z = √(R² + Xc²)', 'Z = R + Xc', 'Z = √(R² − Xc²)'],
+      R: ['R = √(Z² − Xc²)', 'R = Z − Xc', 'R = √(Z² + Xc²)'],
+      Xc: ['Xc = √(Z² − R²)', 'Xc = Z − R', 'Xc = √(Z² + R²)']
+    },
+    scenarios: {
+      Z: [
+        "A {R} resistor and a capacitor with reactance {Xc} are connected in series in an AC circuit. Calculate the impedance of the circuit.",
+        "In an AC circuit, a lamp of resistance {R} is in series with a capacitor of reactance {Xc}. Find the impedance of the circuit.",
+      ],
+      R: [
+        "An AC circuit has an impedance of {Z} and a capacitor with reactance {Xc}. Calculate the resistance in the circuit.",
+      ],
+      Xc: [
+        "An AC circuit has an impedance of {Z} and a resistor of {R}. Calculate the capacitive reactance of the capacitor.",
+      ]
+    },
+    generate: function(){
+      var R = pick([10, 15, 22, 33, 47, 68, 100]);
+      var Xc = pick([5, 10, 15, 20, 30, 50, 75, 100, 150, 220, 330, 470, 663]);
+      return { R: R, Xc: Xc, Z: Math.sqrt(R*R + Xc*Xc) };
+    }
+  });
+})();
+</script>
+
 <script>
 // ---------------------------------------------------------------
 // Level 3 electromagnetic induction / inductor topics (added 2026-09-25).
@@ -5139,7 +5422,9 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
 // law), so sizes are calculated and a formula with or without the minus
 // sign is accepted.
 // ---------------------------------------------------------------
-var IND_SHEET_OPTIONS = ['ε = −L ΔI ÷ Δt', 'φ = BA', 'ε = −Δφ ÷ Δt', 'τ = L ÷ R', 'E = ½LI²', 'Np ÷ Ns = Vp ÷ Vs', 'τ = RC', 'Q = CV'];
+var IND_SHEET_OPTIONS = ['ε = −L ΔI ÷ Δt', 'φ = BA', 'ε = −Δφ ÷ Δt', 'τ = L ÷ R', 'E = ½LI²', 'Np ÷ Ns = Vp ÷ Vs', 'XL = 2πfL', 'f0 = 1 ÷ (2π√(LC))', 'τ = RC', 'Q = CV'];
+var IND_F_POOL = [50, 100, 200, 325, 500, 800, 1000, 2000];
+var IND_AC_L_POOL = [0.05, 0.1, 0.2, 0.4, 0.6, 0.8, 1.0];
 var IND_L_POOL = [0.05, 0.1, 0.25, 0.4, 0.6, 0.8, 1.2, 1.6, 2.4];
 var IND_DT_POOL = [0.01, 0.02, 0.04, 0.05, 0.1, 0.2, 0.3, 0.4];
 var IND_UNIT_ALIASES = {
@@ -5158,7 +5443,10 @@ var IND_UNIT_ALIASES = {
   Np: ['', 'turns', 'turn', 'none', 'no unit', 'no units'],
   Ns: ['', 'turns', 'turn', 'none', 'no unit', 'no units'],
   Vp: ['v', 'volt', 'volts'],
-  Vs: ['v', 'volt', 'volts']
+  Vs: ['v', 'volt', 'volts'],
+  f: ['hz', 'hertz'],
+  XL: ['ω', 'ohm', 'ohms'],
+  f0: ['hz', 'hertz']
 };
 // Every accepted typed form of "lhs = num / den": factor orders, optional
 // brackets, and (for EMF formulae) an optional minus sign.
@@ -5493,6 +5781,110 @@ function indArea(v){
     generate: function(){
       var pair = pick([[230, 1150, 60], [240, 4800, 240], [230, 2300, 120], [240, 1200, 60], [12, 50, 1000], [11000, 5500, 110], [230, 460, 24], [120, 600, 1500]]);
       return { Vp: pair[0], Np: pair[1], Ns: pair[2], Vs: pair[0]*pair[2]/pair[1] };
+    }
+  });
+})();
+</script>
+
+<script>
+// ---------------------------------------------------------------
+// Inductive reactance / resonant frequency (added 2026-10-17). Scope
+// checked against the real 2023 91526 exam Q3(c)/(d): XL = 2πfL and
+// f0 = 1/(2π√(LC)) (the frequency at which XL = Xc) are both Achieved --
+// that exam's only Achieved evidence for part (c) is the numeric f0
+// answer, with no rearrangement for L or C expected at any grade, so f0
+// is built as a forward-only calculation here, unlike the other topics.
+// ---------------------------------------------------------------
+</script>
+
+<script>
+(function(){
+  "use strict";
+  buildFormulaTopic({
+    idSuffix: 'xl', dataTopic: 'xl',
+    keys: ['f','L','XL'], targets: ['XL','f','L'],
+    CLR: { f: capColor('#2B6CB0','#7FB2E8'), L: capColor('#8A2B6C','#D67FB2'), XL: capColor('#B0562B','#E8A67F') },
+    LABEL: { f:'f', L:'L', XL:'XL' },
+    NAME: { f:'frequency', L:'inductance', XL:'inductive reactance' },
+    UNIT: { f:'Hz', L:'H', XL:'Ω' },
+    NAME_ALIASES: { f: ['frequency'], L: ['inductance', 'self-inductance'], XL: ['inductive reactance', 'reactance'] },
+    SYMBOL_ALIASES: { f: ['f'], L: ['l'], XL: ['xl'] },
+    UNIT_ALIASES: { f: IND_UNIT_ALIASES.f, L: IND_UNIT_ALIASES.L, XL: IND_UNIT_ALIASES.XL },
+    scenarioFmt: function(k, v){
+      if(k === 'XL' && v >= 1000) return sig3(v/1000) + ' kΩ';
+      return null;
+    },
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: indForms('xl', ['2','pi','f','l'], [], false),
+    formulaOk: {
+      XL: indForms('xl', ['2','pi','f','l'], [], false),
+      f: indForms('f', ['xl'], ['2','pi','l'], false),
+      L: indForms('l', ['xl'], ['2','pi','f'], false)
+    },
+    formulaCorrectDisplay: { XL: 'XL = 2πfL', f: 'f = XL ÷ (2πL)', L: 'L = XL ÷ (2πf)' },
+    formulaChoices: {
+      XL: ['XL = 2πfL', 'XL = 1 ÷ (2πfL)', 'XL = fL ÷ 2π'],
+      f: ['f = XL ÷ (2πL)', 'f = 2πLXL', 'f = XL × 2πL'],
+      L: ['L = XL ÷ (2πf)', 'L = 2πfXL', 'L = XL × 2πf']
+    },
+    scenarios: {
+      XL: [
+        "A {L} inductor is connected to an AC supply at {f}. Calculate its inductive reactance.",
+        "A coil with inductance {L} is used in a circuit operating at {f}. Find the inductive reactance.",
+      ],
+      f: [
+        "An inductor of {L} has an inductive reactance of {XL}. Calculate the frequency of the AC supply.",
+      ],
+      L: [
+        "A coil has an inductive reactance of {XL} at a frequency of {f}. Calculate its inductance.",
+      ]
+    },
+    generate: function(){
+      var f = pick(IND_F_POOL);
+      var L = pick(IND_AC_L_POOL);
+      return { f: f, L: L, XL: 2*Math.PI*f*L };
+    }
+  });
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var f0Forms = capPerms(['2','pi','sqrt(lc)']).concat(capPerms(['2','pi','sqrt(cl)'])).map(function(d){ return 'f0=1/('+d+')'; });
+  buildFormulaTopic({
+    idSuffix: 'f0', dataTopic: 'f0',
+    keys: ['L','C','f0'], targets: ['f0'],
+    CLR: { L: capColor('#8A2B6C','#D67FB2'), C: capColor('#6B2BB0','#B27FE8'), f0: capColor('#1B8A6B','#5FD1AC') },
+    LABEL: { L:'L', C:'C', f0:'f0' },
+    NAME: { L:'inductance', C:'capacitance', f0:'resonant frequency' },
+    UNIT: { L:'H', C:'F', f0:'Hz' },
+    NAME_ALIASES: { L: ['inductance'], C: ['capacitance'], f0: ['resonant frequency', 'resonance frequency'] },
+    SYMBOL_ALIASES: { L: ['l'], C: ['c'], f0: ['f0', 'fo', 'f naught', 'fnaught'] },
+    UNIT_ALIASES: { L: IND_UNIT_ALIASES.L, C: CAP_UNIT_ALIASES.C, f0: IND_UNIT_ALIASES.f0 },
+    scenarioFmt: function(k, v){
+      if(k === 'C') return capMicro(v);
+      if(k === 'f0' && v >= 1000) return sig3(v/1000) + ' kHz';
+      return null;
+    },
+    formulaSheetOptions: IND_SHEET_OPTIONS,
+    formulaOriginalOk: f0Forms,
+    formulaOk: { f0: f0Forms },
+    formulaCorrectDisplay: { f0: 'f0 = 1 ÷ (2π√(LC))' },
+    formulaChoices: {
+      f0: ['f0 = 1 ÷ (2π√(LC))', 'f0 = 2π√(LC)', 'f0 = 1 ÷ (2πLC)']
+    },
+    scenarios: {
+      f0: [
+        "A {L} inductor and a {C} capacitor are connected in series with a resistor in an AC circuit. Calculate the resonant frequency of the circuit.",
+        "An LC circuit contains a {L} inductor and a {C} capacitor. Find the frequency at which the circuit resonates.",
+        "A radio tuning circuit uses a {L} inductor and a {C} capacitor. Calculate the resonant frequency of the circuit.",
+      ]
+    },
+    generate: function(){
+      var L = pick(IND_AC_L_POOL);
+      var C = pick(CAP_AC_C_POOL);
+      return { L: L, C: C, f0: 1/(2*Math.PI*Math.sqrt(L*C)) };
     }
   });
 })();

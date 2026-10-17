@@ -263,7 +263,7 @@
 
   <section class="topic-panel" data-topic="cap" hidden>
     <div class="toprow">
-      <span class="badge" id="progressBadge-cap"><b>0</b> / 5 done</span>
+      <span class="badge" id="progressBadge-cap"><b>0</b> / 7 done</span>
       <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer. Expert: type everything, nothing given.">
         <button class="mode-btn" data-mode="learner" type="button">Learner</button>
         <button class="mode-btn" data-mode="confident" type="button">Confident</button>
@@ -279,7 +279,7 @@
 
   <section class="topic-panel" data-topic="ind" hidden>
     <div class="toprow">
-      <span class="badge" id="progressBadge-ind"><b>0</b> / 6 done</span>
+      <span class="badge" id="progressBadge-ind"><b>0</b> / 8 done</span>
       <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer. Expert: type everything, nothing given.">
         <button class="mode-btn" data-mode="learner" type="button">Learner</button>
         <button class="mode-btn" data-mode="confident" type="button">Confident</button>
@@ -2162,6 +2162,24 @@
       ],
       definition:"The time constant is how quickly a capacitor charges or discharges through a resistor. It is measured in seconds.",
       colorLight:'#B0562B', colorDark:'#E8A67F', fill:'#B0562B' },
+    { key:'Xc', order:6, name:'Capacitive reactance', symbol:'Xc', unit:'Ω',
+      nameAliases:['capacitive reactance', 'reactance'], symbolAliases:['xc'], unitAliases:['ω', 'ohm', 'ohms'],
+      clues:[
+        "How strongly a capacitor opposes the flow of AC current, at a given frequency.",
+        "Unlike a resistor, a capacitor opposes AC current more at low frequencies and less at high frequencies — what is that frequency-dependent opposition called?",
+        "This quantity is calculated using Xc = 1 ÷ (2πfC) — it falls as the frequency rises.",
+      ],
+      definition:"Capacitive reactance is how strongly a capacitor opposes AC current at a given frequency. It is measured in ohms.",
+      colorLight:'#B0562B', colorDark:'#E8A67F', fill:'#B0562B' },
+    { key:'Z', order:7, name:'Impedance', symbol:'Z', unit:'Ω',
+      nameAliases:['impedance'], symbolAliases:['z'], unitAliases:['ω', 'ohm', 'ohms'],
+      clues:[
+        "The total opposition to AC current in a circuit, combining resistance and reactance together.",
+        "A resistor and a capacitor in series each oppose AC current differently — this quantity is the combined total opposition of the whole circuit.",
+        "This quantity is calculated using Z = √(R² + Xc²) for a resistor and capacitor in series — not simple addition, because the two oppositions are out of phase.",
+      ],
+      definition:"Impedance is the total opposition to AC current in a circuit, combining resistance and reactance. It is measured in ohms.",
+      colorLight:'#8A2B6C', colorDark:'#D67FB2', fill:'#8A2B6C' },
   ];
 
   var FIELD_ORDER = ['name','symbol','unit'];
@@ -2174,7 +2192,7 @@
     return out;
   })();
 
-  var unlocked = {"C": false, "Q": false, "V": false, "E": false, "tau": false};
+  var unlocked = {"C": false, "Q": false, "V": false, "E": false, "tau": false, "Xc": false, "Z": false};
   var FIELD_MODE = 'learner';
   var seenClues = { learner:{}, confident:{}, expert:{} };
   var fullyCycled = { learner:{}, confident:{}, expert:{} };
@@ -2523,6 +2541,24 @@
       ],
       definition:"The time constant is how quickly current in an LR circuit rises or falls. It is measured in seconds.",
       colorLight:'#6B2BB0', colorDark:'#B27FE8', fill:'#6B2BB0' },
+    { key:'XL', order:7, name:'Inductive reactance', symbol:'XL', unit:'Ω',
+      nameAliases:['inductive reactance', 'reactance'], symbolAliases:['xl'], unitAliases:['ω', 'ohm', 'ohms'],
+      clues:[
+        "How strongly an inductor opposes the flow of AC current, at a given frequency.",
+        "Unlike a capacitor, an inductor opposes AC current more at high frequencies and less at low frequencies — what is that frequency-dependent opposition called?",
+        "This quantity is calculated using XL = 2πfL — it rises as the frequency rises.",
+      ],
+      definition:"Inductive reactance is how strongly an inductor opposes AC current at a given frequency. It is measured in ohms.",
+      colorLight:'#8A5A1B', colorDark:'#D1A05F', fill:'#8A5A1B' },
+    { key:'f0', order:8, name:'Resonant frequency', symbol:'f0', unit:'Hz',
+      nameAliases:['resonant frequency', 'resonance frequency'], symbolAliases:['f0', 'fo'], unitAliases:['hz', 'hertz'],
+      clues:[
+        "The one frequency at which an inductor and a capacitor in the same circuit oppose AC current by exactly equal amounts, cancelling each other out.",
+        "A radio tuning circuit is adjusted until it responds strongly to only one station's frequency — what is that special frequency called?",
+        "This quantity is calculated using f0 = 1 ÷ (2π√(LC)) — the frequency where the inductive and capacitive reactances are equal.",
+      ],
+      definition:"Resonant frequency is the frequency at which an inductor's and a capacitor's reactances cancel out, leaving minimum impedance. It is measured in hertz.",
+      colorLight:'#1B8A6B', colorDark:'#5FD1AC', fill:'#1B8A6B' },
   ];
 
   var FIELD_ORDER = ['name','symbol','unit'];
@@ -2535,7 +2571,7 @@
     return out;
   })();
 
-  var unlocked = {"L": false, "phi": false, "B": false, "eps": false, "E": false, "tau": false};
+  var unlocked = {"L": false, "phi": false, "B": false, "eps": false, "E": false, "tau": false, "XL": false, "f0": false};
   var FIELD_MODE = 'learner';
   var seenClues = { learner:{}, confident:{}, expert:{} };
   var fullyCycled = { learner:{}, confident:{}, expert:{} };
