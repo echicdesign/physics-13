@@ -63,6 +63,12 @@
   .status-note{ color:var(--ink-muted); font-size:0.85rem; flex:1 1 220px; }
   .status-actions{ display:flex; gap:8px; margin-left:auto; }
 
+  .sheet-box{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:18px; }
+  .sheet-title{ font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem; margin:0 0 10px; }
+  .sheet-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+  .sheet-item{ font-family:'IBM Plex Mono', monospace; font-size:0.82rem; background:var(--surface-2); border:1px solid var(--border); border-radius:7px; padding:5px 10px; }
+  .sheet-note{ margin:10px 0 0; font-size:0.82rem; color:var(--ink-muted); }
+
   .recap-grid{ display:grid; grid-template-columns:1fr; gap:18px; }
   .recap-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
   .recap-card h3{ font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; margin:0; padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface-2); }
@@ -76,6 +82,32 @@
     <a class="ghost-btn nav-link" href="../">&#127968; All tools</a>
   </div>
   <p class="intro">A handful of questions spread across every mechanics topic, a little at a time, so none of it gets rusty while you're focused on electricity. Each card is the real Formula Lab &mdash; just one topic at a time. You don't need to finish a whole round, one question is enough.</p>
+
+  <div class="sheet-box">
+    <h2 class="sheet-title">Formulas provided in the exam</h2>
+    <div class="sheet-grid">
+      <span class="sheet-item">x<sub>COM</sub> = (m&#8321;x&#8321; + m&#8322;x&#8322;) / (m&#8321; + m&#8322;)</span>
+      <span class="sheet-item">F = ma</span>
+      <span class="sheet-item">p = mv</span>
+      <span class="sheet-item">W = Fd</span>
+      <span class="sheet-item">&Delta;Ep = mg&Delta;h</span>
+      <span class="sheet-item">&Delta;p = F&Delta;t</span>
+      <span class="sheet-item">Fc = mv&sup2; &divide; r</span>
+      <span class="sheet-item">Fg = GMm &divide; r&sup2;</span>
+      <span class="sheet-item">&omega; = &Delta;&theta; &divide; &Delta;t</span>
+      <span class="sheet-item">&alpha; = &Delta;&omega; &divide; &Delta;t</span>
+      <span class="sheet-item">&tau; = I&alpha;</span>
+      <span class="sheet-item">L = I&omega;</span>
+      <span class="sheet-item">&omega; = 2&pi;f</span>
+      <span class="sheet-item">E<sub>K(ROT)</sub> = &frac12;I&omega;&sup2;</span>
+      <span class="sheet-item">T = 2&pi;&radic;(l/g)</span>
+      <span class="sheet-item">T = 2&pi;&radic;(m/k)</span>
+      <span class="sheet-item">F = &minus;ky</span>
+      <span class="sheet-item">Ep = &frac12;ky&sup2;</span>
+      <span class="sheet-item">E<sub>K(LIN)</sub> = &frac12;mv&sup2;</span>
+    </div>
+    <p class="sheet-note">Everything else &mdash; e.g. conservation of momentum itself &mdash; isn't on the sheet as a separate line; you build it from the ones above (that's what the &#129504; topic is for).</p>
+  </div>
 
   <div class="status-row">
     <span class="day-badge" id="dayLabel">Day 1 of 10</span>

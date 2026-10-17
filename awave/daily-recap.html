@@ -63,6 +63,12 @@
   .status-note{ color:var(--ink-muted); font-size:0.85rem; flex:1 1 220px; }
   .status-actions{ display:flex; gap:8px; margin-left:auto; }
 
+  .sheet-box{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:18px; }
+  .sheet-title{ font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem; margin:0 0 10px; }
+  .sheet-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+  .sheet-item{ font-family:'IBM Plex Mono', monospace; font-size:0.82rem; background:var(--surface-2); border:1px solid var(--border); border-radius:7px; padding:5px 10px; }
+  .sheet-note{ margin:10px 0 0; font-size:0.82rem; color:var(--ink-muted); }
+
   .recap-grid{ display:grid; grid-template-columns:1fr; gap:18px; }
   .recap-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; overflow:hidden; }
   .recap-card h3{ font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; margin:0; padding:14px 18px; border-bottom:1px solid var(--border); background:var(--surface-2); }
@@ -76,6 +82,18 @@
     <a class="ghost-btn nav-link" href="../">&#127968; All tools</a>
   </div>
   <p class="intro">A handful of questions spread across every wave-systems topic, a little at a time, so none of it gets rusty while you're focused on electricity. Each card is the real Formula Lab &mdash; just one topic at a time. You don't need to finish a whole round, one question is enough.</p>
+
+  <div class="sheet-box">
+    <h2 class="sheet-title">Formulas provided in the exam</h2>
+    <div class="sheet-grid">
+      <span class="sheet-item">v = f &lambda;</span>
+      <span class="sheet-item">f = 1 / T</span>
+      <span class="sheet-item">d sin&theta; = n &lambda;</span>
+      <span class="sheet-item">n &lambda; = dx / L</span>
+      <span class="sheet-item">f ' = f &times; v<sub>W</sub> &divide; (v<sub>W</sub> &plusmn; v<sub>S</sub>)</span>
+    </div>
+    <p class="sheet-note">Everything else &mdash; beat frequency, standing-wave length rules &mdash; isn't on the sheet. You need to know those (that's what the &#129504; topics above are for).</p>
+  </div>
 
   <div class="status-row">
     <span class="day-badge" id="dayLabel">Day 1 of 10</span>
