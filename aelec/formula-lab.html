@@ -1128,16 +1128,23 @@
       if(unitScaleUsed === null){ allOk = false; message = message || 'Do not forget to write the unit, check it matches your answer.'; }
 
       asked++;
-      if(allOk){
+      if(answerOk && unitScaleUsed !== null){
         score++;
         document.getElementById('scoreBadge-'+id).innerHTML = '<b>'+score+'</b> / '+ROUND_SIZE+' correct this round';
         checkBtn.disabled = true;
         var correctModal = document.getElementById('correctModal');
-        correctModal.hidden = false;
-        setTimeout(function(){
-          correctModal.hidden = true;
-          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-        }, 1000);
+        if(allOk){
+          correctModal.hidden = false;
+          setTimeout(function(){
+            correctModal.hidden = true;
+            if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+          }, 1000);
+        } else {
+          feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+          setTimeout(function(){
+            if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+          }, 2200);
+        }
       } else {
         feedback.textContent = message;
         asked--;
@@ -1570,16 +1577,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -1927,16 +1941,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -2285,16 +2306,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -2643,16 +2671,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -3000,16 +3035,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -3357,16 +3399,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -3720,16 +3769,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -4083,16 +4139,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -4446,16 +4509,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
@@ -4809,16 +4879,23 @@
     if(!unitOk){ allOk = false; message = message || 'Don\'t forget to write the unit — check it matches your answer.'; }
 
     asked++;
-    if(allOk){
+    if(answerOk && unitOk){
       score++;
       updateScore();
       checkBtn.disabled = true;
       var correctModal = document.getElementById('correctModal');
-      correctModal.hidden = false;
-      setTimeout(function(){
-        correctModal.hidden = true;
-        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
-      }, 1000);
+      if(allOk){
+        correctModal.hidden = false;
+        setTimeout(function(){
+          correctModal.hidden = true;
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 1000);
+      } else {
+        feedback.textContent = 'Answer and unit correct — but check the step(s) marked in red before your next one.';
+        setTimeout(function(){
+          if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+        }, 2200);
+      }
     } else {
       feedback.textContent = message;
       asked--;
