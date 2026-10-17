@@ -155,6 +155,8 @@
     <button class="tab-btn active" data-topic="ohm" type="button">Ohm's Law &amp; Power</button>
     <button class="tab-btn" data-topic="series" type="button">Series Circuits</button>
     <button class="tab-btn" data-topic="parallel" type="button">Parallel Circuits</button>
+    <button class="tab-btn" data-topic="cap" type="button">Capacitors</button>
+    <button class="tab-btn" data-topic="ind" type="button">Inductors &amp; Induction</button>
   </div>
   <section class="topic-panel" data-topic="ohm">
     <div class="toprow">
@@ -256,6 +258,38 @@
         <canvas id="waveCanvas-par" role="img" aria-label="Parallel Circuits circuit diagram"></canvas>
       </div>
       <div class="grid" id="cardsGrid-par"></div>
+    </div>
+  </section>
+
+  <section class="topic-panel" data-topic="cap" hidden>
+    <div class="toprow">
+      <span class="badge" id="progressBadge-cap"><b>0</b> / 5 done</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer. Expert: type everything, nothing given.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="resetBtn-cap" type="button">Next set</button>
+    </div>
+
+    <div class="layout">
+      <div class="grid" id="cardsGrid-cap"></div>
+    </div>
+  </section>
+
+  <section class="topic-panel" data-topic="ind" hidden>
+    <div class="toprow">
+      <span class="badge" id="progressBadge-ind"><b>0</b> / 6 done</span>
+      <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer. Expert: type everything, nothing given.">
+        <button class="mode-btn" data-mode="learner" type="button">Learner</button>
+        <button class="mode-btn" data-mode="confident" type="button">Confident</button>
+        <button class="mode-btn" data-mode="expert" type="button">Expert</button>
+      </div>
+      <button class="ghost-btn" id="resetBtn-ind" type="button">Next set</button>
+    </div>
+
+    <div class="layout">
+      <div class="grid" id="cardsGrid-ind"></div>
     </div>
   </section>
 
@@ -2059,6 +2093,719 @@
     requestAnimationFrame(render);
   }
   requestAnimationFrame(render);
+
+  renderGrid();
+  updateProgress();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var panel = document.querySelector('.topic-panel[data-topic="cap"]');
+
+  function isDarkMode(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  var SYMBOL_PRONOUNCE = { 'τ':'tau' };
+  function symbolOptionLabel(s){
+    return SYMBOL_PRONOUNCE[s] ? (s + ' (' + SYMBOL_PRONOUNCE[s] + ')') : s;
+  }
+
+  var QUANTITIES = [
+    { key:'C', order:1, name:'Capacitance', symbol:'C', unit:'F',
+      nameAliases:['capacitance'], symbolAliases:['c'], unitAliases:['f', 'farad', 'farads'],
+      clues:[
+        "How much charge a component can store on its plates for every volt of potential difference across it.",
+        "A capacitor is labelled 100 µF. What quantity is 100 µF measuring?",
+        "A bigger capacitor can store more charge than a smaller one for the same voltage across it — what is that rating called?",
+      ],
+      definition:"Capacitance is how much charge a capacitor stores per volt of potential difference across it. It is measured in farads.",
+      colorLight:'#1B8A6B', colorDark:'#5FD1AC', fill:'#1B8A6B' },
+    { key:'Q', order:2, name:'Charge', symbol:'Q', unit:'C',
+      nameAliases:['charge', 'charge stored', 'electric charge'], symbolAliases:['q'], unitAliases:['c', 'coulomb', 'coulombs'],
+      clues:[
+        "The total amount of electric charge stored on a capacitor's plates.",
+        "A capacitor charged to 9 V stores a certain total amount of this quantity on its plates.",
+        "This quantity is calculated using Q = CV — the capacitance times the voltage across the plates.",
+      ],
+      definition:"Charge (on a capacitor) is the total amount of electric charge stored on its plates. It is measured in coulombs.",
+      colorLight:'#5A2BB0', colorDark:'#A07FE8', fill:'#5A2BB0' },
+    { key:'V', order:3, name:'Voltage', symbol:'V', unit:'V',
+      nameAliases:['voltage', 'potential difference', 'pd'], symbolAliases:['v'], unitAliases:['v', 'volt', 'volts'],
+      clues:[
+        "The potential difference across a capacitor's plates.",
+        "A capacitor is connected to a 12 V supply. What quantity is 12 V, once the capacitor is fully charged?",
+        "The electrical push driving charge onto a capacitor's plates, same idea as in any other part of a circuit.",
+      ],
+      definition:"Voltage (on a capacitor) is the potential difference across its plates. It is measured in volts.",
+      colorLight:'#2B6CB0', colorDark:'#7FB2E8', fill:'#2B6CB0' },
+    { key:'E', order:4, name:'Energy stored', symbol:'E', unit:'J',
+      nameAliases:['energy stored', 'energy', 'stored energy'], symbolAliases:['e'], unitAliases:['j', 'joule', 'joules'],
+      clues:[
+        "The total electrical energy stored in a charged capacitor's electric field.",
+        "A defibrillator's capacitor delivers a certain amount of this quantity in a single pulse.",
+        "This quantity is calculated using E = ½QV, or equivalently ½CV² — it isn't measured directly.",
+      ],
+      definition:"Energy stored is the total electrical energy held in a charged capacitor's field. It is measured in joules.",
+      colorLight:'#B08A2B', colorDark:'#E8CC7F', fill:'#B08A2B' },
+    { key:'tau', order:5, name:'Time constant', symbol:'τ', unit:'s',
+      nameAliases:['time constant', 'rc time constant'], symbolAliases:['τ', 'tau'], unitAliases:['s', 'sec', 'second', 'seconds'],
+      clues:[
+        "How long it takes a capacitor to charge or discharge to about 63% of the way to its final value, through a given resistor.",
+        "A bigger resistor or a bigger capacitor both make this quantity longer — charging takes more time.",
+        "This quantity is calculated using τ = RC — resistance times capacitance.",
+      ],
+      definition:"The time constant is how quickly a capacitor charges or discharges through a resistor. It is measured in seconds.",
+      colorLight:'#B0562B', colorDark:'#E8A67F', fill:'#B0562B' },
+  ];
+
+  var FIELD_ORDER = ['name','symbol','unit'];
+  var FIELD_LABELS = { name:'Name', symbol:'Symbol', unit:'Unit of measurement' };
+  var ALL_SYMBOLS = QUANTITIES.map(function(x){ return x.symbol; });
+  var ALL_NAMES = QUANTITIES.map(function(x){ return x.name; });
+  var ALL_UNITS_UNIQUE = (function(){
+    var seen = {}, out = [];
+    QUANTITIES.forEach(function(x){ if(!seen[x.unit]){ seen[x.unit]=true; out.push(x.unit); } });
+    return out;
+  })();
+
+  var unlocked = {"C": false, "Q": false, "V": false, "E": false, "tau": false};
+  var FIELD_MODE = 'learner';
+  var seenClues = { learner:{}, confident:{}, expert:{} };
+  var fullyCycled = { learner:{}, confident:{}, expert:{} };
+  var currentClueIndex = {};
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+  function normalize(s){
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9]/gi,'');
+  }
+
+  function saveKey(){ return 'elecLab_cap_v1'; }
+  function save(){
+    try{
+      localStorage.setItem(saveKey(), JSON.stringify({ unlocked:unlocked, seenClues:seenClues, fullyCycled:fullyCycled, FIELD_MODE:FIELD_MODE }));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      var raw = localStorage.getItem(saveKey());
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      if(data.unlocked) unlocked = data.unlocked;
+      if(data.seenClues) seenClues = data.seenClues;
+      if(data.fullyCycled) fullyCycled = data.fullyCycled;
+      if(data.FIELD_MODE) FIELD_MODE = data.FIELD_MODE;
+    }catch(e){}
+  }
+  function ensureClueIndices(){
+    QUANTITIES.forEach(function(q){ if(!(q.key in currentClueIndex)) currentClueIndex[q.key] = 0; });
+  }
+  load();
+  ensureClueIndices();
+
+  var grid = panel.querySelector('.grid');
+
+  function fieldIsDropdown(f){ return FIELD_MODE === 'learner'; }
+  function fieldPool(f){
+    if(f === 'symbol') return ALL_SYMBOLS;
+    if(f === 'name') return ALL_NAMES;
+    return ALL_UNITS_UNIQUE;
+  }
+  function buildFieldHtml(f, q){
+    if(fieldIsDropdown(f)){
+      var opts = shuffle(fieldPool(f));
+      var optHtml = '<option value="">— choose —</option>';
+      opts.forEach(function(s){
+        var label = f === 'symbol' ? symbolOptionLabel(s) : s;
+        optHtml += '<option value="'+s+'">'+label+'</option>';
+      });
+      return '<label>'+FIELD_LABELS[f]+'<select data-field="'+f+'">'+optHtml+'</select></label>';
+    }
+    return '<label>'+FIELD_LABELS[f]+'<input data-field="'+f+'" autocomplete="off" spellcheck="false"></label>';
+  }
+
+  function fieldCorrect(q, f, el){
+    var correctVal = f==='name' ? q.name : (f==='symbol' ? q.symbol : q.unit);
+    if(el.tagName === 'SELECT') return el.value === correctVal;
+    var val = normalize(el.value);
+    if(val === '') return false;
+    var aliases = f==='name' ? q.nameAliases : (f==='symbol' ? q.symbolAliases : q.unitAliases);
+    return aliases.map(normalize).indexOf(val) !== -1;
+  }
+
+  function applyQColor(card, q){
+    card.style.setProperty('--qcolor', isDarkMode() ? q.colorDark : q.colorLight);
+    card.style.setProperty('--qfill', q.fill);
+  }
+
+  function pickCluesForMode(q){
+    var mode = FIELD_MODE;
+    if(!seenClues[mode][q.key]) seenClues[mode][q.key] = {};
+    var total = q.clues.length;
+    var seenCount = Object.keys(seenClues[mode][q.key]).length;
+    if(seenCount >= total){
+      seenClues[mode][q.key] = {};
+      fullyCycled[mode][q.key] = true;
+    }
+  }
+
+  function nextClueIndex(q){
+    pickCluesForMode(q);
+    var mode = FIELD_MODE;
+    var total = q.clues.length;
+    var tries = 0;
+    var idx;
+    do{
+      idx = Math.floor(Math.random()*total);
+      tries++;
+    } while(seenClues[mode][q.key][idx] && tries < 20);
+    seenClues[mode][q.key][idx] = true;
+    return idx;
+  }
+
+  function renderCard(q){
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.setAttribute('data-key', q.key);
+    applyQColor(card, q);
+
+    var tagHtml = '<span class="tag" hidden></span>';
+    card.innerHTML =
+      tagHtml +
+      '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
+      '<p class="clue"></p>' +
+      '<div class="quiz"></div>' +
+      '<div class="unlocked-panel" hidden></div>';
+
+    renderQuizState(q, card);
+    return card;
+  }
+
+  function renderQuizState(q, card){
+    if(unlocked[q.key]){
+      unlockCard(q, card, true);
+      return;
+    }
+    currentClueIndex[q.key] = nextClueIndex(q);
+    var clueEl = card.querySelector('.clue');
+    clueEl.textContent = q.clues[currentClueIndex[q.key]];
+
+    var quiz = card.querySelector('.quiz');
+    var rowHtml = '';
+    FIELD_ORDER.forEach(function(f){
+      rowHtml += '<div class="quiz-row">' + buildFieldHtml(f, q) + '</div>';
+    });
+    rowHtml += '<div class="quiz-actions"><button class="check-btn" type="button">Check</button><span class="feedback" aria-live="polite"></span></div>';
+    quiz.innerHTML = rowHtml;
+
+    var btn = quiz.querySelector('.check-btn');
+    var fields = quiz.querySelectorAll('[data-field]');
+    function attempt(){ checkCard(q, card); }
+    btn.addEventListener('click', attempt);
+    fields.forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); attempt(); } });
+    });
+  }
+
+  function checkCard(q, card){
+    var quiz = card.querySelector('.quiz');
+    var fields = quiz.querySelectorAll('[data-field]');
+    var allOk = true;
+    fields.forEach(function(el){
+      var f = el.getAttribute('data-field');
+      var ok = fieldCorrect(q, f, el);
+      el.classList.remove('ok','bad');
+      el.classList.add(ok ? 'ok' : 'bad');
+      if(!ok) allOk = false;
+    });
+    var feedback = quiz.querySelector('.feedback');
+    if(allOk){
+      feedback.textContent = '';
+      unlockCard(q, card, false);
+    } else {
+      feedback.textContent = 'Not quite — check name, symbol AND unit, then try again.';
+    }
+  }
+
+  function unlockCard(q, card, silent){
+    unlocked[q.key] = true;
+    card.classList.add('is-unlocked');
+    var tagEl = card.querySelector('.tag');
+    tagEl.hidden = false;
+    tagEl.className = 'tag unlocked';
+    tagEl.textContent = 'DONE';
+    card.querySelector('.qcard-title').textContent = q.symbol + ' — ' + q.name + ' (' + q.unit + ')';
+    card.querySelector('.quiz').hidden = true;
+    var panelEl = card.querySelector('.unlocked-panel');
+    panelEl.hidden = false;
+    panelEl.innerHTML = '<p class="qnote">'+q.definition+'</p>';
+    if(!silent){
+      save();
+      grid.appendChild(card);
+      showCelebration(q);
+      updateProgress();
+    }
+  }
+
+  function showCelebration(q){
+    var modal = document.getElementById('celebrateModal');
+    var symbolEl = document.getElementById('celebrateSymbol');
+    var titleEl = document.getElementById('celebrateTitle');
+    var summaryEl = document.getElementById('celebrateSummary');
+    symbolEl.textContent = q.symbol + ' — ' + q.name;
+    titleEl.textContent = 'Wahoo — well done!';
+    summaryEl.textContent = q.definition;
+    modal.hidden = false;
+    setTimeout(function(){
+      modal.hidden = true;
+      checkAllDone();
+    }, 1000);
+  }
+
+  function updateProgress(){
+    var done = Object.keys(unlocked).filter(function(k){ return unlocked[k]; }).length;
+    document.getElementById('progressBadge-cap').innerHTML = '<b>'+done+'</b> / '+QUANTITIES.length+' done';
+  }
+
+  function allFullyCycled(){
+    return QUANTITIES.every(function(q){ return fullyCycled[FIELD_MODE][q.key]; });
+  }
+
+  function checkAllDone(){
+    var allUnlocked = QUANTITIES.every(function(q){ return unlocked[q.key]; });
+    if(!allUnlocked) return;
+    var modal = document.getElementById('allDoneModal');
+    var title = document.getElementById('allDoneTitle');
+    var summary = document.getElementById('allDoneSummary');
+    var btn = document.getElementById('allDoneBtn');
+    if(allFullyCycled()){
+      title.textContent = "You've mastered Capacitors!";
+      summary.textContent = "Every quantity, every clue variation, in " + FIELD_MODE + " mode. Time for the next mode, or the next topic.";
+      btn.textContent = 'Keep going';
+    } else {
+      title.textContent = "Amazing progress!";
+      summary.textContent = "All quantities unlocked at least once in " + FIELD_MODE + " mode — next set will cycle through the clues you haven't seen yet.";
+      btn.textContent = 'Next set';
+    }
+    btn.onclick = function(){ modal.hidden = true; fullReset(false); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function renderGrid(){
+    grid.innerHTML = '';
+    var order = QUANTITIES.slice().sort(function(a,b){
+      var au = unlocked[a.key] ? 1 : 0, bu = unlocked[b.key] ? 1 : 0;
+      if(au !== bu) return au - bu;
+      return a.order - b.order;
+    });
+    order.forEach(function(q){ grid.appendChild(renderCard(q)); });
+  }
+
+  function fullReset(clearStorage){
+    unlocked = {};
+    QUANTITIES.forEach(function(q){ unlocked[q.key] = false; });
+    if(clearStorage){
+      seenClues = { learner:{}, confident:{}, expert:{} };
+      fullyCycled = { learner:{}, confident:{}, expert:{} };
+      FIELD_MODE = 'learner';
+      updateModeButtons();
+    }
+    currentClueIndex = {};
+    save();
+    renderGrid();
+    updateProgress();
+  }
+  window.elecLabTopics = window.elecLabTopics || [];
+  window.elecLabTopics.push(function(){ fullReset(true); });
+
+  document.getElementById('resetBtn-cap').addEventListener('click', function(){ fullReset(false); });
+
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){
+    modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+  }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if(m === FIELD_MODE) return;
+      FIELD_MODE = m;
+      save();
+      updateModeButtons();
+      renderGrid();
+    });
+  });
+  updateModeButtons();
+
+  renderGrid();
+  updateProgress();
+})();
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var panel = document.querySelector('.topic-panel[data-topic="ind"]');
+
+  function isDarkMode(){
+    var explicit = document.documentElement.getAttribute('data-theme');
+    if(explicit === 'dark') return true;
+    if(explicit === 'light') return false;
+    return !!(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  }
+
+  var SYMBOL_PRONOUNCE = { 'τ':'tau', 'Φ':'phi', 'ε':'epsilon' };
+  function symbolOptionLabel(s){
+    return SYMBOL_PRONOUNCE[s] ? (s + ' (' + SYMBOL_PRONOUNCE[s] + ')') : s;
+  }
+
+  var QUANTITIES = [
+    { key:'L', order:1, name:'Inductance', symbol:'L', unit:'H',
+      nameAliases:['inductance', 'self-inductance'], symbolAliases:['l'], unitAliases:['h', 'henry', 'henries'],
+      clues:[
+        "How strongly a coil opposes a change in the current flowing through it.",
+        "A coil is labelled 2.5 H. What quantity is 2.5 H?",
+        "A coil with more of this quantity fights harder against a changing current than one with less.",
+      ],
+      definition:"Inductance is how strongly a coil opposes a change in current through it. It is measured in henries.",
+      colorLight:'#1B8A6B', colorDark:'#5FD1AC', fill:'#1B8A6B' },
+    { key:'phi', order:2, name:'Magnetic flux', symbol:'Φ', unit:'Wb',
+      nameAliases:['magnetic flux', 'flux'], symbolAliases:['φ', 'phi'], unitAliases:['wb', 'weber', 'webers'],
+      clues:[
+        "The total amount of magnetic field passing through a loop or coil.",
+        "A single loop sits in a magnetic field, with a certain total amount of field lines threading through it — what is that quantity called?",
+        "This quantity is calculated using Φ = BA — flux density times the area it passes through.",
+      ],
+      definition:"Magnetic flux is the total amount of magnetic field passing through a loop. It is measured in webers.",
+      colorLight:'#2B6CB0', colorDark:'#7FB2E8', fill:'#2B6CB0' },
+    { key:'B', order:3, name:'Magnetic flux density', symbol:'B', unit:'T',
+      nameAliases:['magnetic flux density', 'flux density', 'magnetic field strength'], symbolAliases:['b'], unitAliases:['t', 'tesla', 'teslas'],
+      clues:[
+        "How concentrated a magnetic field is at a given point — the field strength per unit area.",
+        "A fridge magnet and an MRI scanner both produce a magnetic field, but the MRI's is far bigger for this quantity.",
+        "A stronger magnet has more of this quantity than a weaker one of the same size.",
+      ],
+      definition:"Magnetic flux density is how concentrated a magnetic field is. It is measured in teslas.",
+      colorLight:'#B0562B', colorDark:'#E8A67F', fill:'#B0562B' },
+    { key:'eps', order:4, name:'Induced EMF', symbol:'ε', unit:'V',
+      nameAliases:['induced emf', 'emf', 'electromotive force'], symbolAliases:['ε', 'epsilon'], unitAliases:['v', 'volt', 'volts'],
+      clues:[
+        "The voltage generated by a changing magnetic field or a changing current, driving a current of its own.",
+        "Moving a magnet into a coil generates a certain amount of this quantity across its ends.",
+        "This quantity is calculated using Faraday's law, from how fast the magnetic flux is changing.",
+      ],
+      definition:"Induced EMF is the voltage generated by a changing magnetic flux. It is measured in volts.",
+      colorLight:'#5A2BB0', colorDark:'#A07FE8', fill:'#5A2BB0' },
+    { key:'E', order:5, name:'Energy stored', symbol:'E', unit:'J',
+      nameAliases:['energy stored', 'energy', 'stored energy'], symbolAliases:['e'], unitAliases:['j', 'joule', 'joules'],
+      clues:[
+        "The total electrical energy stored in an inductor's magnetic field while current flows through it.",
+        "An inductor carrying a steady current holds a certain amount of this quantity in its magnetic field.",
+        "This quantity is calculated using E = ½LI² — it isn't measured directly.",
+      ],
+      definition:"Energy stored is the total energy held in an inductor's magnetic field. It is measured in joules.",
+      colorLight:'#B08A2B', colorDark:'#E8CC7F', fill:'#B08A2B' },
+    { key:'tau', order:6, name:'Time constant', symbol:'τ', unit:'s',
+      nameAliases:['time constant', 'lr time constant'], symbolAliases:['τ', 'tau'], unitAliases:['s', 'sec', 'second', 'seconds'],
+      clues:[
+        "How long it takes current in an inductor-resistor circuit to rise or fall to about 63% of the way to its final value.",
+        "A bigger inductance or a smaller resistance both make this quantity longer.",
+        "This quantity is calculated using τ = L/R — inductance divided by resistance.",
+      ],
+      definition:"The time constant is how quickly current in an LR circuit rises or falls. It is measured in seconds.",
+      colorLight:'#6B2BB0', colorDark:'#B27FE8', fill:'#6B2BB0' },
+  ];
+
+  var FIELD_ORDER = ['name','symbol','unit'];
+  var FIELD_LABELS = { name:'Name', symbol:'Symbol', unit:'Unit of measurement' };
+  var ALL_SYMBOLS = QUANTITIES.map(function(x){ return x.symbol; });
+  var ALL_NAMES = QUANTITIES.map(function(x){ return x.name; });
+  var ALL_UNITS_UNIQUE = (function(){
+    var seen = {}, out = [];
+    QUANTITIES.forEach(function(x){ if(!seen[x.unit]){ seen[x.unit]=true; out.push(x.unit); } });
+    return out;
+  })();
+
+  var unlocked = {"L": false, "phi": false, "B": false, "eps": false, "E": false, "tau": false};
+  var FIELD_MODE = 'learner';
+  var seenClues = { learner:{}, confident:{}, expert:{} };
+  var fullyCycled = { learner:{}, confident:{}, expert:{} };
+  var currentClueIndex = {};
+
+  function shuffle(arr){
+    var a = arr.slice();
+    for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var tmp=a[i]; a[i]=a[j]; a[j]=tmp; }
+    return a;
+  }
+  function normalize(s){
+    return (s||'').toString().trim().toLowerCase().replace(/[^a-z0-9]/gi,'');
+  }
+
+  function saveKey(){ return 'elecLab_ind_v1'; }
+  function save(){
+    try{
+      localStorage.setItem(saveKey(), JSON.stringify({ unlocked:unlocked, seenClues:seenClues, fullyCycled:fullyCycled, FIELD_MODE:FIELD_MODE }));
+    }catch(e){}
+  }
+  function load(){
+    try{
+      var raw = localStorage.getItem(saveKey());
+      if(!raw) return;
+      var data = JSON.parse(raw);
+      if(data.unlocked) unlocked = data.unlocked;
+      if(data.seenClues) seenClues = data.seenClues;
+      if(data.fullyCycled) fullyCycled = data.fullyCycled;
+      if(data.FIELD_MODE) FIELD_MODE = data.FIELD_MODE;
+    }catch(e){}
+  }
+  function ensureClueIndices(){
+    QUANTITIES.forEach(function(q){ if(!(q.key in currentClueIndex)) currentClueIndex[q.key] = 0; });
+  }
+  load();
+  ensureClueIndices();
+
+  var grid = panel.querySelector('.grid');
+
+  function fieldIsDropdown(f){ return FIELD_MODE === 'learner'; }
+  function fieldPool(f){
+    if(f === 'symbol') return ALL_SYMBOLS;
+    if(f === 'name') return ALL_NAMES;
+    return ALL_UNITS_UNIQUE;
+  }
+  function buildFieldHtml(f, q){
+    if(fieldIsDropdown(f)){
+      var opts = shuffle(fieldPool(f));
+      var optHtml = '<option value="">— choose —</option>';
+      opts.forEach(function(s){
+        var label = f === 'symbol' ? symbolOptionLabel(s) : s;
+        optHtml += '<option value="'+s+'">'+label+'</option>';
+      });
+      return '<label>'+FIELD_LABELS[f]+'<select data-field="'+f+'">'+optHtml+'</select></label>';
+    }
+    return '<label>'+FIELD_LABELS[f]+'<input data-field="'+f+'" autocomplete="off" spellcheck="false"></label>';
+  }
+
+  function fieldCorrect(q, f, el){
+    var correctVal = f==='name' ? q.name : (f==='symbol' ? q.symbol : q.unit);
+    if(el.tagName === 'SELECT') return el.value === correctVal;
+    var val = normalize(el.value);
+    if(val === '') return false;
+    var aliases = f==='name' ? q.nameAliases : (f==='symbol' ? q.symbolAliases : q.unitAliases);
+    return aliases.map(normalize).indexOf(val) !== -1;
+  }
+
+  function applyQColor(card, q){
+    card.style.setProperty('--qcolor', isDarkMode() ? q.colorDark : q.colorLight);
+    card.style.setProperty('--qfill', q.fill);
+  }
+
+  function pickCluesForMode(q){
+    var mode = FIELD_MODE;
+    if(!seenClues[mode][q.key]) seenClues[mode][q.key] = {};
+    var total = q.clues.length;
+    var seenCount = Object.keys(seenClues[mode][q.key]).length;
+    if(seenCount >= total){
+      seenClues[mode][q.key] = {};
+      fullyCycled[mode][q.key] = true;
+    }
+  }
+
+  function nextClueIndex(q){
+    pickCluesForMode(q);
+    var mode = FIELD_MODE;
+    var total = q.clues.length;
+    var tries = 0;
+    var idx;
+    do{
+      idx = Math.floor(Math.random()*total);
+      tries++;
+    } while(seenClues[mode][q.key][idx] && tries < 20);
+    seenClues[mode][q.key][idx] = true;
+    return idx;
+  }
+
+  function renderCard(q){
+    var card = document.createElement('div');
+    card.className = 'qcard';
+    card.setAttribute('data-key', q.key);
+    applyQColor(card, q);
+
+    var tagHtml = '<span class="tag" hidden></span>';
+    card.innerHTML =
+      tagHtml +
+      '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
+      '<p class="clue"></p>' +
+      '<div class="quiz"></div>' +
+      '<div class="unlocked-panel" hidden></div>';
+
+    renderQuizState(q, card);
+    return card;
+  }
+
+  function renderQuizState(q, card){
+    if(unlocked[q.key]){
+      unlockCard(q, card, true);
+      return;
+    }
+    currentClueIndex[q.key] = nextClueIndex(q);
+    var clueEl = card.querySelector('.clue');
+    clueEl.textContent = q.clues[currentClueIndex[q.key]];
+
+    var quiz = card.querySelector('.quiz');
+    var rowHtml = '';
+    FIELD_ORDER.forEach(function(f){
+      rowHtml += '<div class="quiz-row">' + buildFieldHtml(f, q) + '</div>';
+    });
+    rowHtml += '<div class="quiz-actions"><button class="check-btn" type="button">Check</button><span class="feedback" aria-live="polite"></span></div>';
+    quiz.innerHTML = rowHtml;
+
+    var btn = quiz.querySelector('.check-btn');
+    var fields = quiz.querySelectorAll('[data-field]');
+    function attempt(){ checkCard(q, card); }
+    btn.addEventListener('click', attempt);
+    fields.forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); attempt(); } });
+    });
+  }
+
+  function checkCard(q, card){
+    var quiz = card.querySelector('.quiz');
+    var fields = quiz.querySelectorAll('[data-field]');
+    var allOk = true;
+    fields.forEach(function(el){
+      var f = el.getAttribute('data-field');
+      var ok = fieldCorrect(q, f, el);
+      el.classList.remove('ok','bad');
+      el.classList.add(ok ? 'ok' : 'bad');
+      if(!ok) allOk = false;
+    });
+    var feedback = quiz.querySelector('.feedback');
+    if(allOk){
+      feedback.textContent = '';
+      unlockCard(q, card, false);
+    } else {
+      feedback.textContent = 'Not quite — check name, symbol AND unit, then try again.';
+    }
+  }
+
+  function unlockCard(q, card, silent){
+    unlocked[q.key] = true;
+    card.classList.add('is-unlocked');
+    var tagEl = card.querySelector('.tag');
+    tagEl.hidden = false;
+    tagEl.className = 'tag unlocked';
+    tagEl.textContent = 'DONE';
+    card.querySelector('.qcard-title').textContent = q.symbol + ' — ' + q.name + ' (' + q.unit + ')';
+    card.querySelector('.quiz').hidden = true;
+    var panelEl = card.querySelector('.unlocked-panel');
+    panelEl.hidden = false;
+    panelEl.innerHTML = '<p class="qnote">'+q.definition+'</p>';
+    if(!silent){
+      save();
+      grid.appendChild(card);
+      showCelebration(q);
+      updateProgress();
+    }
+  }
+
+  function showCelebration(q){
+    var modal = document.getElementById('celebrateModal');
+    var symbolEl = document.getElementById('celebrateSymbol');
+    var titleEl = document.getElementById('celebrateTitle');
+    var summaryEl = document.getElementById('celebrateSummary');
+    symbolEl.textContent = q.symbol + ' — ' + q.name;
+    titleEl.textContent = 'Wahoo — well done!';
+    summaryEl.textContent = q.definition;
+    modal.hidden = false;
+    setTimeout(function(){
+      modal.hidden = true;
+      checkAllDone();
+    }, 1000);
+  }
+
+  function updateProgress(){
+    var done = Object.keys(unlocked).filter(function(k){ return unlocked[k]; }).length;
+    document.getElementById('progressBadge-ind').innerHTML = '<b>'+done+'</b> / '+QUANTITIES.length+' done';
+  }
+
+  function allFullyCycled(){
+    return QUANTITIES.every(function(q){ return fullyCycled[FIELD_MODE][q.key]; });
+  }
+
+  function checkAllDone(){
+    var allUnlocked = QUANTITIES.every(function(q){ return unlocked[q.key]; });
+    if(!allUnlocked) return;
+    var modal = document.getElementById('allDoneModal');
+    var title = document.getElementById('allDoneTitle');
+    var summary = document.getElementById('allDoneSummary');
+    var btn = document.getElementById('allDoneBtn');
+    if(allFullyCycled()){
+      title.textContent = "You've mastered Inductors & Induction!";
+      summary.textContent = "Every quantity, every clue variation, in " + FIELD_MODE + " mode. Time for the next mode, or the next topic.";
+      btn.textContent = 'Keep going';
+    } else {
+      title.textContent = "Amazing progress!";
+      summary.textContent = "All quantities unlocked at least once in " + FIELD_MODE + " mode — next set will cycle through the clues you haven't seen yet.";
+      btn.textContent = 'Next set';
+    }
+    btn.onclick = function(){ modal.hidden = true; fullReset(false); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function renderGrid(){
+    grid.innerHTML = '';
+    var order = QUANTITIES.slice().sort(function(a,b){
+      var au = unlocked[a.key] ? 1 : 0, bu = unlocked[b.key] ? 1 : 0;
+      if(au !== bu) return au - bu;
+      return a.order - b.order;
+    });
+    order.forEach(function(q){ grid.appendChild(renderCard(q)); });
+  }
+
+  function fullReset(clearStorage){
+    unlocked = {};
+    QUANTITIES.forEach(function(q){ unlocked[q.key] = false; });
+    if(clearStorage){
+      seenClues = { learner:{}, confident:{}, expert:{} };
+      fullyCycled = { learner:{}, confident:{}, expert:{} };
+      FIELD_MODE = 'learner';
+      updateModeButtons();
+    }
+    currentClueIndex = {};
+    save();
+    renderGrid();
+    updateProgress();
+  }
+  window.elecLabTopics = window.elecLabTopics || [];
+  window.elecLabTopics.push(function(){ fullReset(true); });
+
+  document.getElementById('resetBtn-ind').addEventListener('click', function(){ fullReset(false); });
+
+  var modeButtons = panel.querySelectorAll('.mode-btn');
+  function updateModeButtons(){
+    modeButtons.forEach(function(b){ b.classList.toggle('active', b.getAttribute('data-mode') === FIELD_MODE); });
+  }
+  modeButtons.forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if(m === FIELD_MODE) return;
+      FIELD_MODE = m;
+      save();
+      updateModeButtons();
+      renderGrid();
+    });
+  });
+  updateModeButtons();
 
   renderGrid();
   updateProgress();
