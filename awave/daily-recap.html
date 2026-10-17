@@ -58,10 +58,15 @@
   }
   button.next-btn:hover{ opacity:0.92; }
 
-  .status-row{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; margin-bottom:22px; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; }
+  .status-row{ display:flex; flex-direction:column; gap:12px; margin-bottom:22px; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:12px; }
+  .status-top{ display:flex; align-items:center; gap:12px; flex-wrap:wrap; width:100%; }
   .day-badge{ font-family:'IBM Plex Mono', monospace; font-size:0.82rem; background:var(--surface-2); border:1px solid var(--border); border-radius:999px; padding:6px 14px; color:var(--ink); font-weight:600; }
   .status-note{ color:var(--ink-muted); font-size:0.85rem; flex:1 1 220px; }
   .status-actions{ display:flex; gap:8px; margin-left:auto; }
+  .day-picker{ display:flex; gap:6px; flex-wrap:wrap; }
+  .day-pill{ font-family:'IBM Plex Mono', monospace; font-size:0.8rem; min-width:34px; height:34px; padding:0 4px; display:flex; align-items:center; justify-content:center; border-radius:999px; border:1px solid var(--border); background:var(--surface-2); color:var(--ink-muted); cursor:pointer; }
+  .day-pill:hover{ border-color:var(--input-line); color:var(--ink); }
+  .day-pill.active{ background:var(--accent); color:var(--on-accent); border-color:var(--accent); font-weight:600; }
 
   .sheet-box{ background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px 16px; margin-bottom:18px; }
   .sheet-title{ font-family:'Fraunces', serif; font-weight:600; font-size:0.95rem; margin:0 0 10px; }
@@ -96,12 +101,15 @@
   </div>
 
   <div class="status-row">
-    <span class="day-badge" id="dayLabel">Day 1 of 10</span>
-    <span class="status-note">Come back and click "Done for today" once you've had a go at each one below.</span>
-    <div class="status-actions">
-      <button class="ghost-btn" id="resetBtn" type="button">Reset recap</button>
-      <button class="next-btn" id="doneBtn" type="button">Done for today &rarr;</button>
+    <div class="status-top">
+      <span class="day-badge" id="dayLabel">Day 1 of 10</span>
+      <span class="status-note">Pick any day below, or click "Done for today" to move to the next one.</span>
+      <div class="status-actions">
+        <button class="ghost-btn" id="resetBtn" type="button">Reset recap</button>
+        <button class="next-btn" id="doneBtn" type="button">Done for today &rarr;</button>
+      </div>
     </div>
+    <div class="day-picker" id="dayPicker"></div>
   </div>
 
   <div class="recap-grid" id="recapGrid"></div>
@@ -181,6 +189,21 @@
   var todaysTopics = days[dayInSweep];
 
   document.getElementById('dayLabel').textContent = 'Day ' + (dayInSet + 1) + ' of 10 (set ' + setNumber + ')';
+
+  var picker = document.getElementById('dayPicker');
+  for(var d = 1; d <= 10; d++){
+    (function(dayNum){
+      var pill = document.createElement('button');
+      pill.type = 'button';
+      pill.className = 'day-pill' + (dayNum === dayInSet + 1 ? ' active' : '');
+      pill.textContent = String(dayNum);
+      pill.addEventListener('click', function(){
+        saveCounter((setNumber - 1) * 10 + (dayNum - 1));
+        location.reload();
+      });
+      picker.appendChild(pill);
+    })(d);
+  }
 
   var grid = document.getElementById('recapGrid');
   todaysTopics.forEach(function(t){
