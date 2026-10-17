@@ -298,6 +298,12 @@
     *{ transition:none !important; }
     .modal-box{ animation:none !important; }
   }
+
+  /* Single-topic embed mode, used by daily-recap.html via ?topic=X&embed=1 */
+  .embed-mode .title-row{ display:none; }
+  .embed-mode .wrap > .toprow{ display:none; }
+  .embed-mode .tab-bar{ display:none; }
+  .embed-mode .wrap{ padding:6px 8px 20px; }
 </style>
 </head>
 <body>
@@ -3002,6 +3008,21 @@
       });
     });
   });
+
+  // Deep-link support for daily-recap.html: ?topic=X picks that topic on
+  // load, ?embed=1 hides the page chrome so just the practice panel shows.
+  var qp = new URLSearchParams(location.search);
+  var initTopic = qp.get('topic');
+  if(initTopic){
+    var targetBtn = document.querySelector('.tab-btn[data-topic="'+initTopic+'"]');
+    if(targetBtn){
+      tabButtons.forEach(function(b){ b.classList.toggle('active', b === targetBtn); });
+      document.querySelectorAll('.topic-panel').forEach(function(p){
+        p.hidden = (p.getAttribute('data-topic') !== initTopic);
+      });
+    }
+  }
+  if(qp.get('embed') === '1'){ document.body.classList.add('embed-mode'); }
 
   document.getElementById('newStudentBtn').addEventListener('click', function(){
     (window.formulaLabTopics || []).forEach(function(fn){ fn(); });
