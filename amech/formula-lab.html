@@ -1891,5 +1891,42 @@
   });
 })();
 </script>
+<script>
+(function(){
+  "use strict";
+  var TRACK_URL = "https://metaologist.herokuapp.com/api/log/";
+  var SUBJECT = "mechanics";
+  var PAGE = (location.search.indexOf('embed=1') !== -1) ? 'formula-lab-recap' : 'formula-lab';
+  function send(payload){
+    try{
+      var body = JSON.stringify(payload);
+      if(navigator.sendBeacon){ navigator.sendBeacon(TRACK_URL, new Blob([body], {type:'application/json'})); }
+      else { fetch(TRACK_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:body, keepalive:true}).catch(function(){}); }
+    }catch(e){}
+  }
+  function track(eventType, extra){
+    var payload = {event_type:eventType, subject:SUBJECT, page:PAGE};
+    for(var k in extra){ payload[k] = extra[k]; }
+    send(payload);
+  }
+  track('visit');
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('.check-btn');
+    if(!btn) return;
+    var scope = btn.closest('.problem-card') || btn.closest('.quiz');
+    if(!scope) return;
+    var bad = scope.querySelectorAll('.bad').length;
+    var ok = scope.querySelectorAll('.ok').length;
+    if(bad + ok === 0) return;
+    var panel = btn.closest('.topic-panel');
+    var modeBtn = panel ? panel.querySelector('.mode-btn.active') : null;
+    track('answer', {
+      topic: panel ? panel.getAttribute('data-topic') : '',
+      level: modeBtn ? modeBtn.getAttribute('data-mode') : '',
+      correct: bad === 0
+    });
+  });
+})();
+</script>
 </body>
 </html>

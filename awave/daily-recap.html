@@ -220,6 +220,7 @@
   });
 
   document.getElementById('doneBtn').addEventListener('click', function(){
+    if(window.physicsTrack){ window.physicsTrack('recap_done'); }
     saveCounter(counter + 1);
     location.reload();
   });
@@ -227,6 +228,26 @@
     saveCounter(0);
     location.reload();
   });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  var TRACK_URL = "https://metaologist.herokuapp.com/api/log/";
+  var SUBJECT = "waves", PAGE = "daily-recap";
+  function send(payload){
+    try{
+      var body = JSON.stringify(payload);
+      if(navigator.sendBeacon){ navigator.sendBeacon(TRACK_URL, new Blob([body], {type:'application/json'})); }
+      else { fetch(TRACK_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:body, keepalive:true}).catch(function(){}); }
+    }catch(e){}
+  }
+  window.physicsTrack = function(eventType, extra){
+    var payload = {event_type:eventType, subject:SUBJECT, page:PAGE};
+    for(var k in extra){ payload[k] = extra[k]; }
+    send(payload);
+  };
+  window.physicsTrack('visit');
 })();
 </script>
 </body>
