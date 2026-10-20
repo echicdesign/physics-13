@@ -106,7 +106,8 @@
   .quiz-row{ display:flex; flex-direction:column; gap:8px; margin-bottom:6px; }
   .quiz-row label{ font-family:'IBM Plex Mono', monospace; font-size:0.68rem; letter-spacing:0.04em; text-transform:uppercase; color:var(--ink-muted); }
   .qcard.is-unlocked .quiz-row label{ color:rgba(255,255,255,0.75); }
-  .quiz-row input, .quiz-row select{ font-family:'Trocchi', serif; font-size:0.92rem; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:10px 12px; }
+  .quiz-row input, .quiz-row select{ width:100%; min-width:0; box-sizing:border-box; font-family:'Trocchi', serif; font-size:0.92rem; color:var(--ink); background:var(--surface-2); border:1.5px solid var(--input-line); border-radius:9px; padding:10px 12px; }
+  .quiz-row select{ text-overflow:ellipsis; white-space:nowrap; overflow:hidden; }
   .quiz-row input:focus, .quiz-row select:focus{ outline:none; border-color:var(--qcolor, var(--accent)); box-shadow:0 0 0 3px var(--focus-ring); }
   .quiz-row input.ok, .quiz-row select.ok{ border-color:var(--good); }
   .quiz-row input.bad, .quiz-row select.bad{ border-color:var(--bad); }
@@ -264,7 +265,7 @@
 
   <section class="topic-panel" data-topic="cap" hidden>
     <div class="toprow">
-      <span class="badge" id="progressBadge-cap"><b>0</b> / 7 done</span>
+      <span class="badge" id="progressBadge-cap"><b>0</b> / 13 done</span>
       <div class="mode-toggle" role="group" aria-label="Practice mode" title="Learner: pick from a list. Confident: type your own answer. Expert: type everything, nothing given.">
         <button class="mode-btn" data-mode="learner" type="button">Learner</button>
         <button class="mode-btn" data-mode="confident" type="button">Confident</button>
@@ -2188,6 +2189,67 @@
       definition:"Impedance is the total opposition to AC current in a circuit, combining resistance and reactance. It is measured in ohms.",
       img:'caps/dndcaps/impedance.JPG',
       colorLight:'#8A2B6C', colorDark:'#D67FB2', fill:'#8A2B6C' },
+    { key:'uF2F', order:8, name:'Microfarad–farad conversion', symbol:'×10⁻⁶', unit:'F',
+      nameAliases:['microfarad to farad conversion', 'microfarad-farad conversion', 'micro to farad conversion', 'uf to f conversion', 'the micro conversion', 'converting microfarads to farads'],
+      symbolAliases:['10^-6', '10-6', '1e-6', 'x10^-6', '1x10^-6', '1*10^-6', '0.000001', '10 to the power of -6', '10 to the minus 6'],
+      unitAliases:['f', 'farad', 'farads'],
+      clues:[
+        "A capacitor is labelled 220 µF. What power of ten do you multiply by to turn that into plain farads — and what unit do you end up with?",
+        "Going from µF to F, or back again, means multiplying or dividing by the same power of ten. What is it?",
+        "This conversion is really two 'milli' (×10⁻³) jumps multiplied together — do that twice and you've gone all the way from F down to this unit.",
+      ],
+      definition:"1 µF (microfarad) = 10⁻⁶ F. To go from µF to F, multiply by 10⁻⁶ (divide by a million); to go back from F to µF, multiply by 10⁶ (a million). Two ×10⁻³ (milli) jumps in a row give the same ×10⁻⁶ — handy for checking you've shifted the decimal point the right number of places. Memory trick: full-grown wizards keep their coins in silver cauldrons, but pixies only carry a few in silver thimbles — the exchange rate between a thimble (µF) and a cauldron (F) is 10⁻⁶.",
+      img:'caps/dndcaps/micro farids.jpg',
+      colorLight:'#B02B3A', colorDark:'#E87F8C', fill:'#B02B3A' },
+    { key:'er', order:9, name:'Dielectric constant / relative permittivity', symbol:'εᵣ', unit:'none',
+      nameAliases:['dielectric constant', 'relative permittivity', 'permittivity', 'dielectric', 'dielectric constant / relative permittivity'], symbolAliases:['er', 'epsilonr', 'k'], unitAliases:['none', 'no unit', 'no units', 'nounit', 'dimensionless', '-'],
+      clues:[
+        "How much more charge a capacitor can store with an insulating material between its plates, compared to empty space.",
+        "A capacitor's plates have a plastic film between them instead of a vacuum. The multiplier for how much extra capacitance that gives is called this.",
+        "This quantity goes by two names that mean exactly the same thing — dielectric constant and relative permittivity — both turn up on NCEA papers, so know them both. It has no unit, and on the formula sheet it's written εᵣ (sometimes k).",
+      ],
+      definition:"The dielectric constant — also called relative permittivity — is a ratio describing how much more charge a capacitor can store with an insulating material between its plates, compared to empty space. Both names mean the same thing and both appear in NCEA papers. It has no unit — it's a pure number, written εᵣ (or sometimes k).",
+      img:'caps/dndcaps/Relative Permittivity.jpg',
+      colorLight:'#8A5A1B', colorDark:'#D1A05F', fill:'#8A5A1B' },
+    { key:'A', order:10, name:'Plate area', symbol:'A', unit:'m²',
+      nameAliases:['plate area', 'area', 'area of plates', 'area of the plates'], symbolAliases:['a'], unitAliases:['m2', 'm^2', 'm²', 'square metres', 'square meters', 'square metre'],
+      clues:[
+        "The size of the facing, overlapping surface of each plate in a parallel-plate capacitor.",
+        "A bigger version of this quantity lets a capacitor store more charge, because there's more surface for charge to spread across.",
+        "This is one of the three things (along with plate separation and the material between them) that decide a parallel-plate capacitor's capacitance: C = ε₀εᵣA ÷ d.",
+      ],
+      definition:"Plate area is the size of each overlapping plate surface in a parallel-plate capacitor. A bigger plate area means more capacitance. It is measured in square metres. Think of two bonded treasure chests: a wide chest fits more coins, a narrow one only fits a few — bigger plate area means more coins guarded, i.e. more charge stored.",
+      img:'caps/dndcaps/plate area.jpg',
+      colorLight:'#1B6E8A', colorDark:'#5FC4E8', fill:'#1B6E8A' },
+    { key:'d', order:11, name:'Plate separation', symbol:'d', unit:'m',
+      nameAliases:['plate separation', 'separation', 'distance', 'distance between plates', 'gap'], symbolAliases:['d'], unitAliases:['m', 'metre', 'metres', 'meter', 'meters'],
+      clues:[
+        "The gap between the two plates of a parallel-plate capacitor.",
+        "Pulling a capacitor's plates further apart makes this quantity bigger — and the capacitance smaller.",
+        "This is one of the three things that decide a parallel-plate capacitor's capacitance: C = ε₀εᵣA ÷ d — it's on the bottom, so a bigger value means less capacitance.",
+      ],
+      definition:"Plate separation is the gap between the two plates of a parallel-plate capacitor. A bigger gap means less capacitance. It is measured in metres. Think of a taut ward of magical energy strung between two bonded chests, holding their coins in place: the closer the chests, the tighter and stronger the ward, and the more coins it holds; pull them far apart and the ward goes slack, spilling coins — bigger plate separation means a weaker ward, so less charge stored.",
+      img:'caps/dndcaps/plate distance.jpg',
+      colorLight:'#6C8A2B', colorDark:'#B5D67F', fill:'#6C8A2B' },
+    { key:'f', order:12, name:'Frequency', symbol:'f', unit:'Hz',
+      nameAliases:['frequency'], symbolAliases:['f'], unitAliases:['hz', 'hertz'],
+      clues:[
+        "How many complete cycles of an AC signal happen every second.",
+        "Mains power in NZ alternates at 50 of this quantity every second — written 50 Hz.",
+        "This quantity appears in Xc = 1 ÷ (2πfC) — the higher it is, the less a capacitor opposes the AC current.",
+      ],
+      definition:"Frequency is how many complete cycles of an alternating signal occur each second. It is measured in hertz.",
+      colorLight:'#3A2B8A', colorDark:'#8F7FE8', fill:'#3A2B8A' },
+    { key:'e0', order:13, name:'Permittivity of free space', symbol:'ε₀', unit:'F m⁻¹',
+      nameAliases:['permittivity of free space', 'vacuum permittivity', 'permittivity of a vacuum', 'electric constant'], symbolAliases:['e0', 'epsilon0', 'epsilonnought', 'epsilonnaught'], unitAliases:['f/m', 'fm^-1', 'fm-1', 'f m^-1', 'f m-1', 'farads per metre', 'farads per meter', 'farad per metre', 'farad per meter'],
+      clues:[
+        "The fixed constant that sets how much capacitance you'd get from a given plate area and separation if there were nothing but a vacuum between the plates.",
+        "This quantity never changes from question to question — it's always 8.85 × 10⁻¹² F m⁻¹, always given on the formula sheet, just like g.",
+        "In C = ε₀εᵣA ÷ d, this is the baseline multiplier out the front, before the material's dielectric constant scales it up.",
+      ],
+      definition:"The permittivity of free space (ε₀) is a fixed physical constant, 8.85 × 10⁻¹² F m⁻¹, describing how well a vacuum supports an electric field. It's always given on the formula sheet — it never needs to be calculated.",
+      img:'caps/dndcaps/Permittivity of free space.jpg',
+      colorLight:'#1B8A8A', colorDark:'#5FD1D1', fill:'#1B8A8A' },
   ];
 
   var FIELD_ORDER = ['name','symbol','unit'];
@@ -2200,7 +2262,7 @@
     return out;
   })();
 
-  var unlocked = {"C": false, "Q": false, "V": false, "E": false, "tau": false, "Xc": false, "Z": false};
+  var unlocked = {"C": false, "Q": false, "V": false, "E": false, "tau": false, "Xc": false, "Z": false, "uF2F": false, "er": false, "A": false, "d": false, "f": false, "e0": false};
   var FIELD_MODE = 'learner';
   var seenClues = { learner:{}, confident:{}, expert:{} };
   var fullyCycled = { learner:{}, confident:{}, expert:{} };

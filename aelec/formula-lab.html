@@ -213,6 +213,7 @@
           <option value="cpar">Parallel Capacitors</option>
           <option value="xc">Capacitive Reactance</option>
           <option value="zrc">RC Impedance</option>
+          <option value="ufconv">&micro;F &harr; F Conversion</option>
         </optgroup>
         <optgroup label="Inductors and induction">
           <option value="selfemf">Self-Induced EMF</option>
@@ -484,6 +485,14 @@
       <button class="ghost-btn" id="newRoundBtn-zrc" type="button">New round</button>
     </div>
     <div class="problem-card" id="problemCard-zrc"></div>
+  </section>
+
+  <section class="topic-panel" data-topic="ufconv" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-ufconv"><b>0</b> / 6 correct this round</span>
+      <button class="ghost-btn" id="newRoundBtn-ufconv" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-ufconv"></div>
   </section>
 
   <section class="topic-panel" data-topic="selfemf" hidden>
@@ -5068,10 +5077,10 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     keys: ['er','A','d','C'], targets: ['C','d','A'],
     CLR: { er: capColor('#8A5A1B','#D1A05F'), A: capColor('#1B8A6B','#5FD1AC'), d: capColor('#B0562B','#E8A67F'), C: capColor('#6B2BB0','#B27FE8') },
     LABEL: { er:'εᵣ', A:'A', d:'d', C:'C' },
-    NAME: { er:'dielectric constant', A:'plate area', d:'plate separation', C:'capacitance' },
+    NAME: { er:'dielectric constant / relative permittivity', A:'plate area', d:'plate separation', C:'capacitance' },
     UNIT: { er:'', A:'m²', d:'m', C:'F' },
     NAME_ALIASES: {
-      er: ['dielectric constant', 'relative permittivity', 'permittivity', 'dielectric'],
+      er: ['dielectric constant', 'relative permittivity', 'permittivity', 'dielectric', 'dielectric constant / relative permittivity'],
       A: ['area', 'plate area', 'area of plates', 'area of the plates'],
       d: ['separation', 'plate separation', 'distance', 'distance between plates', 'gap'],
       C: ['capacitance']
@@ -5550,6 +5559,154 @@ function indArea(v){
   if(v < 0.01) return sig3(v*1e4) + ' cm² (' + sig3(v) + ' m²)';
   return null;
 }
+</script>
+
+<script>
+(function(){
+  "use strict";
+  var id = 'ufconv';
+  var CLR = { light:'#B02B3A', dark:'#E87F8C' };
+  function colorNow(){ return isDarkMode() ? CLR.dark : CLR.light; }
+  var UF_POOL = [1, 2.2, 4.7, 10, 22, 47, 100, 220, 330, 470, 680, 1000];
+  var F_UNIT_ALIASES = ['f', 'farad', 'farads'];
+  var TO_F_SCENARIOS = [
+    "A capacitor is labelled {UF} µF. Write its capacitance in plain farads (no prefix).",
+    "An electrolytic capacitor is rated at {UF} µF. Express this value in farads, with no prefix on the unit.",
+    "A capacitor's datasheet gives its capacitance as {UF} µF. Convert that to farads."
+  ];
+  var TO_UF_SCENARIOS = [
+    "A calculation gives a capacitance of {F} F. Write this value in microfarads (µF), the way it would actually be printed on a capacitor.",
+    "A capacitor's capacitance works out to {F} F. Express that as a value in µF.",
+    "You calculate a capacitance of {F} F for a filter circuit. Convert that into µF."
+  ];
+
+  var score = 0, asked = 0;
+  var ROUND_SIZE = 6;
+  var current = null;
+
+  function newProblem(){
+    var uf = pick(UF_POOL);
+    var direction = Math.random() < 0.5 ? 'toF' : 'toUF';
+    var correctSI = uf * 1e-6;
+    var scenario = direction === 'toF'
+      ? pick(TO_F_SCENARIOS).split('{UF}').join(sig3(uf))
+      : pick(TO_UF_SCENARIOS).split('{F}').join(sig3(correctSI));
+    current = { uf: uf, direction: direction, correct: correctSI, scenario: scenario };
+    renderProblem();
+  }
+
+  function renderProblem(){
+    var card = document.getElementById('problemCard-'+id);
+    var d = current.direction;
+    var col = colorNow();
+    var givenHtml, findLabel, hintText;
+    if(d === 'toF'){
+      givenHtml = '<span class="fact-chip" style="color:'+col+';border-color:'+col+'">C = ' + sig3(current.uf) + ' µF</span>';
+      findLabel = 'Find: C in plain farads (no prefix)';
+      hintText = 'Write the number, then the unit — just &quot;F&quot;, no prefix letter in front of it.';
+    } else {
+      givenHtml = '<span class="fact-chip" style="color:'+col+';border-color:'+col+'">C = ' + sig3(current.correct) + ' F</span>';
+      findLabel = 'Find: C in µF';
+      hintText = 'Write the number the way it would appear on a real capacitor label, then the unit &quot;µF&quot; (type u for µ).';
+    }
+    var factsRowHtml = '<div class="facts-row">' + givenHtml +
+      '<span class="find-chip" style="color:'+col+';border-color:'+col+'">' + findLabel + '</span></div>';
+
+    card.innerHTML =
+      '<p class="problem-text">' + current.scenario + '</p>' +
+      factsRowHtml +
+      '<div class="field-row">' +
+        '<label>Your answer</label>' +
+        '<div class="answer-row">' +
+          '<input id="answerInput-'+id+'" class="answer-value-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00">' +
+          '<input id="answerUnitInput-'+id+'" class="answer-unit-input" type="text" autocomplete="off" spellcheck="false" placeholder="unit">' +
+          buildCalculatorHtml() +
+        '</div>' +
+        '<p class="field-hint">' + hintText + '</p>' +
+      '</div>' +
+      '<div class="actions-row">' +
+        '<button class="check-btn" id="checkBtn-'+id+'" type="button">Check</button>' +
+        '<span class="feedback" id="feedback-'+id+'" aria-live="polite"></span>' +
+      '</div>';
+
+    document.getElementById('checkBtn-'+id).addEventListener('click', checkAnswer);
+    card.querySelectorAll('input').forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+    });
+    wireCalculator(card);
+    document.getElementById('answerInput-'+id).focus();
+  }
+
+  function checkAnswer(){
+    var answerEl = document.getElementById('answerInput-'+id);
+    var answerUnitEl = document.getElementById('answerUnitInput-'+id);
+    var feedback = document.getElementById('feedback-'+id);
+    var checkBtn = document.getElementById('checkBtn-'+id);
+    function mark(el, ok){ el.classList.remove('ok','bad'); el.classList.add(ok ? 'ok' : 'bad'); }
+
+    var requiredScale = current.direction === 'toF' ? 1 : 1e-6;
+    var unitScaleUsed = unitScale(F_UNIT_ALIASES, answerUnitEl.value);
+    var unitRight = unitScaleUsed === requiredScale;
+    mark(answerUnitEl, unitRight);
+
+    var numRight = closeEnough(normalizeNumber(answerEl.value) * (unitScaleUsed || 1), current.correct);
+    mark(answerEl, numRight);
+
+    var message = '';
+    if(!numRight){ message = 'Not quite — check your powers of ten and try again.'; }
+    else if(!unitRight){
+      message = current.direction === 'toF'
+        ? 'Right number, but write it with no prefix — just "F".'
+        : 'Right number, but write it with the µ (micro) prefix — "µF", not plain "F".';
+    }
+
+    asked++;
+    if(numRight && unitRight){
+      score++;
+      document.getElementById('scoreBadge-'+id).innerHTML = '<b>'+score+'</b> / '+ROUND_SIZE+' correct this round';
+      checkBtn.disabled = true;
+      feedback.textContent = '';
+      var correctModal = document.getElementById('correctModal');
+      correctModal.hidden = false;
+      setTimeout(function(){
+        correctModal.hidden = true;
+        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+      }, 1000);
+    } else {
+      feedback.textContent = message;
+      asked--;
+    }
+  }
+
+  function showRoundDone(){
+    var modal = document.getElementById('roundDoneModal');
+    var title = document.getElementById('roundDoneTitle');
+    var summary = document.getElementById('roundDoneSummary');
+    var btn = document.getElementById('roundDoneBtn');
+    if(score === ROUND_SIZE){
+      title.textContent = "Perfect round!";
+      summary.textContent = "All " + ROUND_SIZE + " correct.";
+    } else {
+      title.textContent = "Round complete";
+      summary.textContent = score + " out of " + ROUND_SIZE + " correct. Have another go to lock it in.";
+    }
+    btn.onclick = function(){ modal.hidden = true; startRound(); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function startRound(){
+    score = 0; asked = 0;
+    document.getElementById('scoreBadge-'+id).innerHTML = '<b>0</b> / '+ROUND_SIZE+' correct this round';
+    newProblem();
+  }
+
+  document.getElementById('newRoundBtn-'+id).addEventListener('click', startRound);
+
+  window.formulaLabTopics = window.formulaLabTopics || [];
+  window.formulaLabTopics.push(startRound);
+  startRound();
+})();
 </script>
 
 <script>
