@@ -1894,14 +1894,42 @@
 <script>
 (function(){
   "use strict";
+  // Keep the "Rearranged formula" field hidden until the student has put
+  // something in "Original formula" (or picked one, in Learner mode) —
+  // otherwise it's visible (and in Confident mode, its placeholder gives
+  // the answer away) before the prerequisite step is even attempted.
+  function syncFormulaGate(card){
+    var origField = card.querySelector('[id^="origFormulaInput-"]');
+    var rearrField = card.querySelector('[id^="formulaInput-"]');
+    if(!origField || !rearrField) return;
+    var rearrRow = rearrField.closest('.field-row') || rearrField.parentElement;
+    if(!rearrRow) return;
+    rearrRow.style.display = origField.value ? '' : 'none';
+  }
+  function syncAllCards(){
+    document.querySelectorAll('.problem-card').forEach(syncFormulaGate);
+  }
+  var gateObserver = new MutationObserver(syncAllCards);
+  document.querySelectorAll('.problem-card').forEach(function(card){
+    gateObserver.observe(card, {childList:true, subtree:true});
+  });
+  syncAllCards();
+  document.addEventListener('input', syncAllCards);
+  document.addEventListener('change', syncAllCards);
+  document.addEventListener('click', function(){ setTimeout(syncAllCards, 0); });
+})();
+</script>
+<script>
+(function(){
+  "use strict";
   var TRACK_URL = "https://metaologist.herokuapp.com/api/log/";
   var SUBJECT = "mechanics";
   var PAGE = (location.search.indexOf('embed=1') !== -1) ? 'formula-lab-recap' : 'formula-lab';
   function send(payload){
     try{
       var body = JSON.stringify(payload);
-      if(navigator.sendBeacon){ navigator.sendBeacon(TRACK_URL, new Blob([body], {type:'application/json'})); }
-      else { fetch(TRACK_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:body, keepalive:true}).catch(function(){}); }
+      if(navigator.sendBeacon){ navigator.sendBeacon(TRACK_URL, new Blob([body], {type:'text/plain'})); }
+      else { fetch(TRACK_URL, {method:'POST', headers:{'Content-Type':'text/plain'}, body:body, keepalive:true}).catch(function(){}); }
     }catch(e){}
   }
   function track(eventType, extra){

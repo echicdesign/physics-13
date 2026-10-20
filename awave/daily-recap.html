@@ -238,8 +238,8 @@
   function send(payload){
     try{
       var body = JSON.stringify(payload);
-      if(navigator.sendBeacon){ navigator.sendBeacon(TRACK_URL, new Blob([body], {type:'application/json'})); }
-      else { fetch(TRACK_URL, {method:'POST', headers:{'Content-Type':'application/json'}, body:body, keepalive:true}).catch(function(){}); }
+      if(navigator.sendBeacon){ navigator.sendBeacon(TRACK_URL, new Blob([body], {type:'text/plain'})); }
+      else { fetch(TRACK_URL, {method:'POST', headers:{'Content-Type':'text/plain'}, body:body, keepalive:true}).catch(function(){}); }
     }catch(e){}
   }
   window.physicsTrack = function(eventType, extra){
