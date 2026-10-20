@@ -2126,6 +2126,7 @@
         "A bigger capacitor can store more charge than a smaller one for the same voltage across it — what is that rating called?",
       ],
       definition:"Capacitance is how much charge a capacitor stores per volt of potential difference across it. It is measured in farads.",
+      img:'caps/dndcaps/capacitance.JPG',
       colorLight:'#1B8A6B', colorDark:'#5FD1AC', fill:'#1B8A6B' },
     { key:'Q', order:2, name:'Charge', symbol:'Q', unit:'C',
       nameAliases:['charge', 'charge stored', 'electric charge'], symbolAliases:['q'], unitAliases:['c', 'coulomb', 'coulombs'],
@@ -2135,6 +2136,7 @@
         "This quantity is calculated using Q = CV — the capacitance times the voltage across the plates.",
       ],
       definition:"Charge (on a capacitor) is the total amount of electric charge stored on its plates. It is measured in coulombs.",
+      img:'caps/dndcaps/charge.JPG',
       colorLight:'#5A2BB0', colorDark:'#A07FE8', fill:'#5A2BB0' },
     { key:'V', order:3, name:'Voltage', symbol:'V', unit:'V',
       nameAliases:['voltage', 'potential difference', 'pd'], symbolAliases:['v'], unitAliases:['v', 'volt', 'volts'],
@@ -2144,6 +2146,7 @@
         "The electrical push driving charge onto a capacitor's plates, same idea as in any other part of a circuit.",
       ],
       definition:"Voltage (on a capacitor) is the potential difference across its plates. It is measured in volts.",
+      img:'caps/dndcaps/voltage.JPG',
       colorLight:'#2B6CB0', colorDark:'#7FB2E8', fill:'#2B6CB0' },
     { key:'E', order:4, name:'Energy stored', symbol:'E', unit:'J',
       nameAliases:['energy stored', 'energy', 'stored energy'], symbolAliases:['e'], unitAliases:['j', 'joule', 'joules'],
@@ -2153,6 +2156,7 @@
         "This quantity is calculated using E = ½QV, or equivalently ½CV² — it isn't measured directly.",
       ],
       definition:"Energy stored is the total electrical energy held in a charged capacitor's field. It is measured in joules.",
+      img:'caps/dndcaps/energy-stored.JPG',
       colorLight:'#B08A2B', colorDark:'#E8CC7F', fill:'#B08A2B' },
     { key:'tau', order:5, name:'Time constant', symbol:'τ', unit:'s',
       nameAliases:['time constant', 'rc time constant'], symbolAliases:['τ', 'tau'], unitAliases:['s', 'sec', 'second', 'seconds'],
@@ -2162,6 +2166,7 @@
         "This quantity is calculated using τ = RC — resistance times capacitance.",
       ],
       definition:"The time constant is how quickly a capacitor charges or discharges through a resistor. It is measured in seconds.",
+      img:'caps/dndcaps/time-constant.JPG',
       colorLight:'#B0562B', colorDark:'#E8A67F', fill:'#B0562B' },
     { key:'Xc', order:6, name:'Capacitive reactance', symbol:'Xc', unit:'Ω',
       nameAliases:['capacitive reactance', 'reactance'], symbolAliases:['xc'], unitAliases:['ω', 'ohm', 'ohms'],
@@ -2171,6 +2176,7 @@
         "This quantity is calculated using Xc = 1 ÷ (2πfC) — it falls as the frequency rises.",
       ],
       definition:"Capacitive reactance is how strongly a capacitor opposes AC current at a given frequency. It is measured in ohms.",
+      img:'caps/dndcaps/capacitive-reactance.JPG',
       colorLight:'#B0562B', colorDark:'#E8A67F', fill:'#B0562B' },
     { key:'Z', order:7, name:'Impedance', symbol:'Z', unit:'Ω',
       nameAliases:['impedance'], symbolAliases:['z'], unitAliases:['ω', 'ohm', 'ohms'],
@@ -2180,6 +2186,7 @@
         "This quantity is calculated using Z = √(R² + Xc²) for a resistor and capacitor in series — not simple addition, because the two oppositions are out of phase.",
       ],
       definition:"Impedance is the total opposition to AC current in a circuit, combining resistance and reactance. It is measured in ohms.",
+      img:'caps/dndcaps/impedance.JPG',
       colorLight:'#8A2B6C', colorDark:'#D67FB2', fill:'#8A2B6C' },
   ];
 
@@ -2298,12 +2305,23 @@
     applyQColor(card, q);
 
     var tagHtml = '<span class="tag" hidden></span>';
+    var picHtml = q.img ?
+      '<button type="button" class="qpic-toggle">🖼 Show diagram</button>'
+      : '';
     card.innerHTML =
       tagHtml +
       '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
       '<p class="clue"></p>' +
+      picHtml +
       '<div class="quiz"></div>' +
       '<div class="unlocked-panel" hidden></div>';
+
+    var picToggle = card.querySelector('.qpic-toggle');
+    if(picToggle){
+      picToggle.addEventListener('click', function(){
+        window.openPicLightbox(q.img, q.name + ' diagram', picToggle);
+      });
+    }
 
     renderQuizState(q, card);
     return card;
