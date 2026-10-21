@@ -177,9 +177,9 @@
 
   .pic-lightbox{ position:fixed; inset:0; z-index:60; background:rgba(0,0,0,0.88); display:flex; align-items:center; justify-content:center; padding:16px; cursor:zoom-out; }
   .pic-lightbox[hidden]{ display:none; }
-  .pic-lightbox-gallery{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; align-items:flex-start; max-width:92vw; max-height:92vh; overflow:auto; cursor:auto; }
+  .pic-lightbox-gallery{ display:flex; gap:20px; flex-wrap:wrap; justify-content:center; align-items:flex-start; max-width:96vw; max-height:94vh; overflow:auto; cursor:auto; }
   .pic-lightbox-figure{ margin:0; text-align:center; }
-  .pic-lightbox-figure img{ max-width:min(85vw,360px); max-height:70vh; object-fit:contain; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,0.5); display:block; }
+  .pic-lightbox-figure img{ max-width:92vw; max-height:88vh; width:auto; height:auto; object-fit:contain; border-radius:8px; box-shadow:0 12px 40px rgba(0,0,0,0.5); display:block; }
   .pic-lightbox-figure figcaption{ margin-top:8px; font-family:'IBM Plex Mono', monospace; font-size:0.78rem; color:#fff; letter-spacing:0.03em; }
   .pic-lightbox-close{ position:absolute; top:12px; right:12px; font-family:'IBM Plex Mono', monospace; font-size:1.3rem; line-height:1; width:44px; height:44px; border-radius:50%; border:1px solid rgba(255,255,255,0.4); background:rgba(0,0,0,0.5); color:#fff; cursor:pointer; }
   .pic-lightbox-close:hover{ background:rgba(255,255,255,0.15); }
@@ -5814,7 +5814,7 @@ function indArea(v){
     CLR: { B: capColor('#2B6CB0','#7FB2E8'), A: capColor('#1B8A6B','#5FD1AC'), phi: capColor('#6B2BB0','#B27FE8') },
     LABEL: { B:'B', A:'A', phi:'φ' },
     NAME: { B:'magnetic flux density', A:'area', phi:'magnetic flux' },
-    IMG: { B:'ind/dndind/flux-density.JPG', phi:'ind/dndind/magnetic-flux.JPG' },
+    IMG: { B:'ind/dndind/flux-density.JPG', A:'ind/dndind/coil-area.jpg', phi:'ind/dndind/magnetic-flux.JPG' },
     UNIT: { B:'T', A:'m²', phi:'Wb' },
     NAME_ALIASES: {
       B: ['magnetic flux density', 'flux density', 'magnetic field', 'magnetic field strength', 'field strength'],

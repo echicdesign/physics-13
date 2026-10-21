@@ -16,6 +16,10 @@
 !aelec/Images/*.jpg
 !aelec/Images/*.JPG
 !aelec/caps/dndcaps/*.JPG
+!aelec/ind/dndind/*.JPG
+!aelec/ind/dndind/*.jpg
+!aelec/Induction-Variables.pdf
+!aelec/Capacitor-Variables.pdf
 !acomplex/complex-lab.html
 !acomplex/formula-lab.html
 !adiff/formula-lab.html
