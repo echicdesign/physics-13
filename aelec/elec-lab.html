@@ -188,9 +188,6 @@
     </div>
 
     <div class="layout">
-      <div class="stage">
-        <canvas id="waveCanvas-ohm" role="img" aria-label="Ohm's Law &amp; Power circuit diagram"></canvas>
-      </div>
       <div class="grid" id="cardsGrid-ohm"></div>
     </div>
   </section>
@@ -273,6 +270,7 @@
       </div>
       <button class="ghost-btn" id="resetBtn-cap" type="button">Next set</button>
       <a class="ghost-btn" href="Capacitor-Variables.pdf" target="_blank" rel="noopener">📄 Overview</a>
+      <a class="ghost-btn" href="https://claude.ai/artifact/VrGse5sWp1MyUFbwMR7PFQ" target="_blank" rel="noopener">🎵 Ditty</a>
     </div>
 
     <div class="layout">
@@ -318,16 +316,37 @@
 (function(){
   "use strict";
   var tabButtons = document.querySelectorAll('.tab-btn');
+
+  function selectTab(id, updateUrl){
+    var btn = document.querySelector('.tab-btn[data-topic="' + id + '"]');
+    if(!btn || btn.disabled) return false;
+    tabButtons.forEach(function(b){ b.classList.toggle('active', b === btn); });
+    document.querySelectorAll('.topic-panel').forEach(function(p){
+      p.hidden = (p.getAttribute('data-topic') !== id);
+    });
+    if(updateUrl){
+      try{
+        var url = new URL(window.location.href);
+        url.searchParams.set('tab', id);
+        window.history.replaceState(null, '', url);
+      }catch(e){}
+    }
+    return true;
+  }
+
   tabButtons.forEach(function(btn){
     btn.addEventListener('click', function(){
       if(btn.disabled) return;
-      var id = btn.getAttribute('data-topic');
-      tabButtons.forEach(function(b){ b.classList.toggle('active', b === btn); });
-      document.querySelectorAll('.topic-panel').forEach(function(p){
-        p.hidden = (p.getAttribute('data-topic') !== id);
-      });
+      selectTab(btn.getAttribute('data-topic'), true);
     });
   });
+
+  // Deep-link: ?tab=cap opens straight to that topic, so a student's
+  // address bar tells you which one they're stuck on.
+  try{
+    var wantedTab = new URLSearchParams(window.location.search).get('tab');
+    if(wantedTab) selectTab(wantedTab, false);
+  }catch(e){}
 
   document.querySelectorAll('.show-pic-btn').forEach(function(btn){
     var box = btn.closest('.toprow').parentElement.querySelector('.picture-box');
@@ -857,91 +876,6 @@
     });
   });
   updateModeButtons();
-
-  // ---------- canvas ----------
-  var canvas = document.getElementById('waveCanvas-ohm');
-  var cctx = canvas.getContext('2d');
-  var cw = 0, ch = 130;
-  var pal = {};
-  function readPalette(){
-    var cs = getComputedStyle(document.documentElement);
-    pal.ink = cs.getPropertyValue('--ink').trim();
-    pal.inkMuted = cs.getPropertyValue('--ink-muted').trim();
-    pal.border = cs.getPropertyValue('--border').trim();
-    QUANTITIES.forEach(function(q){
-      pal[q.key] = isDarkMode() ? q.colorDark : q.colorLight;
-    });
-  }
-  readPalette();
-  if(window.matchMedia){ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', readPalette); }
-
-  function sizeCanvas(){
-    var rect = canvas.getBoundingClientRect();
-    var dpr = window.devicePixelRatio || 1;
-    cw = rect.width;
-    canvas.width = cw*dpr; canvas.height = ch*dpr;
-    cctx.setTransform(dpr,0,0,dpr,0,0);
-  }
-  sizeCanvas();
-  window.addEventListener('resize', sizeCanvas);
-
-  function render(){
-    cctx.clearRect(0,0,cw,ch);
-
-    var margin = 50;
-    var loopW = Math.max(cw - margin*2, 120);
-    var topY = 25, botY = 100;
-    var leftX = margin, rightX = margin + loopW;
-
-    cctx.strokeStyle = pal.border;
-    cctx.lineWidth = 2;
-    cctx.beginPath();
-    cctx.moveTo(leftX, topY); cctx.lineTo(leftX, botY);
-    cctx.moveTo(leftX, topY); cctx.lineTo(rightX, topY);
-    cctx.moveTo(leftX, botY); cctx.lineTo(rightX, botY);
-    cctx.stroke();
-
-    var zigTop = topY + 10, zigBot = botY - 10, zigN = 6, i, yy, xx;
-    cctx.strokeStyle = unlocked.R ? pal.R : pal.ink;
-    cctx.beginPath();
-    cctx.moveTo(rightX, topY);
-    cctx.lineTo(rightX, zigTop);
-    for(i=0;i<=zigN;i++){
-      yy = zigTop + (zigBot-zigTop)*i/zigN;
-      xx = rightX + (i%2===0 ? -8 : 8);
-      cctx.lineTo(xx, yy);
-    }
-    cctx.lineTo(rightX, zigBot);
-    cctx.lineTo(rightX, botY);
-    cctx.stroke();
-    cctx.fillStyle = pal.inkMuted;
-    cctx.font = "11px 'Trocchi', serif"; cctx.textAlign = 'left';
-    cctx.fillText('R', rightX + 14, (zigTop+zigBot)/2);
-    cctx.textAlign = 'right';
-    cctx.fillText('V', leftX - 8, (topY+botY)/2);
-
-    var speed = unlocked.I ? waveState.I : 1;
-    var perim = 2*loopW + 2*(botY-topY);
-    var tNow = (performance.now()/1000 * speed * 30) % perim;
-    function pointOnLoop(d){
-      if(d < loopW) return {x:leftX+d, y:topY};
-      d -= loopW;
-      if(d < (botY-topY)) return {x:rightX, y:topY+d};
-      d -= (botY-topY);
-      if(d < loopW) return {x:rightX-d, y:botY};
-      d -= loopW;
-      return {x:leftX, y:botY-d};
-    }
-    cctx.fillStyle = unlocked.I ? pal.I : pal.ink;
-    for(var k=0;k<6;k++){
-      var dd = (tNow + k*(perim/6)) % perim;
-      var pt = pointOnLoop(dd);
-      cctx.beginPath(); cctx.arc(pt.x, pt.y, 3.5, 0, 2*Math.PI); cctx.fill();
-    }
-
-    requestAnimationFrame(render);
-  }
-  requestAnimationFrame(render);
 
   renderGrid();
   updateProgress();
