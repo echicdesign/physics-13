@@ -2865,12 +2865,23 @@
     applyQColor(card, q);
 
     var tagHtml = '<span class="tag" hidden></span>';
+    var picHtml = q.img ?
+      '<button type="button" class="qpic-toggle">🖼 Show diagram</button>'
+      : '';
     card.innerHTML =
       tagHtml +
       '<h3 class="qcard-title">Quantity ' + q.order + '</h3>' +
       '<p class="clue"></p>' +
+      picHtml +
       '<div class="quiz"></div>' +
       '<div class="unlocked-panel" hidden></div>';
+
+    var picToggle = card.querySelector('.qpic-toggle');
+    if(picToggle){
+      picToggle.addEventListener('click', function(){
+        window.openPicLightbox(q.img, q.name + ' diagram', picToggle);
+      });
+    }
 
     renderQuizState(q, card);
     return card;
