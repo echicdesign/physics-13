@@ -914,6 +914,18 @@
     return !isNaN(typed) && Math.abs(typed - correct) <= 0.02*Math.abs(correct);
   }
 
+  // Learner mode spells out the unit name alongside its symbol (e.g. "Webers, Wb")
+  // so students see what the abbreviation stands for, not just the letter.
+  var UNIT_FULL_NAME = {
+    'F':'Farads', 'C':'Coulombs', 'V':'Volts', 'J':'Joules', 's':'Seconds',
+    'Ω':'Ohms', 'H':'Henries', 'Wb':'Webers', 'T':'Teslas', 'Hz':'Hertz',
+    'A':'Amps', 'm²':'Square Metres'
+  };
+  function unitDisplay(sym){
+    var full = UNIT_FULL_NAME[sym];
+    return full ? (full + ', ' + sym) : sym;
+  }
+
   function buildFormulaTopic(cfg){
     var id = cfg.idSuffix;
     var panel = document.querySelector('.topic-panel[data-topic="'+cfg.dataTopic+'"]');
@@ -959,7 +971,7 @@
 
       var learnerFactsHtml = givenKeys.map(function(k){
         return '<span class="fact-chip" style="color:'+colorOf(k)+';border-color:'+colorOf(k)+'">'
-          + cfg.LABEL[k] + ' = ' + fmtVal(k, current.values[k]) + ' ' + cfg.UNIT[k] + picBtnHtml(k) + '</span>';
+          + cfg.LABEL[k] + ' = ' + fmtVal(k, current.values[k]) + ' ' + unitDisplay(cfg.UNIT[k]) + picBtnHtml(k) + '</span>';
       }).join('');
 
       var factGuessHtml = '';
