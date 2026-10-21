@@ -85,8 +85,11 @@
   .problem-card{ background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:24px 26px; }
   .problem-text{ font-family:'Fraunces', serif; font-size:1.15rem; line-height:1.5; margin:0 0 18px; text-wrap:balance; }
   .facts-row{ display:flex; gap:12px; flex-wrap:wrap; margin-bottom:22px; }
-  .fact-chip{ font-family:'Trocchi', serif; font-size:0.95rem; font-weight:600; padding:8px 14px; border-radius:9px; border:1.5px solid; background:var(--surface-2); }
-  .find-chip{ font-family:'Trocchi', serif; font-size:0.95rem; font-weight:700; padding:8px 14px; border-radius:9px; border:1.5px dashed; }
+  .fact-chip{ font-family:'Trocchi', serif; font-size:0.95rem; font-weight:600; padding:8px 14px; border-radius:9px; border:1.5px solid; background:var(--surface-2); display:inline-flex; align-items:center; gap:7px; }
+  .find-chip{ font-family:'Trocchi', serif; font-size:0.95rem; font-weight:700; padding:8px 14px; border-radius:9px; border:1.5px dashed; display:inline-flex; align-items:center; gap:7px; }
+  .fact-pic-btn{ font-size:0.95rem; line-height:1; background:none; border:none; padding:0; margin:0; cursor:pointer; opacity:0.75; }
+  .fact-pic-btn:hover{ opacity:1; }
+  .fact-pic-btn:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:4px; }
 
   .id-block{ margin-bottom:22px; }
   .id-block-label{ font-family:'IBM Plex Mono', monospace; font-size:0.78rem; letter-spacing:0.02em; color:var(--ink-muted); margin:0 0 10px; }
@@ -224,6 +227,7 @@
           <option value="xfmr">Transformer</option>
           <option value="xl">Inductive Reactance</option>
           <option value="f0">Resonant Frequency</option>
+          <option value="hconv">mH &harr; H Conversion</option>
         </optgroup>
       </select>
       <button class="ghost-btn danger-btn" id="newStudentBtn" type="button">New student &mdash; clear everything</button>
@@ -598,6 +602,14 @@
     </div>
     <div class="problem-card" id="problemCard-f0"></div>
   </section>
+
+  <section class="topic-panel" data-topic="hconv" hidden>
+    <div class="toprow">
+      <span class="badge" id="scoreBadge-hconv"><b>0</b> / 6 correct this round</span>
+      <button class="ghost-btn" id="newRoundBtn-hconv" type="button">New round</button>
+    </div>
+    <div class="problem-card" id="problemCard-hconv"></div>
+  </section>
 </div>
 
 <div class="modal-overlay" id="roundDoneModal" hidden>
@@ -939,9 +951,15 @@
       var t = current.target;
       var givenKeys = cfg.keys.filter(function(k){ return k !== t; });
 
+      function picBtnHtml(k){
+        var src = cfg.IMG && cfg.IMG[k];
+        if(!src) return '';
+        return '<button type="button" class="fact-pic-btn" data-pic-src="'+src+'" data-pic-name="'+cfg.NAME[k]+'" aria-label="Show '+cfg.NAME[k]+' diagram">🖼</button>';
+      }
+
       var learnerFactsHtml = givenKeys.map(function(k){
         return '<span class="fact-chip" style="color:'+colorOf(k)+';border-color:'+colorOf(k)+'">'
-          + cfg.LABEL[k] + ' = ' + fmtVal(k, current.values[k]) + ' ' + cfg.UNIT[k] + '</span>';
+          + cfg.LABEL[k] + ' = ' + fmtVal(k, current.values[k]) + ' ' + cfg.UNIT[k] + picBtnHtml(k) + '</span>';
       }).join('');
 
       var factGuessHtml = '';
@@ -960,7 +978,7 @@
       var factsRowHtml = '';
       if(FIELD_MODE !== 'expert'){
         var findHtml = '<span class="find-chip" style="color:'+colorOf(t)+';border-color:'+colorOf(t)+'">Find: '
-          + cfg.LABEL[t] + ' (' + cfg.NAME[t] + ')</span>';
+          + cfg.LABEL[t] + ' (' + cfg.NAME[t] + ')' + picBtnHtml(t) + '</span>';
         factsRowHtml = '<div class="facts-row">' + (FIELD_MODE === 'learner' ? learnerFactsHtml : '') + findHtml + '</div>';
       }
 
@@ -1247,18 +1265,17 @@
     closeBtn.addEventListener('click', closeLightbox);
     document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeLightbox(); });
 
-    function openPicGallery(keys, opener){
+    function openPicGallerySrcs(items, opener){
       gallery.innerHTML = '';
-      keys.forEach(function(k){
-        var pic = PIC_MAP[k];
-        if(!pic) return;
+      items.forEach(function(it){
+        if(!it || !it.src) return;
         var fig = document.createElement('figure');
         fig.className = 'pic-lightbox-figure';
         var img = document.createElement('img');
-        img.src = pic.src;
-        img.alt = pic.name + ' diagram';
+        img.src = it.src;
+        img.alt = it.name + ' diagram';
         var cap = document.createElement('figcaption');
-        cap.textContent = pic.name;
+        cap.textContent = it.name;
         fig.appendChild(img);
         fig.appendChild(cap);
         gallery.appendChild(fig);
@@ -1269,9 +1286,24 @@
       closeBtn.focus();
     }
 
+    function openPicGallery(keys, opener){
+      openPicGallerySrcs(keys.map(function(k){ return PIC_MAP[k]; }), opener);
+    }
+
     document.querySelectorAll('.pic-btn').forEach(function(btn){
       var keys = (btn.getAttribute('data-keys') || '').split(',').map(function(s){ return s.trim(); }).filter(Boolean);
       btn.addEventListener('click', function(){ openPicGallery(keys, btn); });
+    });
+
+    // Learner-mode fact chips (any topic) carry their own data-pic-src/name,
+    // so handle their clicks generically via delegation -- cards re-render
+    // on every new problem, direct listeners would need constant rebinding.
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest && e.target.closest('.fact-pic-btn');
+      if(!btn) return;
+      var src = btn.getAttribute('data-pic-src');
+      if(!src) return;
+      openPicGallerySrcs([{ src: src, name: btn.getAttribute('data-pic-name') || '' }], btn);
     });
   })();
 </script>
@@ -5023,6 +5055,7 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     CLR: { C: capColor('#6B2BB0','#B27FE8'), V: capColor('#B0562B','#E8A67F'), Q: capColor('#2B6CB0','#7FB2E8') },
     LABEL: { C:'C', V:'V', Q:'Q' },
     NAME: { C:'capacitance', V:'voltage', Q:'charge' },
+    IMG: { C:'caps/dndcaps/capacitance.JPG', V:'caps/dndcaps/voltage.JPG', Q:'caps/dndcaps/charge.JPG' },
     UNIT: { C:'F', V:'V', Q:'C' },
     NAME_ALIASES: { C: ['capacitance'], V: ['voltage', 'potential difference', 'pd'], Q: ['charge', 'charge stored'] },
     SYMBOL_ALIASES: { C: ['c'], V: ['v'], Q: ['q'] },
@@ -5078,6 +5111,7 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     CLR: { er: capColor('#8A5A1B','#D1A05F'), A: capColor('#1B8A6B','#5FD1AC'), d: capColor('#B0562B','#E8A67F'), C: capColor('#6B2BB0','#B27FE8') },
     LABEL: { er:'εᵣ', A:'A', d:'d', C:'C' },
     NAME: { er:'dielectric constant / relative permittivity', A:'plate area', d:'plate separation', C:'capacitance' },
+    IMG: { er:'caps/dndcaps/Relative Permittivity.jpg', A:'caps/dndcaps/plate area.jpg', d:'caps/dndcaps/plate distance.jpg', C:'caps/dndcaps/capacitance.JPG' },
     UNIT: { er:'', A:'m²', d:'m', C:'F' },
     NAME_ALIASES: {
       er: ['dielectric constant', 'relative permittivity', 'permittivity', 'dielectric', 'dielectric constant / relative permittivity'],
@@ -5135,6 +5169,7 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     CLR: { Q: capColor('#2B6CB0','#7FB2E8'), V: capColor('#B0562B','#E8A67F'), E: capColor('#1B8A6B','#5FD1AC') },
     LABEL: { Q:'Q', V:'V', E:'E' },
     NAME: { Q:'charge', V:'voltage', E:'energy stored' },
+    IMG: { Q:'caps/dndcaps/charge.JPG', V:'caps/dndcaps/voltage.JPG', E:'caps/dndcaps/energy-stored.JPG' },
     UNIT: { Q:'C', V:'V', E:'J' },
     NAME_ALIASES: { Q: ['charge', 'charge stored'], V: ['voltage', 'potential difference', 'pd'], E: ['energy', 'energy stored', 'stored energy', 'potential energy'] },
     SYMBOL_ALIASES: { Q: ['q'], V: ['v'], E: ['e', 'ep', 'w'] },
@@ -5184,6 +5219,7 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     CLR: { R: capColor('#1B8A6B','#5FD1AC'), C: capColor('#6B2BB0','#B27FE8'), tau: capColor('#8A2B6C','#D67FB2') },
     LABEL: { R:'R', C:'C', tau:'τ' },
     NAME: { R:'resistance', C:'capacitance', tau:'time constant' },
+    IMG: { C:'caps/dndcaps/capacitance.JPG', tau:'caps/dndcaps/time-constant.JPG' },
     UNIT: { R:'Ω', C:'F', tau:'s' },
     NAME_ALIASES: { R: ['resistance'], C: ['capacitance'], tau: ['time constant', 'tau'] },
     SYMBOL_ALIASES: { R: ['r'], C: ['c'], tau: ['τ', 'tau'] },
@@ -5248,6 +5284,7 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     CLR: { C: capColor('#6B2BB0','#B27FE8'), V: capColor('#2B6CB0','#7FB2E8'), Qtau: capColor('#5A2BB0','#A07FE8') },
     LABEL: { C:'C', V:'V', Qtau:'Qτ' },
     NAME: { C:'capacitance', V:'voltage', Qtau:'charge at one time constant' },
+    IMG: { C:'caps/dndcaps/capacitance.JPG', V:'caps/dndcaps/voltage.JPG', Qtau:'caps/dndcaps/charge.JPG' },
     UNIT: { C:'F', V:'V', Qtau:'C' },
     NAME_ALIASES: {
       C: ['capacitance'],
@@ -5308,6 +5345,7 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     CLR: { C1: capColor('#2B6CB0','#7FB2E8'), C2: capColor('#B0562B','#E8A67F'), CT: capColor('#6B2BB0','#B27FE8') },
     LABEL: { C1:'C₁', C2:'C₂', CT:'CT' },
     NAME: { C1:'capacitance 1', C2:'capacitance 2', CT:'total capacitance' },
+    IMG: { C1:'caps/dndcaps/capacitance.JPG', C2:'caps/dndcaps/capacitance.JPG', CT:'caps/dndcaps/capacitance.JPG' },
     UNIT: { C1:'F', C2:'F', CT:'F' },
     NAME_ALIASES: { C1: ['capacitance', 'capacitance 1', 'capacitance1'], C2: ['capacitance', 'capacitance 2', 'capacitance2'], CT: ['total capacitance', 'capacitance total', 'combined capacitance', 'equivalent capacitance'] },
     SYMBOL_ALIASES: { C1: ['c1'], C2: ['c2'], CT: ['ct', 'ctotal'] },
@@ -5350,6 +5388,7 @@ function capColor(light, dark){ return { light: light, dark: dark }; }
     CLR: { C1: capColor('#2B6CB0','#7FB2E8'), C2: capColor('#B0562B','#E8A67F'), C3: capColor('#1B8A6B','#5FD1AC'), CT: capColor('#6B2BB0','#B27FE8') },
     LABEL: { C1:'C₁', C2:'C₂', C3:'C₃', CT:'CT' },
     NAME: { C1:'capacitance 1', C2:'capacitance 2', C3:'capacitance 3', CT:'total capacitance' },
+    IMG: { C1:'caps/dndcaps/capacitance.JPG', C2:'caps/dndcaps/capacitance.JPG', C3:'caps/dndcaps/capacitance.JPG', CT:'caps/dndcaps/capacitance.JPG' },
     UNIT: { C1:'F', C2:'F', C3:'F', CT:'F' },
     NAME_ALIASES: { C1: ['capacitance', 'capacitance 1', 'capacitance1'], C2: ['capacitance', 'capacitance 2', 'capacitance2'], C3: ['capacitance', 'capacitance 3', 'capacitance3'], CT: ['total capacitance', 'capacitance total', 'combined capacitance', 'equivalent capacitance'] },
     SYMBOL_ALIASES: { C1: ['c1'], C2: ['c2'], C3: ['c3'], CT: ['ct', 'ctotal'] },
@@ -5407,6 +5446,7 @@ var CAP_AC_C_POOL = [0.001e-6, 0.0047e-6, 0.01e-6, 0.047e-6, 0.1e-6, 0.47e-6, 1e
     CLR: { f: capColor('#2B6CB0','#7FB2E8'), C: capColor('#6B2BB0','#B27FE8'), Xc: capColor('#B0562B','#E8A67F') },
     LABEL: { f:'f', C:'C', Xc:'Xc' },
     NAME: { f:'frequency', C:'capacitance', Xc:'capacitive reactance' },
+    IMG: { C:'caps/dndcaps/capacitance.JPG', Xc:'caps/dndcaps/capacitive-reactance.JPG' },
     UNIT: { f:'Hz', C:'F', Xc:'Ω' },
     NAME_ALIASES: { f: ['frequency'], C: ['capacitance'], Xc: ['capacitive reactance', 'reactance'] },
     SYMBOL_ALIASES: { f: ['f'], C: ['c'], Xc: ['xc'] },
@@ -5458,6 +5498,7 @@ var CAP_AC_C_POOL = [0.001e-6, 0.0047e-6, 0.01e-6, 0.047e-6, 0.1e-6, 0.47e-6, 1e
     CLR: { R: capColor('#1B8A6B','#5FD1AC'), Xc: capColor('#B0562B','#E8A67F'), Z: capColor('#8A2B6C','#D67FB2') },
     LABEL: { R:'R', Xc:'Xc', Z:'Z' },
     NAME: { R:'resistance', Xc:'capacitive reactance', Z:'impedance' },
+    IMG: { Xc:'caps/dndcaps/capacitive-reactance.JPG', Z:'caps/dndcaps/impedance.JPG' },
     UNIT: { R:'Ω', Xc:'Ω', Z:'Ω' },
     NAME_ALIASES: { R: ['resistance'], Xc: ['capacitive reactance', 'reactance'], Z: ['impedance'] },
     SYMBOL_ALIASES: { R: ['r'], Xc: ['xc'], Z: ['z'] },
@@ -5718,6 +5759,7 @@ function indArea(v){
     CLR: { L: capColor('#8A2B6C','#D67FB2'), dI: capColor('#2B6CB0','#7FB2E8'), dt: capColor('#8A5A1B','#D1A05F'), eps: capColor('#B0562B','#E8A67F') },
     LABEL: { L:'L', dI:'ΔI', dt:'Δt', eps:'ε' },
     NAME: { L:'inductance', dI:'change in current', dt:'time taken', eps:'induced EMF' },
+    IMG: { L:'ind/dndind/inductance.JPG', eps:'ind/dndind/induced-emf.JPG' },
     UNIT: { L:'H', dI:'A', dt:'s', eps:'V' },
     NAME_ALIASES: {
       L: ['inductance', 'self inductance', 'self-inductance'],
@@ -5772,6 +5814,7 @@ function indArea(v){
     CLR: { B: capColor('#2B6CB0','#7FB2E8'), A: capColor('#1B8A6B','#5FD1AC'), phi: capColor('#6B2BB0','#B27FE8') },
     LABEL: { B:'B', A:'A', phi:'φ' },
     NAME: { B:'magnetic flux density', A:'area', phi:'magnetic flux' },
+    IMG: { B:'ind/dndind/flux-density.JPG', phi:'ind/dndind/magnetic-flux.JPG' },
     UNIT: { B:'T', A:'m²', phi:'Wb' },
     NAME_ALIASES: {
       B: ['magnetic flux density', 'flux density', 'magnetic field', 'magnetic field strength', 'field strength'],
@@ -5822,6 +5865,7 @@ function indArea(v){
     CLR: { dphi: capColor('#6B2BB0','#B27FE8'), dt: capColor('#8A5A1B','#D1A05F'), eps: capColor('#B0562B','#E8A67F') },
     LABEL: { dphi:'Δφ', dt:'Δt', eps:'ε' },
     NAME: { dphi:'change in flux', dt:'time taken', eps:'induced EMF' },
+    IMG: { eps:'ind/dndind/induced-emf.JPG' },
     UNIT: { dphi:'Wb', dt:'s', eps:'V' },
     NAME_ALIASES: {
       dphi: ['change in flux', 'change in magnetic flux', 'flux change'],
@@ -5875,6 +5919,7 @@ function indArea(v){
     CLR: { L: capColor('#8A2B6C','#D67FB2'), R: capColor('#1B8A6B','#5FD1AC'), tau: capColor('#8A5A1B','#D1A05F') },
     LABEL: { L:'L', R:'R', tau:'τ' },
     NAME: { L:'inductance', R:'resistance', tau:'time constant' },
+    IMG: { L:'ind/dndind/inductance.JPG', tau:'ind/dndind/time-constant-cart.JPG' },
     UNIT: { L:'H', R:'Ω', tau:'s' },
     NAME_ALIASES: { L: ['inductance', 'self inductance', 'self-inductance'], R: ['resistance'], tau: ['time constant', 'tau'] },
     SYMBOL_ALIASES: { L: ['l'], R: ['r'], tau: ['τ', 'tau'] },
@@ -5922,6 +5967,7 @@ function indArea(v){
     CLR: { L: capColor('#8A2B6C','#D67FB2'), I: capColor('#2B6CB0','#7FB2E8'), E: capColor('#1B8A6B','#5FD1AC') },
     LABEL: { L:'L', I:'I', E:'E' },
     NAME: { L:'inductance', I:'current', E:'energy stored' },
+    IMG: { L:'ind/dndind/inductance.JPG', E:'ind/dndind/energy-stored.JPG' },
     UNIT: { L:'H', I:'A', E:'J' },
     NAME_ALIASES: { L: ['inductance', 'self inductance', 'self-inductance'], I: ['current', 'steady current'], E: ['energy', 'energy stored', 'stored energy'] },
     SYMBOL_ALIASES: { L: ['l'], I: ['i'], E: ['e', 'ep', 'w'] },
@@ -5971,6 +6017,7 @@ function indArea(v){
     CLR: { Vp: capColor('#B0562B','#E8A67F'), Np: capColor('#2B6CB0','#7FB2E8'), Ns: capColor('#1B8A6B','#5FD1AC'), Vs: capColor('#6B2BB0','#B27FE8') },
     LABEL: { Vp:'Vp', Np:'Np', Ns:'Ns', Vs:'Vs' },
     NAME: { Vp:'primary voltage', Np:'primary turns', Ns:'secondary turns', Vs:'secondary voltage' },
+    IMG: { Vp:'ind/dndind/turns-ratio.JPG', Np:'ind/dndind/turns-ratio.JPG', Ns:'ind/dndind/turns-ratio.JPG', Vs:'ind/dndind/turns-ratio.JPG' },
     UNIT: { Vp:'V', Np:'', Ns:'', Vs:'V' },
     NAME_ALIASES: {
       Vp: ['primary voltage', 'input voltage', 'voltage primary'],
@@ -6041,6 +6088,7 @@ function indArea(v){
     CLR: { f: capColor('#2B6CB0','#7FB2E8'), L: capColor('#8A2B6C','#D67FB2'), XL: capColor('#B0562B','#E8A67F') },
     LABEL: { f:'f', L:'L', XL:'XL' },
     NAME: { f:'frequency', L:'inductance', XL:'inductive reactance' },
+    IMG: { L:'ind/dndind/inductance.JPG', XL:'ind/dndind/inductive-reactance.JPG' },
     UNIT: { f:'Hz', L:'H', XL:'Ω' },
     NAME_ALIASES: { f: ['frequency'], L: ['inductance', 'self-inductance'], XL: ['inductive reactance', 'reactance'] },
     SYMBOL_ALIASES: { f: ['f'], L: ['l'], XL: ['xl'] },
@@ -6093,6 +6141,7 @@ function indArea(v){
     CLR: { L: capColor('#8A2B6C','#D67FB2'), C: capColor('#6B2BB0','#B27FE8'), f0: capColor('#1B8A6B','#5FD1AC') },
     LABEL: { L:'L', C:'C', f0:'f0' },
     NAME: { L:'inductance', C:'capacitance', f0:'resonant frequency' },
+    IMG: { L:'ind/dndind/inductance.JPG', C:'caps/dndcaps/capacitance.JPG', f0:'ind/dndind/resonant-frequency.JPG' },
     UNIT: { L:'H', C:'F', f0:'Hz' },
     NAME_ALIASES: { L: ['inductance'], C: ['capacitance'], f0: ['resonant frequency', 'resonance frequency'] },
     SYMBOL_ALIASES: { L: ['l'], C: ['c'], f0: ['f0', 'fo', 'f naught', 'fnaught'] },
@@ -6124,6 +6173,155 @@ function indArea(v){
   });
 })();
 </script>
+
+<script>
+(function(){
+  "use strict";
+  var id = 'hconv';
+  var CLR = { light:'#1B6E8A', dark:'#5FC4E8' };
+  function colorNow(){ return isDarkMode() ? CLR.dark : CLR.light; }
+  var MH_POOL = [1, 2.2, 4.7, 10, 22, 47, 100, 220, 330, 470, 680, 1000];
+  var H_UNIT_ALIASES = IND_UNIT_ALIASES.L;
+  var TO_H_SCENARIOS = [
+    "A coil is labelled {MH} mH. Write its inductance in plain henries (no prefix).",
+    "An inductor is rated at {MH} mH. Express this value in henries, with no prefix on the unit.",
+    "An inductor's datasheet gives its inductance as {MH} mH. Convert that to henries."
+  ];
+  var TO_MH_SCENARIOS = [
+    "A calculation gives an inductance of {H} H. Write this value in millihenries (mH), the way it would actually be printed on a coil.",
+    "An inductor's inductance works out to {H} H. Express that as a value in mH.",
+    "You calculate an inductance of {H} H for a filter circuit. Convert that into mH."
+  ];
+
+  var score = 0, asked = 0;
+  var ROUND_SIZE = 6;
+  var current = null;
+
+  function newProblem(){
+    var mh = pick(MH_POOL);
+    var direction = Math.random() < 0.5 ? 'toH' : 'toMH';
+    var correctSI = mh * 1e-3;
+    var scenario = direction === 'toH'
+      ? pick(TO_H_SCENARIOS).split('{MH}').join(sig3(mh))
+      : pick(TO_MH_SCENARIOS).split('{H}').join(sig3(correctSI));
+    current = { mh: mh, direction: direction, correct: correctSI, scenario: scenario };
+    renderProblem();
+  }
+
+  function renderProblem(){
+    var card = document.getElementById('problemCard-'+id);
+    var d = current.direction;
+    var col = colorNow();
+    var givenHtml, findLabel, hintText;
+    if(d === 'toH'){
+      givenHtml = '<span class="fact-chip" style="color:'+col+';border-color:'+col+'">L = ' + sig3(current.mh) + ' mH</span>';
+      findLabel = 'Find: L in plain henries (no prefix)';
+      hintText = 'Write the number, then the unit — just &quot;H&quot;, no prefix letter in front of it.';
+    } else {
+      givenHtml = '<span class="fact-chip" style="color:'+col+';border-color:'+col+'">L = ' + sig3(current.correct) + ' H</span>';
+      findLabel = 'Find: L in mH';
+      hintText = 'Write the number the way it would appear on a real coil label, then the unit &quot;mH&quot;.';
+    }
+    var factsRowHtml = '<div class="facts-row">' + givenHtml +
+      '<span class="find-chip" style="color:'+col+';border-color:'+col+'">' + findLabel + '</span></div>';
+
+    card.innerHTML =
+      '<p class="problem-text">' + current.scenario + '</p>' +
+      factsRowHtml +
+      '<div class="field-row">' +
+        '<label>Your answer</label>' +
+        '<div class="answer-row">' +
+          '<input id="answerInput-'+id+'" class="answer-value-input" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00">' +
+          '<input id="answerUnitInput-'+id+'" class="answer-unit-input" type="text" autocomplete="off" spellcheck="false" placeholder="unit">' +
+          buildCalculatorHtml() +
+        '</div>' +
+        '<p class="field-hint">' + hintText + '</p>' +
+      '</div>' +
+      '<div class="actions-row">' +
+        '<button class="check-btn" id="checkBtn-'+id+'" type="button">Check</button>' +
+        '<span class="feedback" id="feedback-'+id+'" aria-live="polite"></span>' +
+      '</div>';
+
+    document.getElementById('checkBtn-'+id).addEventListener('click', checkAnswer);
+    card.querySelectorAll('input').forEach(function(el){
+      el.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); checkAnswer(); } });
+    });
+    wireCalculator(card);
+    document.getElementById('answerInput-'+id).focus();
+  }
+
+  function checkAnswer(){
+    var answerEl = document.getElementById('answerInput-'+id);
+    var answerUnitEl = document.getElementById('answerUnitInput-'+id);
+    var feedback = document.getElementById('feedback-'+id);
+    var checkBtn = document.getElementById('checkBtn-'+id);
+    function mark(el, ok){ el.classList.remove('ok','bad'); el.classList.add(ok ? 'ok' : 'bad'); }
+
+    var requiredScale = current.direction === 'toH' ? 1 : 1e-3;
+    var unitScaleUsed = unitScale(H_UNIT_ALIASES, answerUnitEl.value);
+    var unitRight = unitScaleUsed === requiredScale;
+    mark(answerUnitEl, unitRight);
+
+    var numRight = closeEnough(normalizeNumber(answerEl.value) * (unitScaleUsed || 1), current.correct);
+    mark(answerEl, numRight);
+
+    var message = '';
+    if(!numRight){ message = 'Not quite — check your powers of ten and try again.'; }
+    else if(!unitRight){
+      message = current.direction === 'toH'
+        ? 'Right number, but write it with no prefix — just "H".'
+        : 'Right number, but write it with the m (milli) prefix — "mH", not plain "H".';
+    }
+
+    asked++;
+    if(numRight && unitRight){
+      score++;
+      document.getElementById('scoreBadge-'+id).innerHTML = '<b>'+score+'</b> / '+ROUND_SIZE+' correct this round';
+      checkBtn.disabled = true;
+      feedback.textContent = '';
+      var correctModal = document.getElementById('correctModal');
+      correctModal.hidden = false;
+      setTimeout(function(){
+        correctModal.hidden = true;
+        if(asked >= ROUND_SIZE){ showRoundDone(); } else { newProblem(); }
+      }, 1000);
+    } else {
+      feedback.textContent = message;
+      asked--;
+    }
+  }
+
+  function showRoundDone(){
+    var modal = document.getElementById('roundDoneModal');
+    var title = document.getElementById('roundDoneTitle');
+    var summary = document.getElementById('roundDoneSummary');
+    var btn = document.getElementById('roundDoneBtn');
+    if(score === ROUND_SIZE){
+      title.textContent = "Perfect round!";
+      summary.textContent = "All " + ROUND_SIZE + " correct.";
+    } else {
+      title.textContent = "Round complete";
+      summary.textContent = score + " out of " + ROUND_SIZE + " correct. Have another go to lock it in.";
+    }
+    btn.onclick = function(){ modal.hidden = true; startRound(); };
+    modal.hidden = false;
+    btn.focus();
+  }
+
+  function startRound(){
+    score = 0; asked = 0;
+    document.getElementById('scoreBadge-'+id).innerHTML = '<b>0</b> / '+ROUND_SIZE+' correct this round';
+    newProblem();
+  }
+
+  document.getElementById('newRoundBtn-'+id).addEventListener('click', startRound);
+
+  window.formulaLabTopics = window.formulaLabTopics || [];
+  window.formulaLabTopics.push(startRound);
+  startRound();
+})();
+</script>
+
 <script>
 (function(){
   "use strict";

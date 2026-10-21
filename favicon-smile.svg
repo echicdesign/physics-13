@@ -1,6 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-<circle cx="50" cy="50" r="45" fill="#FFD43B"/>
-<circle cx="35" cy="40" r="6" fill="#222"/>
-<circle cx="65" cy="40" r="6" fill="#222"/>
-<path d="M30 60 Q50 80 70 60" stroke="#222" stroke-width="6" fill="none" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <clipPath id="tophalf"><path d="M4.5 18.8A11.5 11.5 0 0 1 27.5 18.8z"/></clipPath>
+    <path id="g" d="M0-2.2L2 0 0 2.2-2 0z"/>
+  </defs>
+  <style>
+    .ink{stroke:#1f2430;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+    .dot{fill:#1f2430}
+    @media (prefers-color-scheme: dark){ .ink{stroke:#eef0f4} .dot{fill:#eef0f4} }
+  </style>
+  <!-- ragged, part-filled pile in the top half of the head -->
+  <g clip-path="url(#tophalf)">
+    <use href="#g" x="6"  y="16.6" fill="#3d8ef0"/>
+    <use href="#g" x="10" y="16.6" fill="#e5487a"/>
+    <use href="#g" x="14" y="16.6" fill="#2bb5a4"/>
+    <use href="#g" x="18" y="16.6" fill="#f2a33a"/>
+    <use href="#g" x="22" y="16.6" fill="#7a5cf0"/>
+    <use href="#g" x="26" y="16.6" fill="#e5487a"/>
+    <use href="#g" x="12" y="13.1" fill="#f2a33a"/>
+    <use href="#g" x="16" y="13.1" fill="#7a5cf0"/>
+    <use href="#g" x="20" y="13.1" fill="#3d8ef0"/>
+    <use href="#g" x="23.6" y="12.6" fill="#2bb5a4" transform="rotate(25 23.6 12.6)"/>
+  </g>
+  <!-- stream of gems still arriving through the crown -->
+  <use href="#g" x="16.4" y="9.2" fill="#e5487a" transform="rotate(-20 16.4 9.2)"/>
+  <use href="#g" x="15.6" y="5"   fill="#2bb5a4" transform="rotate(15 15.6 5)"/>
+  <use href="#g" x="16.4" y="1.2" fill="#f2a33a"/>
+  <!-- smiling face -->
+  <path class="ink" d="M18 7.18A11.5 11.5 0 1 1 14 7.18"/>
+  <circle class="dot" cx="11.8" cy="21.4" r="1.7"/>
+  <circle class="dot" cx="20.2" cy="21.4" r="1.7"/>
+  <path class="ink" d="M10.8 24.6q5.2 4.2 10.4 0"/>
 </svg>
