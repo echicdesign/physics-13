@@ -1323,11 +1323,44 @@
 (function(){
   "use strict";
   var topicSelect = document.getElementById('topicSelect');
-  topicSelect.addEventListener('change', function(){
-    var id = topicSelect.value;
+
+  function selectTopic(id){
+    var opt = topicSelect.querySelector('option[value="' + id + '"]');
+    if(!opt) return false;
+    topicSelect.value = id;
     document.querySelectorAll('.topic-panel').forEach(function(p){
       p.hidden = (p.getAttribute('data-topic') !== id);
     });
+    return true;
+  }
+
+  function updateUrlParams(topic, mode){
+    try{
+      var url = new URL(window.location.href);
+      if(topic) url.searchParams.set('topic', topic);
+      if(mode) url.searchParams.set('mode', mode);
+      else url.searchParams.delete('mode');
+      window.history.replaceState(null, '', url);
+    }catch(e){}
+  }
+
+  topicSelect.addEventListener('change', function(){
+    selectTopic(topicSelect.value);
+    updateUrlParams(topicSelect.value, null);
+  });
+
+  // Deep-link: ?topic=xl opens straight to that topic; &mode= is written
+  // back whenever a student picks Learner/Confident/Expert, so the URL
+  // always shows exactly what they're working on (e.g. ?topic=xl&mode=confident).
+  try{
+    var wantedTopic = new URLSearchParams(window.location.search).get('topic');
+    if(wantedTopic) selectTopic(wantedTopic);
+  }catch(e){}
+
+  document.addEventListener('click', function(e){
+    var modeBtn = e.target.closest && e.target.closest('.mode-btn');
+    if(!modeBtn) return;
+    updateUrlParams(topicSelect.value, modeBtn.getAttribute('data-mode'));
   });
 
   document.getElementById('newStudentBtn').addEventListener('click', function(){
